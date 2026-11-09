@@ -15,13 +15,18 @@ function CategoryNode({ node }: { node: GraphNode }) {
   const style = {
     ...coordinates(...node.position),
     '--size': `${node.size / width * 100}cqw`,
-    '--tone': node.tone,
   } as CSSProperties;
   const name = <><GraphIcon id={node.id} /><span>{node.label}</span></>;
   const description = `relationship-${node.id}`;
 
   return (
     <li className="category" style={style}>
+      <svg className="graph-edges" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden="true">
+        <path className="edge-line" d={node.curve} />
+        {node.highlights.map(([cx, cy]) => (
+          <circle className="edge-glint" key={cx} cx={cx} cy={cy} r="3" />
+        ))}
+      </svg>
       {node.href
         ? <a className="node category-node" href={node.href} aria-describedby={description}>{name}</a>
         : <div className="node category-node" role="group" tabIndex={0} aria-label={node.label}
@@ -35,22 +40,7 @@ export default function KnowledgeGraph() {
   const { x, y, size, label } = centerNode;
 
   return (
-    <div className="knowledge-graph" role="group" aria-label="Personal knowledge graph">
-      <svg className="graph-edges" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden="true">
-        {graphNodes.map((node) => (
-          <g key={node.id} style={{ color: node.tone }}>
-            <path className="edge-halo" d={node.curve} />
-            <path className="edge-line" d={node.curve} />
-            {node.highlights.map(([cx, cy]) => (
-              <g key={cx}>
-                <ellipse className="edge-glint" cx={cx} cy={cy} rx="9" ry="5" />
-                <ellipse className="edge-core" cx={cx} cy={cy} rx="5" ry="2.4" />
-              </g>
-            ))}
-          </g>
-        ))}
-      </svg>
-
+    <div id="knowledge-graph" className="knowledge-graph" tabIndex={-1} role="group" aria-label="Personal knowledge graph">
       <div className="center-orbit" style={{
         ...coordinates(x, y),
         '--size': `${size / width * 100}cqw`,

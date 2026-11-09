@@ -1,23 +1,17 @@
 ---
 import KnowledgeGraph from '../components/KnowledgeGraph';
-import WaveField from '../components/WaveField.astro';
 import SiteLayout from '../layouts/SiteLayout.astro';
 ---
 <SiteLayout title="DG — Personal Knowledge Graph">
   <main id="main-content" class="home-scene" tabindex="-1" aria-labelledby="home-title">
-    <div class="home-caption text-center">
-      <div class="caption-ornament" aria-hidden="true">
-        <svg viewBox="0 0 30 30" width="26" height="26">
-          <path fill="currentColor" d="M15 0c1.9 11 4 13.1 15 15-11 1.9-13.1 4-15 15C13.1 19 11 16.9 0 15 11 13.1 13.1 11 15 0Z" />
-        </svg>
+    <section class="home-intro" aria-labelledby="home-title">
+      <p class="home-eyebrow">A PERSONAL KNOWLEDGE GRAPH</p>
+      <h1 id="home-title">My world, connected.</h1>
+      <p class="home-description">A living map of what I study, build, research, and enjoy.</p>
+      <div class="intro-action">
+        <a href="#knowledge-graph" class="explore-link">Explore the graph <span aria-hidden="true">→</span></a>
       </div>
-      <h1 id="home-title">My Personal Knowledge Graph</h1>
-      <p>A living map of what I study, build, explore, and enjoy.</p>
-      <svg class="caption-chevron mx-auto" viewBox="0 0 24 16" fill="none" aria-hidden="true">
-        <path d="m2 3 10 10L22 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </div>
+    </section>
     <KnowledgeGraph client:idle />
-    <WaveField />
   </main>
 </SiteLayout>

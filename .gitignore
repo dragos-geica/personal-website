@@ -3,3 +3,18 @@ dist/
 .astro/
 .local-tools/
 .DS_Store
+
+# Local environment files and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Temporary files and logs
+tmp/
+*.tmp
+*.swp
+*.log
