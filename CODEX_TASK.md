@@ -1,4 +1,4 @@
-# Stage 2 — Pulses, pop animation, and expandable branches
+# Stage 3 — Content panel, project pages, and final polish
 
 # Non-negotiable design constraints
 
@@ -7,27 +7,27 @@ The images in `references/` are **visual targets**, not page backgrounds. Rebuil
 Use Astro + TypeScript + Tailwind CSS and a small React island for the graph, unless an existing repository has a clear established alternative. Use editable typed graph data. Do not deploy, purchase services, or publish personal data. Prefer deterministic responsive layouts over randomized physics. Use accessible buttons, keyboard actions, focus indicators, `prefers-reduced-motion`, and mobile fallbacks.
 
 ## Prerequisite
-Stage 1 must already be complete in this repo. Inspect existing code first, **preserve working page structure and theme**.
+Stages 1 and 2 are complete. Inspect the current repo; **do not rebuild or replace the graph**.
 
 ## Objective
-Implement the actual **graph interactions** shown in screenshot 2, WITHOUT building project detail content or full project routes in this stage.
+Implement the content-reveal state from screenshot 3, finish internal routes and improve polish while retaining the graph and animations.
 
 ## Must deliver
-- Subtle center-to-node light pulse traveling over SVG edges every ~3–6 s with at most 1–2 sparks per edge. Never flashy.
-- Gentle node breathing (~1.00 to 1.015), hover and focus emphasis (~1.03).
-- Click `Projects`: bright traveling pulse, 1.06–1.10 scale anticipation, damped 1–3 px jitter, single quick pop/halo with small particles, staggered reveal of four children (AirBox Bootcamp, EcoCrafting, Neo4j Demo, Data Visualizations). Keep Projects visible as the parent hub.
-- Use timing guidelines: onset 0–100ms; anticipation 100–300ms; burst 300–550ms; children appear 450–950ms. Treat these as tunable.
-- Support equivalent expanding/collapsing behavior for the other seven categories using **clearly labeled editable placeholder children**, not invented facts.
-- Click child gives a visible `selected` state and an **honest temporary selected-label UI** only. Do not implement detail panels or content routes yet; this comes in Stage 3.
-- Collapse via parent click, close control, and Escape; avoid stuck animation state when clicking rapidly. Sensible ARIA expanded states and keyboard operation.
-- Reduced-motion mode disables sparks, shakes, and particles but keeps immediate functional expansion.
-- State transitions are unit/testable and animation not used as sole signal.
+- Selecting `AirBox Bootcamp` highlights that child and elegantly reveals a large rounded panel **below the graph**; maintain graph context above. Scroll smoothly when motion allowed.
+- Panel follows mockup 3: image placeholder left (unless genuine provided), Project eyebrow + serif title + accurate summary right, metric cards, `View Case Study` CTA.
+- Accurate AirBox facts: $10,000 Projects for Peace grant; 120+ **registrants**, 60 online-phase completers, 12 finalists who built and deployed monitors, public air-quality dataset. Do NOT imply 120+ graduated or participated in person.
+- Click CTA -> real internal route `/projects/airbox-bootcamp` with meaningful factual content and clear return/back path.
+- Add real, editable routes/placeholders for EcoCrafting, Neo4j Demo, Data Visualizations, Research, About, CV; never invent publications, outcomes, songs, favorite books, images or links.
+- Other expanded categories should lead to honest informational previews or placeholder routes, not dead-end buttons.
+- Handle browser back and forward so selected content and graph state behave sensibly; maintain focus.
+- Add metadata/SEO, accessibility checks, small-screen responsive content layout, image optimization, performance review, project README documentation.
+- Visual comparison at 1440×900 and 390×844 across all three mockup states; resolve noticeable spacing/colors/typography differences without placing screenshots on the page.
 
 ## Verification / stop point
-Build/lint/typecheck and manually test: idle -> expand Projects -> select AirBox -> collapse -> repeat; expand another category; mobile; keyboard; reduced motion; rapid double click. Visually compare expanded state to `references/02-projects-burst-light.png`, keeping Stage 1 styling. **Stop after Stage 2. Do not build detail panels, case-study pages, or deploy.**
+Build/lint/typecheck; check all interactive paths including Home -> Projects -> AirBox -> detail -> back -> collapse; other categories, mobile, keyboard, reduced motion, empty placeholders, broken links, no horizontal overflow, and no console errors. **Stop after Stage 3 and do not deploy unless requested.**
 
 ## Final report
-Summarize behavior implemented, test results, visual differences, any known bugs, and Git checkpoint.
+Provide exact commands, full completion checklist, actual versus placeholder content, remaining limitations, and deployment guidance only (no deployment). Commit changes if possible.
 
 ## How to start Codex
 

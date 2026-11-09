@@ -58,10 +58,10 @@ body {
   padding: .65rem 1rem;
   border-radius: .5rem;
   background: var(--header);
-  transform: translateY(-180%);
+  clip-path: inset(50%);
 }
 
-.skip-link:focus { transform: translateY(0); }
+.skip-link:focus { clip-path: none; }
 
 .site-header {
   position: relative;
@@ -690,4 +690,172 @@ astro-island { display: contents; }
   }
 
   .edge-spark, .node-burst { display: none; }
+}
+
+.site-nav a[data-section-active="true"] { border-bottom-color: currentColor; }
+
+@media (min-width: 881px) {
+  .home-scene:has(.content-panel) {
+    grid-template-rows: max(calc(100svh - var(--header-height) - 4.8vw), 46.2vw) auto;
+    row-gap: 1.5rem;
+  }
+}
+
+.content-panel {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding: clamp(1.1rem, 2.15vw, 2.25rem);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  background: var(--node);
+  box-shadow: 0 14px 38px var(--shadow);
+  scroll-margin-top: 1rem;
+}
+
+.project-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 7fr);
+  gap: clamp(1.2rem, 2.5vw, 2.65rem);
+}
+
+.preview-copy { min-width: 0; }
+.preview-copy h2 { width: fit-content; }
+
+.preview-copy h2, .project-detail h1 {
+  margin: .3rem 0 .7rem;
+  font: 500 clamp(2rem, 3.05vw, 3.2rem)/1.07 Georgia, "Times New Roman", serif;
+  letter-spacing: -.035em;
+  overflow-wrap: anywhere;
+}
+
+.preview-summary, .detail-summary {
+  max-width: 72ch;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.project-image-placeholder, .project-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+.project-image {
+  height: auto;
+  object-fit: cover;
+}
+
+.project-image-placeholder {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: .7rem;
+  padding: 1rem;
+  background: linear-gradient(145deg, var(--accent), var(--node-shade));
+  color: var(--accent-ink);
+  text-align: center;
+  font-size: .88rem;
+  font-weight: 570;
+}
+
+.project-image-placeholder svg { width: 2.5rem; }
+
+.project-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(7.5rem, 100%), 1fr));
+  gap: .65rem;
+  margin: 1.15rem 0;
+}
+
+.project-metrics > div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: .25rem;
+  min-width: 0;
+  padding: .7rem .8rem;
+  border: 1px solid var(--border);
+  border-radius: .65rem;
+  background: var(--node-shade);
+}
+
+.project-metrics dt { color: var(--muted); font-size: .8rem; line-height: 1.28; }
+.project-metrics dd { color: var(--accent-ink); font-size: 1.15rem; font-weight: 650; line-height: 1.15; }
+
+.preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .55rem 1rem;
+  margin-top: 1.15rem;
+}
+
+.return-node {
+  min-height: 44px;
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: .2em;
+  cursor: pointer;
+}
+
+.project-detail { padding-top: clamp(2rem, 5vw, 4rem); }
+
+.project-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: 2rem;
+  color: var(--muted);
+  font-size: .86rem;
+}
+
+.project-breadcrumb a, .detail-section a, .project-directory a {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+
+.detail-image {
+  aspect-ratio: 16 / 7;
+  margin-top: 1.5rem;
+}
+
+.detail-section { margin-top: 1.4rem; }
+.detail-section h2 { margin-bottom: .3rem; font-size: 1.15rem; font-weight: 650; }
+.detail-section p { line-height: 1.6; }
+
+.project-directory {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
+  gap: .8rem;
+  margin-top: 1.5rem;
+}
+
+.project-directory li {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: .75rem;
+  background: var(--node);
+}
+
+.project-directory a { display: inline-block; padding: .4rem 0; font-weight: 650; }
+.project-directory p { font-size: .86rem; }
+
+@media (max-width: 620px) {
+  .content-panel { border-radius: 1rem; }
+  .project-preview { grid-template-columns: minmax(0, 1fr); }
+  .project-preview :is(.project-image-placeholder, .project-image) { aspect-ratio: 16 / 9; }
+}
+
+.graph-primary[data-restored="true"] {
+  transition: none;
+}
+
+.graph-primary[data-restored="true"] :is(.category-node[aria-expanded="true"], .child-node) {
+  animation: none;
+}
+
+.graph-primary[data-restored="true"] :is(.activation-spark, .node-burst) {
+  display: none;
 }

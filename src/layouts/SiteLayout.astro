@@ -3,9 +3,12 @@ import '../styles/global.css';
 
 interface Props {
   title: string;
+  description?: string;
+  noindex?: boolean;
 }
 
-const { title } = Astro.props;
+const { title, description = 'A living map of what I study, build, research, and enjoy.', noindex } = Astro.props;
+const canonical = Astro.site && new URL(Astro.url.pathname, Astro.site);
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const navigation = [
   { label: 'Home', href: '/' },
@@ -20,7 +23,12 @@ const navigation = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="A living map of what I study, build, research, and enjoy." />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    {canonical && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{title}</title>
     <script is:inline>
@@ -38,7 +46,7 @@ const navigation = [
         <a class="brand" href="/" aria-label="DG home">DG</a>
         <nav class="site-nav flex items-center justify-center" aria-label="Main navigation">
           {navigation.map(({ label, href }) => (
-            <a href={href} aria-current={currentPath === (href.replace(/\/$/, '') || '/') ? 'page' : undefined}>
+            <a href={href} data-section-active={href === '/projects/' && currentPath.startsWith(href) ? 'true' : undefined} aria-current={currentPath === (href.replace(/\/$/, '') || '/') ? 'page' : undefined}>
               {label}
             </a>
           ))}

@@ -1,3 +1,5 @@
+import { projects } from './projects.ts';
+
 export const graphCanvas = { width: 1080, height: 815 };
 export const centerNode = { x: 531, y: 411, size: 212, label: 'Me' };
 
@@ -48,7 +50,7 @@ export const graphNodes = [
     size: 152,
     pill: [800, 327],
     curve: 'M 901 318 C 866 319 841 337 800 327 S 698 375 631 392',
-    children: ['AirBox Bootcamp', 'EcoCrafting', 'Neo4j Demo', 'Data Visualizations'],
+    children: projects.map(({ title }) => title),
     tone: '#8eb8e9',
     href: '/projects/',
   },
