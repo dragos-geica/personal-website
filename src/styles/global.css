@@ -182,6 +182,8 @@ astro-island { display: contents; }
   position: relative;
   min-width: 0;
   container-type: inline-size;
+  overflow: clip;
+  overflow-clip-margin: 12px;
 }
 
 .knowledge-graph:focus-visible { outline-offset: 0; }
@@ -204,12 +206,7 @@ astro-island { display: contents; }
   vector-effect: non-scaling-stroke;
 }
 
-.edge-glint {
-  fill: #f6fbff;
-  filter: drop-shadow(0 0 3px #7ba5db);
-}
-
-.category:has(.category-node:is(:hover, :focus-visible)) .edge-line {
+.category:has(.category-node:is(:hover, :focus-visible, [aria-expanded="true"])) .edge-line {
   stroke: var(--edge-active);
   stroke-width: 1.7;
 }
@@ -245,15 +242,15 @@ astro-island { display: contents; }
   transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
 }
 
-.category-node:is(:hover, :focus-visible) {
+.category-node:is(:hover, :focus-visible, [aria-expanded="true"]) {
   border-color: color-mix(in srgb, var(--focus) 55%, var(--border));
   background: var(--accent);
   box-shadow: 0 12px 27px var(--halo);
 }
 
 .category-node span { max-width: 92%; text-wrap: balance; }
-.category:nth-child(4) .category-node span,
-.category:last-child .category-node span { max-width: 70%; }
+#category-data-tools span,
+#category-interests span { max-width: 70%; }
 
 .graph-icon { width: 32%; height: auto; }
 
@@ -275,7 +272,7 @@ astro-island { display: contents; }
   white-space: nowrap;
 }
 
-.category:has(.category-node:is(:hover, :focus-visible)) .relationship {
+.category:has(.category-node:is(:hover, :focus-visible, [aria-expanded="true"])) .relationship {
   border-color: var(--edge-active);
   color: var(--accent-ink);
 }
@@ -323,6 +320,224 @@ astro-island { display: contents; }
   text-transform: uppercase;
 }
 
+.graph-primary {
+  position: absolute;
+  inset: 0;
+  transition: left 360ms ease, right 360ms ease;
+}
+
+.graph-primary[data-branch-side="left"] { left: 22%; }
+.graph-primary[data-branch-side="right"] { right: 22%; }
+
+.graph-primary[data-branch-side] {
+  transition-duration: 220ms;
+  transition-delay: 200ms;
+}
+
+.graph-primary[data-branch-side] :is(.category-node, .center-orbit) {
+  width: calc(var(--size) * .87);
+}
+
+.edge-spark {
+  fill: none;
+  stroke: #dcecff;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-dasharray: 1 105;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 2px #5285be);
+  opacity: 0;
+  animation: graph-pulse var(--pulse-cycle) linear var(--pulse-delay) infinite;
+}
+
+.edge-spark.activation-spark {
+  stroke: #eff8ff;
+  stroke-width: 4;
+  animation: activation-pulse 315ms linear both;
+}
+
+@keyframes graph-pulse {
+  0% { stroke-dashoffset: -100; opacity: 0; }
+  5% { opacity: 1; }
+  27% { stroke-dashoffset: 0; opacity: 1; }
+  32%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+
+@keyframes activation-pulse {
+  0% { stroke-dashoffset: -100; opacity: 0; }
+  12%, 83% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+.category-node {
+  cursor: pointer;
+  animation: node-breathe 5.6s ease-in-out var(--pulse-delay) infinite;
+}
+
+.category-node:is(:hover, :focus-visible), .center-node:is(:hover, :focus-visible) {
+  scale: 1.03;
+}
+
+.category-node:is(:hover, :focus-visible) { animation: none; }
+
+.category-node[aria-expanded="true"] {
+  z-index: 3;
+  animation: node-pop 550ms ease-out both;
+}
+
+@keyframes node-breathe {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.015; }
+}
+
+@keyframes node-pop {
+  0%, 13% { scale: 1; translate: 0; }
+  31% { scale: 1.075; translate: -2px 1px; }
+  39% { scale: 1.09; translate: 3px -1px; }
+  46% { translate: -2px 1px; }
+  53% { scale: 1.09; translate: 1px 0; }
+  60% { scale: .98; translate: 0; }
+  78% { scale: 1.035; }
+  100% { scale: 1.02; }
+}
+
+.node-burst {
+  position: absolute;
+  z-index: 4;
+  top: var(--y);
+  left: var(--x);
+  width: calc(var(--size) * .87);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.node-burst::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 2px solid var(--edge-active);
+  border-radius: 50%;
+  animation: pop-halo 260ms ease-out 300ms both;
+}
+
+.node-burst i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--edge-active);
+  animation: pop-particle 250ms ease-out 310ms both;
+}
+
+@keyframes pop-halo {
+  from { opacity: .5; scale: 1; }
+  to { opacity: 0; scale: 1.37; }
+}
+
+@keyframes pop-particle {
+  from { opacity: .7; transform: translate(calc(var(--dx) * .64), calc(var(--dy) * .64)); }
+  to { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.4); }
+}
+
+.graph-branch {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.branch-edges, .branch-children {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.branch-edges { z-index: 1; pointer-events: none; }
+
+.branch-edge {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 1.1;
+  vector-effect: non-scaling-stroke;
+}
+
+.branch-children { list-style: none; }
+
+.branch-children li {
+  position: absolute;
+  z-index: 2;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+}
+
+.child-node {
+  width: clamp(64px, 10.3cqw, 116px);
+  aspect-ratio: 1;
+  padding: .25rem;
+  border: 1px solid var(--border);
+  background: linear-gradient(155deg, var(--node), var(--node-shade));
+  box-shadow: 0 7px 17px var(--shadow);
+  font-size: clamp(.68rem, 1.31cqw, .9rem);
+  font-weight: 590;
+  line-height: 1.18;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.child-node:is(:hover, :focus-visible, [aria-pressed="true"]) {
+  border-color: var(--edge-active);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.child-node {
+  animation: child-reveal 235ms ease-out calc(450ms + var(--order) * 70ms) both;
+}
+
+.child-node:focus-visible { animation: none; }
+
+@keyframes child-reveal {
+  from { opacity: 0; visibility: hidden; }
+  to { opacity: 1; visibility: visible; }
+}
+
+.branch-actions {
+  position: absolute;
+  z-index: 4;
+  top: .35rem;
+  left: calc(100% + 2.4cqw);
+  width: 19cqw;
+  display: grid;
+  justify-items: start;
+  gap: .45rem;
+  pointer-events: auto;
+}
+
+.graph-branch[data-side="left"] .branch-actions {
+  left: auto;
+  right: calc(100% + 2.4cqw);
+}
+
+.branch-close {
+  padding: .35rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: .45rem;
+  background: var(--node);
+  font-size: .8rem;
+  cursor: pointer;
+}
+
+.branch-close:hover { background: var(--accent); }
+.branch-selection { color: var(--muted); font-size: .8rem; }
+
 .section-page {
   width: min(86%, 48rem);
   padding: clamp(3.5rem, 9vw, 8rem) 0;
@@ -366,7 +581,61 @@ astro-island { display: contents; }
   .home-intro h1 { font-size: clamp(2.6rem, 8vw, 4.75rem); }
   .intro-action { margin-top: 1.35rem; padding-top: 0; border: 0; }
 
-  .graph-edges { display: none; }
+  .knowledge-graph { overflow: visible; }
+
+  .graph-edges, .branch-edges { display: none; }
+
+  .graph-primary, .graph-primary[data-branch-side] {
+    position: relative;
+    inset: auto;
+  }
+
+  .graph-primary[data-branch-side] .category-node { width: min(100%, 35vw, 155px); }
+
+  .graph-primary[data-branch-side] .center-orbit { width: clamp(125px, 39vw, 200px); }
+
+  .node-burst {
+    grid-area: 1 / 1;
+    position: relative;
+    inset: auto;
+    width: min(100%, 35vw, 155px);
+    transform: none;
+  }
+
+  .category > .category-node { grid-area: 1 / 1; }
+
+  .graph-branch {
+    position: relative;
+    grid-column: 1 / -1;
+    margin: -.4rem 0 .4rem;
+    padding: .9rem;
+    border: 1px solid var(--border);
+    border-radius: .85rem;
+  }
+
+  .graph-branch .branch-actions, .graph-branch[data-side="left"] .branch-actions {
+    position: static;
+    width: auto;
+    margin-bottom: .85rem;
+  }
+
+  .branch-children {
+    position: static;
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .55rem;
+  }
+
+  .branch-children li { position: static; transform: none; }
+
+  .child-node {
+    width: 100%;
+    min-height: 3rem;
+    aspect-ratio: auto;
+    border-radius: .55rem;
+    font-size: .81rem;
+  }
 
   .graph-categories, .category-node, .relationship, .center-orbit {
     position: relative;
@@ -415,5 +684,10 @@ astro-island { display: contents; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .node { transition: none; }
+  .knowledge-graph *, .knowledge-graph *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .edge-spark, .node-burst { display: none; }
 }

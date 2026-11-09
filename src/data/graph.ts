@@ -11,7 +11,7 @@ export interface GraphNode {
   size: number;
   pill: Point;
   curve: string;
-  highlights: readonly Point[];
+  children: readonly string[];
   tone: string;
   href?: string;
 }
@@ -25,7 +25,7 @@ export const graphNodes = [
     size: 156,
     pill: [383, 185],
     curve: 'M 316 146 C 350 153 352 180 383 185 S 426 275 472 334',
-    highlights: [[425.3, 247.3]],
+    children: ['Coursework placeholder', 'Academic notes placeholder'],
     tone: '#9aabeb',
   },
   {
@@ -36,7 +36,7 @@ export const graphNodes = [
     size: 152,
     pill: [690, 185],
     curve: 'M 756 146 C 719 155 719 181 690 185 S 644 276 594 334',
-    highlights: [[651.1, 236.6]],
+    children: ['Research topic placeholder', 'Reading notes placeholder'],
     tone: '#b398ed',
     href: '/research/',
   },
@@ -48,7 +48,7 @@ export const graphNodes = [
     size: 152,
     pill: [800, 327],
     curve: 'M 901 318 C 866 319 841 337 800 327 S 698 375 631 392',
-    highlights: [[720.5, 351.9]],
+    children: ['AirBox Bootcamp', 'EcoCrafting', 'Neo4j Demo', 'Data Visualizations'],
     tone: '#8eb8e9',
     href: '/projects/',
   },
@@ -60,7 +60,7 @@ export const graphNodes = [
     size: 152,
     pill: [788, 495],
     curve: 'M 898 521 C 861 516 849 495 788 495 S 686 449 632 437',
-    highlights: [[665.4, 448.7]],
+    children: ['Tool placeholder', 'Dataset placeholder'],
     tone: '#82c9c4',
   },
   {
@@ -71,7 +71,7 @@ export const graphNodes = [
     size: 152,
     pill: [675, 618],
     curve: 'M 748 676 C 708 664 704 635 675 618 S 618 556 586 502',
-    highlights: [[635.3, 578.9]],
+    children: ['Artist placeholder', 'Playlist placeholder'],
     tone: '#d99ccf',
   },
   {
@@ -82,7 +82,7 @@ export const graphNodes = [
     size: 146,
     pill: [384, 614],
     curve: 'M 316 674 C 353 662 360 629 384 614 S 435 551 479 501',
-    highlights: [[418.2, 578.2]],
+    children: ['Book placeholder', 'Article placeholder'],
     tone: '#deb6a0',
   },
   {
@@ -93,7 +93,7 @@ export const graphNodes = [
     size: 146,
     pill: [284, 493],
     curve: 'M 170 518 C 213 510 234 480 284 493 S 373 453 430 438',
-    highlights: [[362.0, 471.4]],
+    children: ['Destination placeholder', 'Travel notes placeholder'],
     tone: '#81c9da',
   },
   {
@@ -104,7 +104,7 @@ export const graphNodes = [
     size: 145,
     pill: [285, 330],
     curve: 'M 178 317 C 224 323 231 337 285 330 S 384 371 431 388',
-    highlights: [[406.1, 376.5]],
+    children: ['Interest placeholder', 'Activity placeholder'],
     tone: '#b79ce9',
   },
 ] as const satisfies readonly GraphNode[];

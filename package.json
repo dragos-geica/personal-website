@@ -10,7 +10,8 @@
     "dev": "astro dev --host 127.0.0.1",
     "check": "astro check",
     "build": "astro build",
-    "preview": "astro preview --host 127.0.0.1"
+    "preview": "astro preview --host 127.0.0.1",
+    "test": "node --experimental-strip-types --test"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.0",
