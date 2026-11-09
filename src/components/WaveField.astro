@@ -1,0 +1,36 @@
+---
+const bands = [
+  {
+    color: '#a6b2f2',
+    lines: 38,
+    path: (i: number) => `M -30 ${28 + i * 4} C 154 ${-58 + i * 4} 174 ${139 + i * 2} 348 ${160 + i * 2} S 530 ${211 + i * 1.1} 762 ${253 + i * 1.1} S 1110 ${200 + i * 2} 1358 ${135 + i * 2} S 1480 ${12 + i * 5} 1704 ${51 + i * 3}`,
+  },
+  {
+    color: '#a99aed',
+    lines: 36,
+    path: (i: number) => `M -25 ${168 + i * 4} C 147 ${35 + i * 3} 190 ${126 + i * 1.5} 351 ${181 + i * 1.3} S 650 ${232 + i} 839 ${252 + i} S 1100 ${128 + i * 2.4} 1266 ${168 + i * 2.2} S 1467 ${193 + i * 2.2} 1700 ${126 + i * 3}`,
+  },
+  {
+    color: '#859de9',
+    lines: 32,
+    path: (i: number) => `M -30 ${125 + i * 3.4} C 136 ${97 + i * 4} 164 ${58 + i * 3} 345 ${116 + i * 2} S 529 ${192 + i * 1.8} 718 ${232 + i * 1.2} S 1010 ${275 + i} 1170 ${204 + i * 1.7} S 1360 ${109 + i * 2.1} 1472 ${132 + i * 2.4} S 1630 ${136 + i * 2.2} 1700 ${109 + i * 3}`,
+  },
+];
+---
+<svg class="wave-field" viewBox="0 0 1672 260" preserveAspectRatio="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="wave-fade" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="white" stop-opacity=".55" />
+      <stop offset=".52" stop-color="white" stop-opacity=".85" />
+      <stop offset="1" stop-color="white" stop-opacity=".12" />
+    </linearGradient>
+    <mask id="wave-mask"><rect width="1672" height="260" fill="url(#wave-fade)" /></mask>
+  </defs>
+  <g fill="none" mask="url(#wave-mask)">
+    {bands.map(({ color, lines, path }) => (
+      <g stroke={color} stroke-opacity=".22" stroke-width=".85">
+        {Array.from({ length: lines }, (_, i) => <path d={path(i)} />)}
+      </g>
+    ))}
+  </g>
+</svg>
