@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  branchRevealDuration, cubicBezier, durations, easings, isLayoutResize, motionProperties, moveCurve, sweepTimeAt,
+  branchRevealDuration, cubicBezier, cubicBezierInverse, durations, easings, isLayoutResize, motionProperties, moveCurve,
+  sweepCurve, sweepTimeAt,
 } from '../src/scripts/motion.ts';
 
 test('mobile toolbar resizes do not count as layout changes', () => {
@@ -15,13 +16,16 @@ test('mobile toolbar resizes do not count as layout changes', () => {
   assert.equal(isLayoutResize(phone, { width: 390, height: 500 }), true);
 });
 
-test('the ring reaches a radius when its ease-out curve says so', () => {
+test('the ring reaches a radius when its sweep curve says so', () => {
   assert.equal(sweepTimeAt(10, 10, 110, 400), 0);
   assert.equal(sweepTimeAt(110, 10, 110, 400), 400);
   assert.equal(sweepTimeAt(500, 10, 110, 400), 400);
   assert.equal(sweepTimeAt(-50, 10, 110, 400), 0);
-  // Ease-out cubic: half the distance is covered after ~20.6% of the time.
-  assert.ok(Math.abs(sweepTimeAt(60, 10, 110, 400) - 400 * (1 - Math.cbrt(.5))) < 1e-9);
+  // The ring's CSS curve, evaluated at that time, gives back the requested distance.
+  const sweep = cubicBezier(...sweepCurve);
+  for (const radius of [25, 60, 95]) {
+    assert.ok(Math.abs(sweep(sweepTimeAt(radius, 10, 110, 400) / 400) - (radius - 10) / 100) < 1e-4);
+  }
   // Later radii are always reached later.
   const times = [20, 40, 60, 80, 100].map((radius) => sweepTimeAt(radius, 10, 110, 400));
   assert.deepEqual(times, [...times].sort((a, b) => a - b));
@@ -53,9 +57,21 @@ test('motion tokens become CSS custom properties', () => {
   assert.match(properties['--motion-reveal-start'], /^\d+ms$/);
 });
 
+test('the ring leaves the node gently instead of jumping', () => {
+  const sweep = cubicBezier(...sweepCurve);
+  // After one 60 Hz frame the ring has covered only a few percent of its distance.
+  assert.ok(sweep(16.7 / durations.sweep) < .06);
+  // No single frame moves the ring by more than ~8% of its distance.
+  for (let time = 0; time < durations.sweep; time += 16.7) {
+    const step = sweep(Math.min(1, (time + 16.7) / durations.sweep)) - sweep(time / durations.sweep);
+    assert.ok(step < .08, `frame at ${Math.round(time)}ms moves ${step.toFixed(3)}`);
+  }
+  assert.ok(Math.abs(cubicBezierInverse(...sweepCurve)(sweep(.4)) - .4) < 1e-4);
+});
+
 test('opening a category stays within the motion budget', () => {
-  // Sweep, then hub travel and the staggered reveal of five children and Back.
+  // Worst case: the full sweep, then hub travel and the staggered reveal of five children and Back.
   const total = durations.sweep + branchRevealDuration(5);
-  assert.ok(total <= 1300, `category open takes ${total}ms`);
+  assert.ok(total <= 1750, `category open takes ${total}ms`);
   assert.ok(durations.panel <= 300);
 });

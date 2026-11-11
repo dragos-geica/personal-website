@@ -889,6 +889,7 @@ main[data-graph-pending] .knowledge-graph {
 .branch-sweep-ring {
   position: absolute;
   border-radius: 50%;
+  /* The band begins at 93% of the radius; RING_INNER in branch-motion.ts must match. */
   background: radial-gradient(circle closest-side,
     transparent 93%, color-mix(in srgb, var(--sweep) 55%, transparent) 97.5%, var(--sweep) 99%, transparent 100%);
   transform-origin: 50% 50%;

@@ -48,6 +48,9 @@ function sweepTargets(graph: HTMLElement, hub: HTMLElement, x: number, y: number
   return targets;
 }
 
+/** Where the band starts inside the ring element, as a fraction of its radius (see .branch-sweep-ring). */
+const RING_INNER = .93;
+
 const settle = (animations: Animation[]) =>
   Promise.all(animations.map(({ finished }) => finished)).then(() => true, () => false);
 
@@ -73,7 +76,9 @@ export function sweepBranch(graph: HTMLElement, hub: HTMLElement, direction: 'hi
   const top = Math.max(0, bounds.top);
   const right = Math.min(innerWidth, bounds.right);
   const bottom = Math.min(innerHeight, bounds.bottom);
-  const startRadius = origin.width / 2;
+  // The band's inner edge starts on the clicked node's circle, so the ring visibly
+  // leaves from the node itself rather than appearing partway out.
+  const startRadius = origin.width / 2 / RING_INNER;
   const radius = Math.max(startRadius + 1,
     Math.hypot(Math.max(x - left, right - x), Math.max(y - top, bottom - y)) + 24);
 
@@ -104,11 +109,11 @@ export function sweepBranch(graph: HTMLElement, hub: HTMLElement, direction: 'hi
     { transform: `scale(${startRadius / radius})`, opacity: 1 },
     { opacity: 1, offset: .8 },
     { transform: 'scale(1)', opacity: 0 },
-  ], { duration: durations.sweep, easing: easings.enter, fill: 'forwards' });
+  ], { duration: durations.sweep, easing: easings.sweep, fill: 'forwards' });
   const fades = sweepTargets(graph, hub, x, y).map(({ element, near, far }) => {
     const start = sweepTimeAt(near, startRadius, radius);
     const end = sweepTimeAt(far, startRadius, radius);
-    const timing = { delay: start, duration: Math.max(90, end - start), easing: 'ease-out' };
+    const timing = { delay: start, duration: Math.max(durations.sweepFade, end - start), easing: 'ease-out' };
     return direction === 'hide'
       ? element.animate([{ opacity: 0 }], { ...timing, fill: 'forwards' })
       : element.animate([{ opacity: 0, offset: 0 }], { ...timing, fill: 'backwards' });
@@ -178,13 +183,19 @@ export function moveBranchHub(hub: HTMLElement, origin: DOMRect) {
   }
   const from = centerOf(origin);
   const to = centerOf(destination);
-  const animation = hub.animate([
-    { translate: `${from.x - to.x}px ${from.y - to.y}px`, scale: String(origin.width / destination.width) },
-    { translate: '0px 0px', scale: '1' },
-  ], { duration: durations.travel, easing: easings.move });
-
+  const start = { translate: `${from.x - to.x}px ${from.y - to.y}px`, scale: String(origin.width / destination.width) };
+  // The swap that put the hub here is the heaviest frame of the sequence. Hold the hub
+  // at its starting pose through it and begin travelling on the next frame, so the
+  // first steps of the movement are not lost to that frame.
+  Object.assign(hub.style, start);
   const controller = new AbortController();
-  if (Math.abs(scrollBy) >= 1) {
+  let animation: Animation | undefined;
+  const frame = requestAnimationFrame(() => {
+    hub.style.removeProperty('translate');
+    hub.style.removeProperty('scale');
+    animation = hub.animate([start, { translate: '0px 0px', scale: '1' }],
+      { duration: durations.travel, easing: easings.move });
+    if (Math.abs(scrollBy) < 1) return;
     const startY = scrollY;
     const stop = () => controller.abort();
     // The visitor's own scroll gesture wins over the scripted one.
@@ -193,11 +204,14 @@ export function moveBranchHub(hub: HTMLElement, origin: DOMRect) {
     void animateFrames(controller.signal, durations.travel, (progress) => {
       window.scrollTo({ left: scrollX, top: startY + scrollBy * moveEase(progress), behavior: 'instant' });
     }).then(stop);
-  }
+  });
   return {
     cancel() {
+      cancelAnimationFrame(frame);
       controller.abort();
-      animation.cancel();
+      animation?.cancel();
+      hub.style.removeProperty('translate');
+      hub.style.removeProperty('scale');
     },
   };
 }
