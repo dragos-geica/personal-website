@@ -6,21 +6,19 @@ export const durations = {
   sweep: 540,
   /** Hub travel to its branch position; it starts while the ring is still moving. */
   travel: 520,
-  /** Each branch edge is drawn from the hub before its node appears. */
-  edge: 220,
+  /** A branch line drawing along its length: first Back → hub, then hub → each child. */
+  edge: 380,
   /** A child's outline traces in, then its label pops. */
   outline: 150,
   label: 210,
   /** Shortest fade for a graph element the ring passes, so nothing blinks out. */
   sweepFade: 180,
   /** Delay between neighbouring branch children. */
-  stagger: 75,
+  stagger: 90,
   /** Closing a branch: node fade, edge retract, reverse stagger. */
   closeNode: 140,
   closeEdge: 150,
   closeStagger: 45,
-  /** Preview panel enter and exit. */
-  panel: 250,
   /** Node → page title morph. */
   morphLeave: 300,
   morphTravel: 640,
@@ -62,7 +60,8 @@ export function motionProperties() {
   const properties: Record<string, string> = {};
   for (const [name, value] of Object.entries(durations)) properties[`--motion-${kebab(name)}`] = `${value}ms`;
   for (const [name, value] of Object.entries(easings)) properties[`--ease-${kebab(name)}`] = value;
-  properties['--motion-reveal-start'] = `${Math.round(durations.travel * revealStartFraction)}ms`;
+  properties['--motion-reveal-start'] = `${revealStart()}ms`;
+  properties['--motion-children-start'] = `${childrenStart()}ms`;
   return properties;
 }
 
@@ -70,14 +69,27 @@ export function applyMotionProperties(root: HTMLElement) {
   for (const [name, value] of Object.entries(motionProperties())) root.style.setProperty(name, value);
 }
 
-/** Time after `revealStart` at which the branch item with this order has fully appeared. */
-export function branchItemSettled(order: number) {
-  return order * durations.stagger + durations.edge + durations.outline / 2 + durations.label;
+/** When the branch reveal starts, measured from the moment the hub begins travelling. */
+export function revealStart() {
+  return Math.round(durations.travel * revealStartFraction);
 }
 
-/** Total time from the hub landing in the branch until every child is visible. */
+/**
+ * The reveal runs in order: the Back node appears, its line draws into the hub, and
+ * only once it arrives do the lines to the children set off, one stagger apart.
+ */
+export function childrenStart() {
+  return revealStart() + durations.outline / 2 + durations.edge;
+}
+
+/** When a child (order 1, 2, …) has fully appeared: its line drawn, outline traced, label in. */
+export function branchItemSettled(order: number) {
+  return childrenStart() + (order - 1) * durations.stagger + durations.edge + durations.outline / 2 + durations.label;
+}
+
+/** Total time from the hub starting to travel until every child is visible. */
 export function branchRevealDuration(children: number) {
-  return Math.round(durations.travel * revealStartFraction) + branchItemSettled(children);
+  return branchItemSettled(children);
 }
 
 /** Inverse of a `cubic-bezier()` timing function: the input time at which it outputs `value`. */

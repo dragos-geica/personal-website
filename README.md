@@ -1,6 +1,8 @@
 # DG Personal Knowledge Graph
 
-An Astro portfolio with a React knowledge graph, expandable branches, project previews, and a static AirBox Bootcamp case study.
+An Astro portfolio with a React knowledge graph, expandable branches, and a page for every item.
+
+**To edit text and photos, see [CONTENT_GUIDE.md](CONTENT_GUIDE.md).** Everything you write lives in `src/content/site.ts`.
 
 ## Run locally
 
@@ -29,12 +31,12 @@ Open the address printed by `npm run preview`. The build output is in `dist/`.
 
 ## Edit content
 
-- `src/data/projects.ts` is the source for project titles, summaries, images, metrics, case-study sections, and links. Keep project slugs stable so shared URLs continue to work. Remove `placeholder: true` after replacing a placeholder entry with verified content.
+- `src/content/site.ts` holds every word and photo: your name and intro, the portrait, the simple pages, and each category's items. `src/data/projects.ts` adds URL slugs (made from titles) for project pages.
 - AirBox uses the facts in the Stage 3 brief. Its photo is a labeled placeholder. Add the public dataset URL to `links` once you have the verified address.
-- To add an image, put a locally optimized WebP or AVIF file under `public/` and replace the image placeholder with its site-relative `src`, descriptive `alt`, and intrinsic `width` and `height`. The preview lazy-loads the image below the graph. Keep actual project photos out of the reference folder.
-- `src/data/graph.ts` holds graph positions, relationship labels, and the non-project child labels. Project child labels come from the project data.
+- Photos go in `public/images/` and are referenced from `site.ts` as `/images/…`. `npm test` checks that every referenced photo exists.
+- `src/data/graph.ts` holds graph positions and line shapes only; labels come from `site.ts`.
 - `src/pages/[section].astro` holds the Projects directory and the Research, About, and CV placeholders. The current placeholders carry a `noindex` directive.
-- Select a category to focus its branch, then choose a child to open its section. Use **Preview mode** in a branch for the original inline content panel. Browser Back and Forward restore the previous route and graph level.
+- Select a category to focus its branch, then choose a child to open its page. Browser Back and Forward restore the previous route and graph level.
 - `src/scripts/node-navigation.ts` handles the SVG outline and label shared by the graph and section heading. Existing Astro URLs remain directly addressable.
 - Opening and closing a category follows the same sequence for clicks and browser history. Reduced motion skips the graph sweep and title morph while keeping navigation and focus working.
 - Motion durations and easing curves live in `src/scripts/motion.ts`, which also publishes them as `--motion-*` and `--ease-*` CSS custom properties for the stylesheet.

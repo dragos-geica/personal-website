@@ -1,40 +1,13 @@
 ---
-import SiteLayout from '../../layouts/SiteLayout.astro';
+import ItemPage from '../../components/ItemPage.astro';
 import { projects } from '../../data/projects';
 import { branchPath } from '../../data/branch-location';
+import { site } from '../../content/site';
 
 export function getStaticPaths() {
   return projects.map((project) => ({ params: { project: project.slug }, props: { project } }));
 }
 
 const { project } = Astro.props;
-const graphReturn = branchPath({ parent: 'projects', selected: null });
 ---
-<SiteLayout title={`DG — ${project.title}`} description={project.summary} noindex={project.placeholder}>
-  <main id="main-content" class="section-page project-detail mx-auto" tabindex="-1">
-    <a class="explore-link leaf-back" href={graphReturn} data-morph-back><span aria-hidden="true">←</span> Back</a>
-    <p class="section-eyebrow">{project.placeholder ? 'Project placeholder' : 'Project case study'}</p>
-    <h1 data-morph-heading tabindex="-1">{project.title}</h1>
-    <p class="detail-summary">{project.summary}</p>
-    {'placeholder' in project.image
-      ? <div class="project-image-placeholder detail-image"><p>{project.image.placeholder}</p></div>
-      : <img class="project-image detail-image" {...project.image} decoding="async" />}
-    {project.metrics.length > 0 && (
-      <dl class="project-metrics">
-        {project.metrics.map(({ label, value }) => <div><dt>{label}</dt><dd>{value}</dd></div>)}
-      </dl>
-    )}
-    {project.sections.map(({ title, text }) => (
-      <section class="detail-section">
-        <h2>{title}</h2>
-        <p>{text}</p>
-      </section>
-    ))}
-    {project.links.length > 0 && (
-      <section class="detail-section">
-        <h2>Project links</h2>
-        <ul>{project.links.map(({ label, href }) => <li><a href={href}>{label}</a></li>)}</ul>
-      </section>
-    )}
-  </main>
-</SiteLayout>
+<ItemPage item={project} category={site.categories.projects.label} back={branchPath({ parent: 'projects' })} />

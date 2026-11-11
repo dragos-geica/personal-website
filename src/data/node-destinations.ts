@@ -1,3 +1,4 @@
+import { site } from '../content/site.ts';
 import { branchPath, childSlug } from './branch-location.ts';
 import { graphNodes } from './graph.ts';
 import { projectPath, projects } from './projects.ts';
@@ -10,6 +11,5 @@ export function nodeDestination(parent: string, child: string) {
 }
 
 export const graphDestinations = graphNodes.flatMap((node) => node.id === 'projects' ? [] :
-  node.children.map((child) => ({ parent: node.label, child, path: nodeDestination(node.id, child),
-    back: branchPath({ parent: node.id, selected: null }) })));
-
+  site.categories[node.id].items.map((item) => ({ parent: node.label, child: item.title, item,
+    path: nodeDestination(node.id, item.title), back: branchPath({ parent: node.id }) })));

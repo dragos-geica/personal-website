@@ -1,30 +1,29 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
 import { projects, projectPath } from '../data/projects';
+import { site } from '../content/site';
 
 export function getStaticPaths() {
-  return [
-    { params: { section: 'projects' }, props: { title: 'Projects', description: 'Explore the projects featured in the knowledge graph.' } },
-    { params: { section: 'research' }, props: { title: 'Research', description: 'Research interests, notes, and publications will go here.' } },
-    { params: { section: 'about' }, props: { title: 'About', description: 'A short biography and portrait will go here.' } },
-    { params: { section: 'cv' }, props: { title: 'CV', description: 'Education, experience, and a downloadable CV will go here.' } },
-  ];
+  return (['projects', 'research', 'about', 'cv'] as const).map((section) => ({ params: { section } }));
 }
 
-const { title, description } = Astro.props;
-const isProjects = Astro.params.section === 'projects';
+const { section } = Astro.params;
+const isProjects = section === 'projects';
+const page = isProjects
+  ? { title: site.categories.projects.label, paragraphs: ['Explore the projects featured in the knowledge graph.'] }
+  : site.pages[section as 'about' | 'research' | 'cv'];
 ---
-<SiteLayout title={`DG — ${title}`} description={description} noindex={!isProjects}>
+<SiteLayout title={`${page.title} — ${site.name}`} description={page.paragraphs[0]} noindex={!isProjects}>
   <main id="main-content" class="section-page mx-auto" tabindex="-1">
-    <p class="section-eyebrow">{isProjects ? 'Knowledge graph' : 'Content placeholder'}</p>
-    <h1>{title}</h1>
-    <p>{description}</p>
+    <p class="section-eyebrow">{site.name}</p>
+    <h1>{page.title}</h1>
+    {page.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
     {isProjects && (
       <ul class="project-directory" aria-label="Projects">
         {projects.map((project) => (
           <li>
             <a href={projectPath(project.slug)}>{project.title}</a>
-            <p>{project.placeholder ? 'Project placeholder' : 'Case study'}</p>
+            <p>{project.draft ? 'Project placeholder' : 'Case study'}</p>
           </li>
         ))}
       </ul>

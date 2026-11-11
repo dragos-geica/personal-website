@@ -15,19 +15,16 @@ test('all eight categories provide children and Projects uses the Stage 2 labels
     ['AirBox Bootcamp', 'EcoCrafting', 'Neo4j Demo', 'Data Visualizations']);
 });
 
-test('selection, close, and reopening reset the branch', () => {
+test('close and reopening reset the branch', () => {
   const open = branchReducer(null, toggle('projects'));
-  const selected = branchReducer(open, { type: 'select', parent: 'projects', child: 'AirBox Bootcamp' });
-  assert.deepEqual(selected, { parent: 'projects', selected: 'AirBox Bootcamp' });
-  const closed = branchReducer(selected, { type: 'close' });
+  assert.deepEqual(open, { parent: 'projects' });
+  const closed = branchReducer(open, { type: 'close' });
   assert.equal(closed, null);
   assert.deepEqual(branchReducer(closed, toggle('projects')), open);
 });
 
-test('rapid toggles and category switches do not retain an old selection', () => {
+test('rapid toggles and category switches settle on one branch', () => {
   const projects = toggle('projects');
   assert.equal([projects, projects].reduce(branchReducer, null), null);
-  const research = [projects, toggle('research')].reduce(branchReducer, null);
-  assert.deepEqual(research, { parent: 'research', selected: null });
-  assert.equal(branchReducer(research, { type: 'select', parent: 'projects', child: 'AirBox Bootcamp' }), research);
+  assert.deepEqual([projects, toggle('research')].reduce(branchReducer, null), { parent: 'research' });
 });

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   branchRevealDuration, cubicBezier, cubicBezierInverse, durations, easings, isLayoutResize, motionProperties, moveCurve,
-  sweepCurve, sweepTimeAt,
+  sweepCurve, sweepTimeAt, childrenStart, revealStart,
 } from '../src/scripts/motion.ts';
 
 test('mobile toolbar resizes do not count as layout changes', () => {
@@ -70,8 +70,14 @@ test('the ring leaves the node gently instead of jumping', () => {
 });
 
 test('opening a category stays within the motion budget', () => {
-  // Worst case: the full sweep, then hub travel and the staggered reveal of five children and Back.
-  const total = durations.sweep + branchRevealDuration(5);
-  assert.ok(total <= 1750, `category open takes ${total}ms`);
-  assert.ok(durations.panel <= 300);
+  // Worst case: the full sweep, then hub travel and the sequenced reveal of Back and four children.
+  const total = durations.sweep + branchRevealDuration(4);
+  assert.ok(total <= 2400, `category open takes ${total}ms`);
+});
+
+test('child lines start only once the Back line has reached the hub', () => {
+  assert.equal(childrenStart(), revealStart() + durations.outline / 2 + durations.edge);
+  assert.equal(motionProperties()['--motion-children-start'], `${childrenStart()}ms`);
+  // Each child's line takes long enough to read as travelling light.
+  assert.ok(durations.edge >= 300);
 });

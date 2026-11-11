@@ -105,18 +105,28 @@ export function sweepBranch(graph: HTMLElement, hub: HTMLElement, direction: 'hi
   else graph.dataset.branchSweeping = '';
   hub.dataset.sweepHub = '';
 
-  const ringAnimation = ring.animate([
-    { transform: `scale(${startRadius / radius})`, opacity: 1 },
+  // Opening sends the light outwards from the node; going back pulls it inwards into it.
+  const inward = direction === 'reveal';
+  const small = `scale(${startRadius / radius})`;
+  const ringAnimation = ring.animate(inward ? [
+    { transform: 'scale(1)', opacity: 0 },
+    { opacity: 1, offset: .15 },
+    { opacity: 1, offset: .85 },
+    { transform: small, opacity: 0 },
+  ] : [
+    { transform: small, opacity: 1 },
     { opacity: 1, offset: .8 },
     { transform: 'scale(1)', opacity: 0 },
   ], { duration: durations.sweep, easing: easings.sweep, fill: 'forwards' });
+  // When the ring's edge is at `distance` from the hub, in either direction.
+  const timeAt = (distance: number) =>
+    sweepTimeAt(inward ? radius + startRadius - distance : distance, startRadius, radius);
   const fades = sweepTargets(graph, hub, x, y).map(({ element, near, far }) => {
-    const start = sweepTimeAt(near, startRadius, radius);
-    const end = sweepTimeAt(far, startRadius, radius);
+    const [start, end] = inward ? [timeAt(far), timeAt(near)] : [timeAt(near), timeAt(far)];
     const timing = { delay: start, duration: Math.max(durations.sweepFade, end - start), easing: 'ease-out' };
-    return direction === 'hide'
-      ? element.animate([{ opacity: 0 }], { ...timing, fill: 'forwards' })
-      : element.animate([{ opacity: 0, offset: 0 }], { ...timing, fill: 'backwards' });
+    return inward
+      ? element.animate([{ opacity: 0, offset: 0 }], { ...timing, fill: 'backwards' })
+      : element.animate([{ opacity: 0 }], { ...timing, fill: 'forwards' });
   });
   const covered = settle(fades);
   const finished = settle([ringAnimation, ...fades]);

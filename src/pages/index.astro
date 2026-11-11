@@ -1,17 +1,15 @@
 ---
 import KnowledgeGraph from '../components/KnowledgeGraph';
 import SiteLayout from '../layouts/SiteLayout.astro';
+import { site } from '../content/site';
 ---
-<SiteLayout title="DG — Personal Knowledge Graph">
+<SiteLayout title={`${site.name} — ${site.tagline}`}>
   <main id="main-content" class="home-scene" tabindex="-1" aria-labelledby="home-title">
-    <section class="home-intro" aria-labelledby="home-title">
-      <p class="home-eyebrow">A PERSONAL KNOWLEDGE GRAPH</p>
-      <h1 id="home-title">My world, connected.</h1>
-      <p class="home-description">A living map of what I study, build, research, and enjoy.</p>
-      <div class="intro-action">
-        <a href="#knowledge-graph" class="explore-link">Explore the graph <span aria-hidden="true">→</span></a>
-      </div>
-    </section>
+    <header class="home-intro">
+      <h1 id="home-title">{site.name}</h1>
+      <p class="home-tagline">{site.tagline}</p>
+      <p class="home-description">{site.intro}</p>
+    </header>
     <KnowledgeGraph client:load transition:persist="knowledge-graph" />
   </main>
 </SiteLayout>

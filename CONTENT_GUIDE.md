@@ -1,0 +1,75 @@
+# Editing the website's content
+
+All the words and photos on the site live in **one file**: [`src/content/site.ts`](src/content/site.ts).
+You can change it without touching any other code.
+
+## Quick start
+
+1. Start the site: `PATH="$PWD/.local-tools/node-v24.16.0-darwin-arm64/bin:$PATH" npm run dev`
+2. Open http://127.0.0.1:4321/
+3. Edit `src/content/site.ts` and save. The browser updates by itself.
+4. When you are done, run `npm test` and `npm run check` (with the same `PATH=…` prefix).
+   They tell you if a photo is missing or something is mistyped, and on which line.
+
+## What you can change
+
+| What | Where in `site.ts` |
+|---|---|
+| Your name, the tagline, the intro sentence | `name`, `tagline`, `intro` at the top |
+| The photo in the centre circle | `portrait` |
+| About, Research and CV pages | `pages` |
+| A category's name or the small word on its line | `categories` → e.g. `music` → `label`, `verb` |
+| The circles that appear when a category opens | that category's `items` |
+
+Each **item** becomes a circle in its category and its own page:
+
+```ts
+{
+  title: 'AirBox Bootcamp',                       // circle label and page heading (required)
+  summary: 'One or two sentences about it.',     // first paragraph on the page (required)
+  image: { src: '/images/airbox.jpg', alt: 'Students assembling an air monitor' },
+  facts: [
+    { value: '120+', label: 'Registrants' },
+  ],
+  sections: [
+    { title: 'What we built', text: 'A paragraph of detail.' },
+  ],
+  links: [
+    { label: 'GitHub', href: 'https://github.com/…' },
+  ],
+},
+```
+
+Only `title` and `summary` are required; leave out anything you don't need.
+Add `draft: true` to mark an item as a placeholder (search engines will skip its page).
+
+## Adding a photo
+
+1. Put the file in `public/images/`, e.g. `public/images/airbox.jpg`.
+   Keep photos reasonably small (about 1600 px wide at most; JPEG or WebP).
+2. Refer to it **without** `public`: `image: { src: '/images/airbox.jpg', alt: '…' }`.
+3. Always write a short `alt` describing the photo. It is read aloud to blind visitors.
+
+To change your portrait, replace `public/images/portrait.jpg` with a square photo of the same name.
+
+## Adding or removing an item
+
+Copy an existing item, from `{` to its closing `},`, paste it into the list and edit it.
+To remove one, delete it from `{` to `},`. A category needs at least one item.
+
+The item's web address is made from its title (for example "Neo4j Demo" becomes `/projects/neo4j-demo/`),
+so renaming an item also changes its address.
+
+## Common mistakes
+
+- **An apostrophe inside text** ends the text early: write `'Dragos\'s notes'` or use a curly `’`.
+- **A missing comma** after `}` or `'…'` between entries.
+- **A photo path with `public` in it**: use `/images/…`, not `public/images/…`.
+
+If the page turns blank or shows an error, the terminal running `npm run dev` names the file and line.
+Undo your last change, or fix that line, and save again.
+
+## What this file does not control
+
+The positions of the eight categories, colours, and animations are part of the design code.
+The eight categories themselves are fixed; you can rename them, but adding a ninth needs a code change.

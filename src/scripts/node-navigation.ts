@@ -6,7 +6,7 @@ import { animateFrames } from './animation-frames';
 import { contentStartFraction, durations, easings, onLayoutResize } from './motion';
 import { waitForElement } from './wait-for-element';
 
-type Surface = 'node' | 'heading' | 'preview';
+type Surface = 'node' | 'heading';
 type FindTarget = () => HTMLElement | null;
 
 interface Pose {
@@ -48,7 +48,6 @@ interface Morph {
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const nodeSelector = '[data-morph-node]';
 const headingSelector = '[data-morph-heading]';
-const previewSelector = '[data-morph-preview]';
 let focusRoute: { signal: AbortSignal; findTarget: FindTarget } | undefined;
 let morph: Morph | undefined;
 const contentAnimations = new Set<Animation>();
@@ -85,7 +84,7 @@ function getPose(element: HTMLElement, surface: Surface): Pose {
     textAlign: styles.textAlign,
     textWrap: styles.textWrap,
     color: styles.color,
-    strokeOpacity: surface === 'preview' ? 0 : 1,
+    strokeOpacity: 1,
   };
 }
 
@@ -145,10 +144,7 @@ function routeInBranch(search: string, pathname: string) {
   const branch = readBranch(search);
   const category = graphNodes.find(({ id }) => id === branch?.parent);
   const matches = (label: string) => category && normalized(nodeDestination(category.id, label)) === normalized(pathname);
-  return {
-    child: category?.children.some(matches),
-    preview: Boolean(branch?.selected && matches(branch.selected)),
-  };
+  return { child: category?.children.some(matches) };
 }
 
 function clean(shot: Morph) {
@@ -204,14 +200,10 @@ document.addEventListener('astro:before-preparation', (raw) => {
     if (!route.child) return;
     source = document.querySelector(headingSelector);
     from = 'heading';
-    to = route.preview ? 'preview' : 'node';
-    findTarget = route.preview ? () => document.querySelector(previewSelector) : () => findNode(event.from.pathname);
+    to = 'node';
+    findTarget = () => findNode(event.from.pathname);
   } else if (event.from.pathname === '/' && event.to.pathname !== '/') {
-    const preview = event.sourceElement?.closest('[data-morph-open]')
-      || (history && routeInBranch(event.from.search, event.to.pathname).preview);
-    source = preview ? document.querySelector(previewSelector)
-      : event.sourceElement?.closest<HTMLElement>(nodeSelector) ?? (history ? findNode(event.to.pathname) : null);
-    from = preview ? 'preview' : 'node';
+    source = event.sourceElement?.closest<HTMLElement>(nodeSelector) ?? (history ? findNode(event.to.pathname) : null);
   }
   focusRoute = source ? { signal: event.signal, findTarget } : undefined;
   const layer = document.querySelector<HTMLElement>('#node-morph');

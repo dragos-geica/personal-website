@@ -2,10 +2,10 @@ import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSPropert
 import { branchReducer, type BranchAction, type BranchState } from '../data/branch-state';
 import { navigate } from 'astro:transitions/client';
 import { branchPath, readBranch } from '../data/branch-location';
-import ContentPanel from './ContentPanel';
 import GraphBranch from './GraphBranch';
 import { centerNode, graphCanvas, graphNodes, type GraphNode } from '../data/graph';
 import GraphIcon from './GraphIcon';
+import { site } from '../content/site';
 import { moveBranchHub, PROJECT_HUB_X, sweepBranch, type BranchSweep } from '../scripts/branch-motion';
 import type { TransitionBeforePreparationEvent } from 'astro:transitions/client';
 
@@ -46,15 +46,13 @@ function CategoryNode({ node, index, open, inactive, onToggle }: {
 }
 
 export default function KnowledgeGraph() {
-  const { x, y, size, label } = centerNode;
+  const { x, y, size } = centerNode;
   const [branch, setBranch] = useState<BranchState>(null);
   const [revealBranch, setRevealBranch] = useState(false);
-  const [leavingPanel, setLeavingPanel] = useState<{ parent: string; child: string } | null>(null);
   const graph = useRef<HTMLDivElement>(null);
   const branchSweep = useRef<BranchSweep | null>(null);
   const currentBranch = useRef<BranchState>(null);
-  const previewTitle = useRef<HTMLHeadingElement>(null);
-  const pendingFocus = useRef<{ id: string; scroll: 'preview' | 'nearest' | 'none' } | null>(null);
+  const pendingFocus = useRef<{ id: string; scroll: 'nearest' | 'none' } | null>(null);
   const pendingNavigation = useRef<{ path: string } | null>(null);
 
   function restoreBranch(next: BranchState) {
@@ -76,10 +74,7 @@ export default function KnowledgeGraph() {
       if (branchPath(next) === branchPath(previous)) return;
       const parent = next?.parent ?? previous?.parent;
       const animate = Boolean(next && branchSweep.current && !reducedMotion.matches);
-      if (parent) pendingFocus.current = {
-        id: next?.selected ? 'preview-title' : `category-${parent}`,
-        scroll: next?.selected ? 'preview' : swap && !animate ? 'nearest' : 'none',
-      };
+      if (parent) pendingFocus.current = { id: `category-${parent}`, scroll: swap && !animate ? 'nearest' : 'none' };
       setRevealBranch(animate);
       restoreBranch(next);
     }
@@ -134,11 +129,11 @@ export default function KnowledgeGraph() {
   useEffect(() => {
     const target = pendingFocus.current;
     if (!target) return;
-    const element = target.id === 'preview-title' ? previewTitle.current : document.getElementById(target.id);
+    const element = document.getElementById(target.id);
     if (!element) return;
     pendingFocus.current = null;
     if (element.closest('[data-morph-main="arriving"], [data-branch-return]')) return;
-    focusTarget(element, target.scroll === 'preview');
+    element.focus({ preventScroll: true });
     if (target.scroll === 'nearest') element.scrollIntoView({ block: 'nearest', behavior: 'instant' });
   }, [branch]);
 
@@ -170,10 +165,7 @@ export default function KnowledgeGraph() {
     const next = branchReducer(previous, action);
     if (next === previous) return;
     const path = branchPath(next);
-    if (path === branchPath(previous)) {
-      if (action.type === 'select' && previewTitle.current) focusTarget(previewTitle.current, true);
-      return;
-    }
+    if (path === branchPath(previous)) return;
     if (pendingNavigation.current?.path === path) return;
     const request = { path };
     pendingNavigation.current = request;
@@ -183,16 +175,6 @@ export default function KnowledgeGraph() {
   }
   const active = graphNodes.find((node) => node.id === branch?.parent);
   const activeIndex = graphNodes.findIndex((node) => node.id === branch?.parent);
-  const shownPanel = active && branch?.selected ? { parent: active.label, child: branch.selected } : null;
-  const lastPanel = useRef(shownPanel);
-  // Keep a cleared preview mounted for its exit, whether Back, close or history cleared it.
-  useLayoutEffect(() => {
-    const previous = lastPanel.current;
-    lastPanel.current = shownPanel;
-    if (shownPanel) setLeavingPanel(null);
-    else if (previous && matchMedia('(prefers-reduced-motion: no-preference)').matches) setLeavingPanel(previous);
-  }, [shownPanel?.parent, shownPanel?.child]);
-
   // On mobile the branch takes a full grid row immediately after its parent’s row.
   const branchAfter = activeIndex + (1 - activeIndex % 2);
 
@@ -200,11 +182,6 @@ export default function KnowledgeGraph() {
     if (!branch) return;
     document.getElementById(`category-${branch.parent}`)?.focus({ preventScroll: true });
     updateBranch({ type: 'close' });
-  }
-
-  function returnToChild() {
-    const child = document.querySelector<HTMLButtonElement>('.child-node:is([aria-pressed="true"], [data-selected="true"])');
-    if (child) focusTarget(child, true);
   }
 
   return (
@@ -238,15 +215,8 @@ export default function KnowledgeGraph() {
             <span className="orbit orbit-inner" aria-hidden="true" />
             <span className="orbit orbit-dotted" aria-hidden="true" />
             <span className="orbit orbit-outer" aria-hidden="true" />
-            <a className="node center-node" href="/about/" aria-labelledby="center-label" aria-describedby="portrait-label">
-              <svg className="portrait-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor"
-                strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
-                <rect x="9" y="7" width="46" height="50" rx="8" strokeDasharray="3 4" />
-                <circle cx="32" cy="25" r="8" />
-                <path d="M17 48c1-8 7-12 15-12s14 4 15 12" />
-              </svg>
-              <span id="center-label" className="center-label">{label}</span>
-              <span id="portrait-label" className="portrait-label">Portrait placeholder</span>
+            <a className="node center-node" href="/about/" aria-label={`About ${site.name}`}>
+              <img src={site.portrait.src} alt={site.portrait.alt} width="480" height="480" decoding="async" />
             </a>
           </div>
 
@@ -257,30 +227,15 @@ export default function KnowledgeGraph() {
                   inactive={Boolean(active && node.id !== active.id)}
                   onToggle={() => updateBranch({ type: 'toggle', parent: node.id })} />
                 {active && branch && index === branchAfter && (
-                  <GraphBranch key={active.id} node={active} selected={branch.selected} onClose={closeBranch}
-                    revealBranch={revealBranch} onRevealComplete={() => setRevealBranch(false)}
-                    onSelect={(child) => updateBranch({ type: 'select', parent: active.id, child })} />
+                  <GraphBranch key={active.id} node={active} onClose={closeBranch}
+                    revealBranch={revealBranch} onRevealComplete={() => setRevealBranch(false)} />
                 )}
               </Fragment>
             ))}
           </ul>
         </div>
       </div>
-      {shownPanel ? (
-        <ContentPanel key={shownPanel.child} {...shownPanel} titleRef={previewTitle} onReturn={returnToChild} />
-      ) : leavingPanel && (
-        <ContentPanel key={`leaving-${leavingPanel.child}`} {...leavingPanel} leaving onReturn={returnToChild}
-          onExited={() => setLeavingPanel(null)} />
-      )}
     </>
   );
 }
 
-function focusTarget(element: HTMLElement, scroll: boolean) {
-  element.focus({ preventScroll: true });
-  if (scroll) {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const panel = element.closest('.content-panel');
-    (panel ?? element).scrollIntoView({ behavior: reduced ? 'instant' : 'smooth', block: panel ? 'start' : 'nearest' });
-  }
-}

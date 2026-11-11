@@ -10,7 +10,7 @@ export interface ConstellationArea {
   right: number;
   top: number;
   bottom: number;
-  /** A corner kept clear for the branch actions (Preview mode). */
+  /** An optional rectangle to keep node centres out of. */
   keepClear?: { left: number; right: number; top: number; bottom: number };
 }
 

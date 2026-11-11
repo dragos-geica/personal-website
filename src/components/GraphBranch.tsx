@@ -12,15 +12,12 @@ const branchExtension = 300;
 // Node centres stay this far inside the graph so a full circle always fits.
 const edgeMargin = 85;
 
-export default function GraphBranch({ node, selected, onSelect, onClose, revealBranch, onRevealComplete }: {
+export default function GraphBranch({ node, onClose, revealBranch, onRevealComplete }: {
   node: GraphNode;
-  selected: string | null;
-  onSelect: (child: string) => void;
   onClose: () => void;
   revealBranch: boolean;
   onRevealComplete: () => void;
 }) {
-  const [preview, setPreview] = useState(Boolean(selected));
   // The hub lands where the cursor was, so a child can appear under a resting pointer.
   // Hover styling waits for the reveal to finish and the pointer to move.
   const [hoverLocked, setHoverLocked] = useState(revealBranch);
@@ -33,12 +30,9 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
   const side = originalX < width / 2 ? 'left' : 'right';
   const backX = x + (side === 'left' ? 225 : -225);
   const branchStart = side === 'left' ? -branchExtension : 0;
-  // The branch actions sit in the top corner on the open side; children keep clear of them.
   const area = side === 'left'
-    ? { left: -branchExtension + edgeMargin, right: x - 200, top: 80, bottom: height - 80,
-        keepClear: { left: -Infinity, right: 60, top: -Infinity, bottom: 150 } }
-    : { left: x + 200, right: width + branchExtension - edgeMargin, top: 80, bottom: height - 80,
-        keepClear: { left: width - 40, right: Infinity, top: -Infinity, bottom: 150 } };
+    ? { left: -branchExtension + edgeMargin, right: x - 200, top: 80, bottom: height - 80 }
+    : { left: x + 200, right: width + branchExtension - edgeMargin, top: 80, bottom: height - 80 };
   const children = constellation(node.id, node.children.length, { x, y }, side, area)
     .map(({ x: cx, y: cy }, index) => ({ label: node.children[index], index, cx, cy }));
 
@@ -77,7 +71,8 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
           const start = [x + ux * hubRadius / scaleX, y + uy * hubRadius / scaleY];
           const end = [target.cx - ux * radius / scaleX, target.cy - uy * radius / scaleY];
           const point = ([px, py]: number[]) => `${px.toFixed(1)} ${py.toFixed(1)}`;
-          if (index === 0) return `M ${point(start)} L ${point(end)}`;
+          // The Back line runs from Back into the hub: the reveal starts there.
+          if (index === 0) return `M ${point(end)} L ${point(start)}`;
           // A slight alternating bow keeps the constellation organic rather than spoked.
           const bow = (index % 2 ? 1 : -1) * Math.min(36, length * .07);
           const middle = [(start[0] + end[0]) / 2 - uy * bow / scaleX, (start[1] + end[1]) / 2 + ux * bow / scaleY];
@@ -92,10 +87,11 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
       const source = category.getBoundingClientRect();
       const startX = source.left + source.width / 2 - bounds.left;
       const startY = source.top + hub.offsetHeight / 2 - bounds.top;
-      const curves = buttons.map((button) => {
+      const curves = buttons.map((button, index) => {
         const rect = button.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2 - bounds.left;
         const top = rect.top - bounds.top;
+        if (index === 0) return `M ${startX} ${top} V ${startY}`;
         if (Math.abs(centerX - startX) < rect.width / 4) return `M ${startX} ${startY} V ${top}`;
         const toward = centerX < startX ? -1 : 1;
         const innerX = centerX - toward * rect.width / 2;
@@ -111,7 +107,7 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
     observer.observe(branch);
     observer.observe(hub);
     return () => observer.disconnect();
-  }, [node.id, preview]);
+  }, [node.id]);
 
   useEffect(() => {
     if (revealBranch || !hoverLocked) return;
@@ -133,18 +129,11 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
     <li id={`branch-${node.id}`} className="graph-branch" data-side={side}
       data-branch-reveal={revealBranch || undefined} data-hover-locked={hoverLocked || undefined}
       onAnimationEnd={onRevealEvent}>
-      <div className="branch-actions">
-        <button type="button" className="branch-close branch-preview-toggle" aria-pressed={preview}
-          onClick={() => setPreview(!preview)}>Preview mode</button>
-        <p className="branch-selection" role="status">
-          {selected ? <>Selected: <strong>{selected}</strong></> : preview ? 'Select a node to preview it' : <>Choose a {node.label} item</>}
-        </p>
-      </div>
       <svg className="branch-edges" ref={desktopEdges} viewBox={`${branchStart} 0 ${width + branchExtension} ${height}`}
         style={{ left: `${branchStart / width * 100}%`, width: `${(width + branchExtension) / width * 100}%` }}
         preserveAspectRatio="none" aria-hidden="true">
         <path className="branch-edge branch-back-edge" pathLength={1} style={{ '--order': 0 } as CSSProperties}
-          d={`M ${x - direction * hubRadius} ${y} H ${backX + direction * 46}`} />
+          d={`M ${backX + direction * 46} ${y} H ${x - direction * hubRadius}`} />
         {/* Placeholder geometry; the layout effect trims these to the circles before paint. */}
         {children.map(({ label, index, cx, cy }) => (
           <path key={label} className="branch-edge" pathLength={1}
@@ -172,13 +161,9 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
           <li key={label} style={{ '--x': `${cx / width * 100}%`, '--y': `${cy / height * 100}%`,
             '--order': index + 1 } as CSSProperties}>
             <NodeOutline />
-            {preview
-              ? <button type="button" className="node child-node" aria-pressed={selected === label} data-morph-node={nodeDestination(node.id, label)}
-                  onClick={() => onSelect(label)}><span className="branch-label">{label}</span></button>
-              : <a className="node child-node" data-selected={selected === label} data-morph-node={nodeDestination(node.id, label)}
-                  href={nodeDestination(node.id, label)}>
-                  <span className="branch-label">{label}</span>
-                </a>}
+            <a className="node child-node" data-morph-node={nodeDestination(node.id, label)} href={nodeDestination(node.id, label)}>
+              <span className="branch-label">{label}</span>
+            </a>
           </li>
         ))}
       </ul>

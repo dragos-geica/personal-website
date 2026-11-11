@@ -19,7 +19,6 @@
   /* Soft lavender-blue band for the category sweep; derived so it follows the theme. */
   --sweep: color-mix(in srgb, var(--edge-active) 30%, var(--accent));
   --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --header-height: 68px;
 }
 
 :root[data-theme="dark"] {
@@ -66,102 +65,64 @@ body {
 
 .skip-link:focus { clip-path: none; }
 
-.site-header {
-  position: relative;
-  z-index: 2;
-  background: var(--header);
-}
-
-.header-inner {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  width: 92.8%;
-  min-height: var(--header-height);
-}
-
-.brand {
-  justify-self: start;
-  font-size: clamp(24px, 2vw, 34px);
-  font-weight: 650;
-  line-height: 1;
-  letter-spacing: -.08em;
-}
-
-.site-nav {
-  gap: clamp(15px, 2.9vw, 55px);
-  font-size: clamp(14px, 1.18vw, 19px);
-}
-
-.site-nav a {
-  padding: .65rem .25rem .53rem;
-  border-bottom: 1px solid transparent;
-  white-space: nowrap;
-}
-
-.site-nav a[aria-current="page"] { border-bottom-color: currentColor; }
-.site-nav a:hover { color: var(--accent-ink); }
-
 .theme-toggle {
-  justify-self: end;
+  position: fixed;
+  z-index: 9;
+  top: 14px;
+  right: 16px;
   display: grid;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   place-items: center;
   border-radius: 50%;
+  color: var(--muted);
   cursor: pointer;
 }
 
 .theme-toggle[hidden], .moon-icon, [data-theme="dark"] .sun-icon { display: none; }
 [data-theme="dark"] .moon-icon { display: block; }
 .theme-toggle:hover { background: var(--accent); }
-.theme-toggle svg { width: 23px; height: 23px; }
+.theme-toggle svg { width: 21px; height: 21px; }
 
 .home-scene {
   display: grid;
-  grid-template-columns: minmax(0, 27fr) minmax(0, 73fr);
-  align-items: stretch;
-  min-height: max(calc(100svh - var(--header-height)), 51vw);
-  padding: 1.2vw 7.6% 3.6vw 3.6%;
-  background: radial-gradient(ellipse at 62% 53%, color-mix(in srgb, var(--accent) 35%, var(--paper)), transparent 55%);
+  justify-items: center;
+  align-content: start;
+  gap: clamp(.25rem, 1.6vh, 1.25rem);
+  min-height: 100svh;
+  padding: clamp(1.75rem, 5vh, 3.5rem) 4% 3vw;
+  background: radial-gradient(ellipse at 50% 62%, color-mix(in srgb, var(--accent) 35%, var(--paper)), transparent 55%);
 }
 
+/* Name and introduction, centred above the graph. */
 .home-intro {
-  align-self: center;
-  max-width: 26rem;
-  padding-right: clamp(1rem, 2.1vw, 2.4rem);
-  margin-bottom: clamp(0px, 14vh, 140px);
-}
-
-.home-eyebrow {
-  margin: 0 0 1.7rem;
-  color: var(--muted);
-  font-size: clamp(.7rem, .91vw, .86rem);
-  font-weight: 650;
-  letter-spacing: .15em;
+  max-width: 40rem;
+  text-align: center;
 }
 
 .home-intro h1 {
-  max-width: 11ch;
-  margin: 0 0 1.25rem;
-  font-size: clamp(2.25rem, 3.55vw, 5.25rem);
+  margin: 0;
+  font-size: clamp(2.25rem, 4vw, 4.25rem);
   font-weight: 680;
   line-height: 1.04;
-  letter-spacing: -.065em;
+  letter-spacing: -.055em;
+}
+
+.home-tagline {
+  margin-top: .3rem;
+  color: var(--accent-ink);
+  font-size: clamp(1.1rem, 1.55vw, 1.5rem);
+  font-weight: 560;
+  letter-spacing: -.02em;
 }
 
 .home-description {
-  max-width: 27ch;
+  max-width: 48ch;
+  margin: .4rem auto 0;
+  text-wrap: balance;
   color: var(--muted);
-  font-size: clamp(1rem, 1.17vw, 1.3rem);
-  line-height: 1.55;
-}
-
-.intro-action {
-  max-width: 17rem;
-  margin-top: 1.8rem;
-  padding-top: 1.45rem;
-  border-top: 1px solid var(--border);
+  font-size: clamp(.95rem, 1.05vw, 1.15rem);
+  line-height: 1.5;
 }
 
 .explore-link {
@@ -183,6 +144,9 @@ astro-island { display: contents; }
 
 .knowledge-graph {
   position: relative;
+  /* Fill the space under the intro without pushing the graph below the fold. */
+  width: min(100%, 1240px, calc((100svh - 12.5rem) * 1.22));
+  aspect-ratio: 1.22;
   min-width: 0;
   container-type: inline-size;
   overflow: clip;
@@ -301,26 +265,21 @@ astro-island { display: contents; }
   width: 100%;
   height: 100%;
   border: clamp(4px, .55cqw, 8px) solid var(--node);
-  background: linear-gradient(164deg, #dce7f3 0%, #a9bfd8 36%, #5f7793 62%, #293746 100%);
+  overflow: hidden;
+  background: var(--node-shade);
   box-shadow: 0 0 24px var(--halo), 0 14px 30px var(--halo);
-  color: #fff;
-  font-size: clamp(16px, 2.3cqw, 26px);
   transition: box-shadow 150ms ease, scale 220ms var(--ease-enter, ease-out);
 }
 
 .center-node:is(:hover, :focus-visible) { box-shadow: 0 0 30px var(--halo), 0 15px 35px var(--shadow); }
 
-.portrait-icon { width: 32%; margin-bottom: 4%; color: #23364d; }
-.center-label { font-size: 1.95em; font-weight: 570; line-height: 1; letter-spacing: -.055em; }
-
-.portrait-label {
-  max-width: 78%;
-  margin-top: .75em;
-  font-size: max(9px, .45em);
-  line-height: 1.35;
-  font-weight: 650;
-  letter-spacing: .09em;
-  text-transform: uppercase;
+.center-node img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  /* The face sits slightly above centre in the portrait. */
+  object-position: 50% 38%;
 }
 
 .graph-primary {
@@ -429,40 +388,11 @@ astro-island { display: contents; }
 }
 
 .graph-branch:not([data-hover-locked]) .child-node:hover,
-.child-node:is(:focus-visible, [aria-pressed="true"]) {
+.child-node:focus-visible {
   border-color: var(--edge-active);
   background: var(--accent);
   color: var(--accent-ink);
 }
-
-.branch-actions {
-  position: absolute;
-  z-index: 4;
-  top: .35rem;
-  left: calc(100% + 2.4cqw);
-  width: 19cqw;
-  display: grid;
-  justify-items: start;
-  gap: .45rem;
-  pointer-events: auto;
-}
-
-.graph-branch[data-side="left"] .branch-actions {
-  left: auto;
-  right: calc(100% + 2.4cqw);
-}
-
-.branch-close {
-  padding: .35rem .7rem;
-  border: 1px solid var(--border);
-  border-radius: .45rem;
-  background: var(--node);
-  font-size: .8rem;
-  cursor: pointer;
-}
-
-.branch-close:hover { background: var(--accent); }
-.branch-selection { color: var(--muted); font-size: .8rem; }
 
 .section-page {
   width: min(86%, 48rem);
@@ -502,12 +432,9 @@ astro-island { display: contents; }
     padding: 3.25rem max(1rem, 6vw) 3.75rem;
   }
 
-  .home-intro { max-width: 30rem; margin: 0; padding: 0; }
-  .home-eyebrow { margin-bottom: 1.2rem; }
-  .home-intro h1 { font-size: clamp(2.6rem, 8vw, 4.75rem); }
-  .intro-action { margin-top: 1.35rem; padding-top: 0; border: 0; }
+  .home-intro h1 { font-size: clamp(2.4rem, 10vw, 4rem); }
 
-  .knowledge-graph { overflow: visible; }
+  .knowledge-graph { width: 100%; aspect-ratio: auto; overflow: visible; }
 
   .graph-edges, .branch-edges { display: none; }
 
@@ -529,12 +456,6 @@ astro-island { display: contents; }
     padding: .9rem;
     border: 1px solid var(--border);
     border-radius: .85rem;
-  }
-
-  .graph-branch .branch-actions, .graph-branch[data-side="left"] .branch-actions {
-    position: static;
-    width: auto;
-    margin-bottom: .85rem;
   }
 
   .branch-children {
@@ -593,22 +514,8 @@ astro-island { display: contents; }
   .relationship { font-size: .73rem; }
 }
 
-@media (max-width: 560px) {
-  .header-inner {
-    grid-template-columns: 1fr 1fr;
-    padding: .45rem 0 .25rem;
-  }
-
-  .site-nav {
-    grid-area: 2 / 1 / 3 / -1;
-    gap: clamp(.25rem, 3vw, 1.5rem);
-  }
-
-  .theme-toggle { grid-area: 1 / 2; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .knowledge-graph *, .knowledge-graph *::before, .content-panel {
+  .knowledge-graph *, .knowledge-graph *::before {
     animation: none !important;
     transition: none !important;
   }
@@ -616,53 +523,14 @@ astro-island { display: contents; }
   .edge-spark { display: none; }
 }
 
-.site-nav a[data-section-active="true"] { border-bottom-color: currentColor; }
-
-@media (min-width: 881px) {
-  .home-scene:has(.content-panel) {
-    grid-template-rows: max(calc(100svh - var(--header-height) - 4.8vw), 46.2vw) auto;
-    row-gap: 1.5rem;
-  }
-}
-
-.content-panel {
-  grid-column: 1 / -1;
-  min-width: 0;
-  padding: clamp(1.1rem, 2.15vw, 2.25rem);
-  border: 1px solid var(--border);
-  border-radius: 1.5rem;
-  background: var(--node);
-  box-shadow: 0 14px 38px var(--shadow);
-  scroll-margin-top: 1rem;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .content-panel { animation: panel-in var(--motion-panel) var(--ease-enter) both; }
-  .content-panel[data-leaving] { animation: panel-out var(--motion-panel) var(--ease-exit) forwards; }
-  /* A title morph landing in the panel owns that entrance. */
-  main[data-morph-main] .content-panel { animation: none; }
-}
-.content-panel[data-leaving] { pointer-events: none; }
-@keyframes panel-in { from { opacity: 0; translate: 0 8px; } }
-@keyframes panel-out { to { opacity: 0; translate: 0 8px; } }
-
-.project-preview {
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 7fr);
-  gap: clamp(1.2rem, 2.5vw, 2.65rem);
-}
-
-.preview-copy { min-width: 0; }
-.preview-copy h2 { width: fit-content; }
-
-.preview-copy h2, .project-detail h1 {
+.project-detail h1 {
   margin: .3rem 0 .7rem;
   font: 500 clamp(2rem, 3.05vw, 3.2rem)/1.07 Georgia, "Times New Roman", serif;
   letter-spacing: -.035em;
   overflow-wrap: anywhere;
 }
 
-.preview-summary, .detail-summary {
+.detail-summary {
   max-width: 72ch;
   color: var(--muted);
   line-height: 1.55;
@@ -717,22 +585,6 @@ astro-island { display: contents; }
 .project-metrics dt { color: var(--muted); font-size: .8rem; line-height: 1.28; }
 .project-metrics dd { color: var(--accent-ink); font-size: 1.15rem; font-weight: 650; line-height: 1.15; }
 
-.preview-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: .55rem 1rem;
-  margin-top: 1.15rem;
-}
-
-.return-node {
-  min-height: 44px;
-  color: var(--accent-ink);
-  text-decoration: underline;
-  text-underline-offset: .2em;
-  cursor: pointer;
-}
-
 .project-detail { padding-top: clamp(2rem, 5vw, 4rem); }
 
 .leaf-back { margin-bottom: 1.35rem; }
@@ -769,12 +621,6 @@ astro-island { display: contents; }
 .project-directory a { display: inline-block; padding: .4rem 0; font-weight: 650; }
 .project-directory p { font-size: .86rem; }
 
-@media (max-width: 620px) {
-  .content-panel { border-radius: 1rem; }
-  .project-preview { grid-template-columns: minmax(0, 1fr); }
-  .project-preview :is(.project-image-placeholder, .project-image) { aspect-ratio: 16 / 9; }
-}
-
 /* Fade the category as a group so a child animation cannot bring it back. */
 .category { transition: opacity 320ms ease; }
 .category > :is(.category-node, .relationship, .graph-edges), .center-orbit {
@@ -789,14 +635,7 @@ astro-island { display: contents; }
 .category[data-active] > :is(.relationship, .graph-edges) { opacity: 0; }
 .category[data-active] .category-node { top: 50%; left: 57.4074%; }
 .graph-primary[data-branch-side="left"] .category[data-active] .category-node { left: 42.5926%; }
-.child-node[data-selected="true"], .branch-preview-toggle[aria-pressed="true"] {
-  border-color: var(--edge-active);
-  background: var(--accent);
-  color: var(--accent-ink);
-}
-.branch-preview-toggle { font-size: .72rem; }
-.branch-actions { width: 21cqw; }
-#center-label { font-size: 1.63em; }
+
 
 @media (max-width: 880px) {
   .graph-primary[data-branch-side] .center-orbit,
@@ -912,10 +751,20 @@ main[data-graph-pending] .knowledge-graph {
 .branch-node-outline, .branch-mobile-edges { display: none; }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Each item draws its edge out of the hub, then traces its outline and pops its label.
-     Items overlap, offset by one stagger step, starting while the hub is still landing. */
+  /* The reveal runs in order: Back appears, its line draws into the hub, and once it
+     arrives each child's line draws outwards (one stagger apart), then that child pops in.
+     A line and its node share --branch-start; the node appears when its line has arrived. */
   .graph-branch[data-branch-reveal] :is(.branch-edge, .branch-children li) {
-    --branch-start: calc(var(--motion-reveal-start) + var(--order) * var(--motion-stagger));
+    --branch-start: calc(var(--motion-children-start) + (var(--order) - 1) * var(--motion-stagger));
+  }
+
+  /* Back's outline and label start the reveal; its line follows as Back appears. */
+  .graph-branch[data-branch-reveal] .branch-children li.branch-back {
+    --branch-start: calc(var(--motion-reveal-start) - var(--motion-edge));
+  }
+
+  .graph-branch[data-branch-reveal] .branch-edge.branch-back-edge {
+    --branch-start: calc(var(--motion-reveal-start) + var(--motion-outline) / 2);
   }
 
   .graph-branch[data-branch-reveal] :is(.branch-edge, .branch-node-outline path) {
@@ -924,7 +773,7 @@ main[data-graph-pending] .knowledge-graph {
   }
 
   .graph-branch[data-branch-reveal] .branch-edge {
-    animation: branch-draw var(--motion-edge) var(--ease-enter) var(--branch-start) both;
+    animation: branch-draw var(--motion-edge) var(--ease-move) var(--branch-start) both;
   }
 
   .graph-branch[data-branch-reveal] .branch-node-outline path {
@@ -957,12 +806,7 @@ main[data-graph-pending] .knowledge-graph {
 
   .graph-branch[data-branch-reveal] .child-node { animation-name: branch-node-ready; animation-timing-function: linear; }
   .graph-branch[data-branch-reveal] .branch-label { animation-name: branch-label-in; }
-  .graph-branch[data-branch-reveal] .branch-actions {
-    animation: branch-actions-in var(--motion-label) ease-out var(--motion-reveal-start) both;
-  }
 }
-
-@keyframes branch-actions-in { from { opacity: 0; visibility: hidden; } 1% { visibility: visible; } }
 
 @media (min-width: 881px) {
   .graph-branch[data-side="left"][data-branch-reveal] .branch-node-outline { transform: none; }
