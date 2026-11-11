@@ -4,7 +4,7 @@ import { branchPath, readBranch } from '../src/data/branch-location.ts';
 import { projects } from '../src/data/projects.ts';
 
 test('each branch round-trips through its URL and old or invalid input falls back safely', () => {
-  for (const parent of ['projects', 'academics', 'data-tools']) {
+  for (const parent of ['projects', 'experience', 'interests']) {
     const path = branchPath({ parent });
     assert.equal(path, `/?branch=${parent}`);
     assert.deepEqual(readBranch(path.slice(1)), { parent });
@@ -12,6 +12,8 @@ test('each branch round-trips through its URL and old or invalid input falls bac
   // Links saved from the removed preview mode still open the right branch.
   assert.deepEqual(readBranch('?branch=projects&item=airbox-bootcamp'), { parent: 'projects' });
   assert.equal(readBranch('?branch=unknown'), null);
+  // Categories that were removed fall back to the plain graph.
+  assert.equal(readBranch('?branch=academics'), null);
   assert.equal(branchPath(null), '/');
 });
 

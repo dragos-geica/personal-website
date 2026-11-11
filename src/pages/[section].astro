@@ -2,6 +2,7 @@
 import SiteLayout from '../layouts/SiteLayout.astro';
 import { projects, projectPath } from '../data/projects';
 import { nodeDestination } from '../data/node-destinations';
+import { itemsTagged, projectTags } from '../data/tags';
 import { site } from '../content/site';
 
 export function getStaticPaths() {
@@ -12,8 +13,8 @@ const { section } = Astro.params;
 const { about, research, cv } = site.pages;
 const title = section === 'projects' ? site.categories.projects.label : site.pages[section as 'about' | 'research' | 'cv'].title;
 const description = section === 'about' ? about.paragraphs[0] : section === 'research' ? research.paragraphs[0]
-  : section === 'cv' ? `${cv.name} — CV` : 'Projects featured in the knowledge graph.';
-const researchItems = site.categories.research.items.filter(({ draft }) => !draft);
+  : section === 'cv' ? `${cv.name} — CV` : 'Projects, with the data and tools behind each one.';
+const researchItems = itemsTagged('Research');
 ---
 <SiteLayout title={`${title} — ${site.name}`} description={description}>
   <main id="main-content" class={section === 'cv' ? 'section-page cv-page mx-auto' : 'section-page mx-auto'} tabindex="-1">
@@ -32,10 +33,10 @@ const researchItems = site.categories.research.items.filter(({ draft }) => !draf
     {section === 'research' && (
       <>
         {research.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-        <ul class="project-directory" aria-label="Research projects">
-          {researchItems.map((item) => (
+        <ul class="project-directory" aria-label="Research">
+          {researchItems.map(({ category, item }) => (
             <li>
-              <a href={nodeDestination('research', item.title)}>{item.title}</a>
+              <a href={nodeDestination(category, item.title)}>{item.title}</a>
               {item.subtitle && <p>{item.subtitle}</p>}
             </li>
           ))}
@@ -44,14 +45,25 @@ const researchItems = site.categories.research.items.filter(({ draft }) => !draf
     )}
 
     {section === 'projects' && (
-      <ul class="project-directory" aria-label="Projects">
-        {projects.map((project) => (
-          <li>
-            <a href={projectPath(project.slug)}>{project.title}</a>
-            <p>{project.draft ? 'In progress' : project.subtitle ?? 'Project'}</p>
-          </li>
-        ))}
-      </ul>
+      <>
+        <p>Every project, with the data, tools and methods behind it. Choose a tag to filter.</p>
+        <div class="tag-filter" role="group" aria-label="Filter projects by tag" hidden>
+          <button type="button" class="tag" aria-pressed="true" data-tag="">All</button>
+          {projectTags.map((tag) => <button type="button" class="tag" aria-pressed="false" data-tag={tag}>{tag}</button>)}
+        </div>
+        <ul class="project-directory project-cards" aria-label="Projects">
+          {projects.map((project) => (
+            <li data-tags={JSON.stringify(project.tags ?? [])}>
+              <a href={projectPath(project.slug)}>{project.title}</a>
+              <p>{project.draft ? 'In progress' : project.subtitle ?? 'Project'}</p>
+              {!!project.tags?.length && (
+                <ul class="tag-list" aria-label="Tags">{project.tags.map((tag) => <li><span class="tag">{tag}</span></li>)}</ul>
+              )}
+            </li>
+          ))}
+        </ul>
+        <p class="tag-empty" hidden>No projects use this tag yet.</p>
+      </>
     )}
 
     {section === 'cv' && cv.sections.map(({ heading, entries }) => (
@@ -73,3 +85,34 @@ const researchItems = site.categories.research.items.filter(({ draft }) => !draf
     <a class="back-link" href="/">← Back to the knowledge graph</a>
   </main>
 </SiteLayout>
+
+<script>
+  // Project tag filter. Without script every project stays visible and the filter stays hidden.
+  document.addEventListener('astro:page-load', () => {
+    const filter = document.querySelector<HTMLElement>('.tag-filter');
+    if (!filter) return;
+    const cards = [...document.querySelectorAll<HTMLElement>('.project-cards > li')];
+    const empty = document.querySelector<HTMLElement>('.tag-empty');
+    const buttons = [...filter.querySelectorAll<HTMLButtonElement>('button')];
+    function apply(tag: string) {
+      buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.tag === tag)));
+      let shown = 0;
+      for (const card of cards) {
+        const match = !tag || (JSON.parse(card.dataset.tags ?? '[]') as string[]).includes(tag);
+        card.hidden = !match;
+        if (match) shown++;
+      }
+      if (empty) empty.hidden = shown > 0;
+      const url = new URL(location.href);
+      if (tag) url.searchParams.set('tag', tag); else url.searchParams.delete('tag');
+      history.replaceState(history.state, '', url);
+    }
+    filter.hidden = false;
+    filter.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>('button[data-tag]');
+      if (button) apply(button.dataset.tag ?? '');
+    });
+    const initial = new URLSearchParams(location.search).get('tag') ?? '';
+    apply(buttons.some(({ dataset }) => dataset.tag === initial) ? initial : '');
+  });
+</script>

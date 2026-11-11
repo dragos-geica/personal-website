@@ -19,7 +19,7 @@ You can change it without touching any other code.
 | The photo in the centre circle | `portrait` |
 | About and Research pages | `pages` → `about`, `research` |
 | The CV | `pages` → `cv` → `sections` (see below) |
-| A category's name or the small word on its line | `categories` → e.g. `music` → `label`, `verb` |
+| A category's name or the small word on its line | `categories` → `experience`, `projects` or `interests` → `label`, `verb` |
 | The circles that appear when a category opens | that category's `items` |
 
 Each **item** becomes a circle in its category and its own page:
@@ -39,10 +39,20 @@ Each **item** becomes a circle in its category and its own page:
   links: [
     { label: 'GitHub', href: 'https://github.com/…' },
   ],
+  tags: ['Stata', 'R', 'Python'],                // data, tools and methods
+  inGraph: false,                                 // keep it off the home graph
 },
 ```
 
 Only `title` and `summary` are required; leave out anything you don't need.
+
+**Tags** list the data, tools and methods behind an item. Every tag used by a project becomes a filter
+on the Projects page, and tags on any page link to the projects that use them. Spell a tool the same way
+everywhere (`'Stata'`, not `'stata'`) so it groups together. Tag research work `'Research'` to list it on
+the Research page.
+
+**The graph shows up to six circles per category**, in the order they appear in the file. Put `inGraph: false`
+on items you want only on the Projects page; it still has its own page.
 Add `draft: true` to mark an item as a placeholder (search engines will skip its page).
 
 ## Editing the CV
@@ -91,4 +101,4 @@ Undo your last change, or fix that line, and save again.
 ## What this file does not control
 
 The positions of the eight categories, colours, and animations are part of the design code.
-The eight categories themselves are fixed; you can rename them, but adding a ninth needs a code change.
+The three categories (Experience, Projects, Other Interests) are fixed; you can rename them, but adding one needs a code change.

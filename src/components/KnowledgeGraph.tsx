@@ -35,7 +35,7 @@ function CategoryNode({ node, index, open, inactive, onToggle }: {
         <path className="edge-spark" d={node.curve} pathLength="100" />
       </svg>
       <button id={`category-${node.id}`} className="node category-node" type="button" onClick={onToggle}
-        data-compact-label={['data-tools', 'interests'].includes(node.id) || undefined}
+        data-compact-label={node.id === 'interests' || undefined}
         aria-expanded={open} aria-controls={open ? `branch-${node.id}` : undefined}
         aria-describedby={`relationship-${node.id}`}>
         <GraphIcon id={node.id} /><span>{node.label}</span>
@@ -176,7 +176,7 @@ export default function KnowledgeGraph() {
   const active = graphNodes.find((node) => node.id === branch?.parent);
   const activeIndex = graphNodes.findIndex((node) => node.id === branch?.parent);
   // On mobile the branch takes a full grid row immediately after its parent’s row.
-  const branchAfter = activeIndex + (1 - activeIndex % 2);
+  const branchAfter = Math.min(activeIndex + (1 - activeIndex % 2), graphNodes.length - 1);
 
   function closeBranch() {
     if (!branch) return;

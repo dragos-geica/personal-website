@@ -647,7 +647,7 @@ astro-island { display: contents; }
   margin-top: 1.5rem;
 }
 
-.project-directory li {
+.project-directory > li {
   padding: 1rem;
   border: 1px solid var(--border);
   border-radius: .75rem;
@@ -677,6 +677,8 @@ astro-island { display: contents; }
   .graph-primary[data-branch-side] .center-orbit,
   .category[data-muted] { display: none; }
   .category[data-active] { grid-column: 1 / -1; }
+  /* An odd last category sits centred on its own row. */
+  .graph-categories > .category:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .graph-primary[data-branch-side] .category[data-active] .category-node { inset: auto; }
   .category[data-active] .relationship { display: none; }
 }
@@ -924,3 +926,25 @@ main[data-branch-return] .knowledge-graph { visibility: hidden; animation: none;
 .section-page .cv-org { margin-top: .1rem; color: var(--muted); font-size: .92rem; }
 .cv-entry ul { margin-top: .35rem; padding-left: 1.1rem; list-style: disc; color: var(--muted); }
 .cv-entry li { margin-top: .2rem; line-height: 1.5; }
+
+/* Tags: data, tools and methods. */
+.tag-list { display: flex; flex-wrap: wrap; gap: .35rem; margin: .2rem 0 1rem; list-style: none; padding: 0; }
+.project-cards .tag-list { margin: .55rem 0 0; }
+.tag {
+  display: inline-block;
+  padding: .22rem .6rem;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: var(--node);
+  color: var(--muted);
+  font: 500 .76rem/1.3 var(--font-mono);
+  white-space: nowrap;
+}
+a.tag:hover, button.tag:hover { border-color: var(--edge-active); color: var(--accent-ink); }
+button.tag { cursor: pointer; }
+button.tag[aria-pressed="true"] { border-color: var(--edge-active); background: var(--accent); color: var(--accent-ink); }
+.tag-filter { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1.3rem; }
+.tag-filter[hidden], .project-cards > li[hidden], .tag-empty[hidden] { display: none; }
+.tag-empty { margin-top: 1rem; }
+
+.tag-list li { padding: 0; border: 0; background: none; }

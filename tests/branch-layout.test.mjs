@@ -59,3 +59,10 @@ test('children are scattered rather than lined up', () => {
     assert.ok(Math.max(...xs) - Math.min(...xs) > 60, `${id} children share one column`);
   }
 });
+
+test('six children on the narrower left side still keep clear of each other', () => {
+  const { points } = layout('experience', 6, 'left');
+  points.forEach((point, index) => points.slice(index + 1).forEach((other) => {
+    assert.ok(distance(point, other) >= 195, `children are ${Math.round(distance(point, other))} apart`);
+  }));
+});

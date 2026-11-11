@@ -69,7 +69,6 @@ export const site: SiteContent = {
                 'Upper-level Monetary Economics, Banking, and Finance, taught in French at Université Paris Cité.',
                 'French grammar, theater, and studio art, including drawing and painting at the Académie de la Grande Chaumière.',
               ],
-              href: '/graph/academics/study-abroad-in-paris/',
             },
             {
               title: 'Oxford for Romania Summer School',
@@ -91,14 +90,14 @@ export const site: SiteContent = {
                 'Linked trade-remedy cases to quarterly U.S. import records from 1990 to 2024 and estimated PPML models with high-dimensional fixed effects on 54.6 million observations in Stata and R.',
                 'Presented the poster “The Trade Effects of US Temporary Trade Barriers: When Do They Start and How Long Do They Last?” in July 2026.',
               ],
-              href: '/graph/research/temporary-trade-barriers/',
+              href: '/graph/experience/temporary-trade-barriers/',
             },
             {
               title: 'Research Intern',
               org: 'Romanian Center for European Policies',
               dates: 'Fall 2025',
               points: ['Compared vocational education and professional certification across five EU countries for a policy brief prepared for Romania’s Ministry of Education.'],
-              href: '/graph/research/vocational-education-policy/',
+              href: '/graph/experience/vocational-education-policy/',
             },
           ],
         },
@@ -109,6 +108,7 @@ export const site: SiteContent = {
               title: 'Student General Manager',
               org: 'Instructional Media Services, Wesleyan University',
               dates: 'September 2025–present',
+              href: '/graph/experience/instructional-media-services/',
               points: [
                 'Oversee operations for a team of 30 student employees, coordinate weekly meetings, and support hiring.',
                 'Replaced manual spreadsheet tracking with a survey-based classroom technology audit.',
@@ -123,6 +123,7 @@ export const site: SiteContent = {
             {
               title: 'Consultant, then Manager',
               org: 'Wesleyan Undergraduate Consulting Group',
+              href: '/graph/experience/undergraduate-consulting/',
               dates: 'September 2025–present',
               points: ['For a career-center engagement project, surveyed 30+ international students, analyzed Handshake engagement data for 650+ students, identified four barriers, and briefed Career Center leadership on recommendations.'],
             },
@@ -159,6 +160,7 @@ export const site: SiteContent = {
             {
               title: 'Co-chair, International Student Advisory Board',
               org: 'Wesleyan University',
+              href: '/graph/experience/international-students/',
               dates: 'September 2024–present',
               points: [
                 'Led a team of 10 on the second edition of a 49-page international student handbook, designed in Figma, supporting a cohort of 95 incoming international students.',
@@ -181,6 +183,7 @@ export const site: SiteContent = {
             {
               title: 'Member, National Children’s Board',
               org: 'UNICEF Romania',
+              href: '/graph/experience/unicef-romania/',
               dates: 'January 2021–April 2024',
               points: [
                 'Represented youth perspectives on children’s rights; served on Bucharest’s Child Friendly Cities Initiative committee in 2022–23.',
@@ -204,11 +207,11 @@ export const site: SiteContent = {
         {
           heading: 'Selected projects',
           entries: [
-            { title: 'High-Performance Computing for Stata', dates: 'Fall 2026', href: '/graph/data-tools/hpc-for-stata/' },
+            { title: 'High-Performance Computing for Stata', dates: 'Fall 2026', href: '/projects/hpc-for-stata/' },
             { title: 'Neo4j trade knowledge graph', dates: 'Fall 2026', href: '/projects/neo4j-demo/' },
-            { title: 'Income Volatility and Self-Reported Health', dates: 'Fall 2025', href: '/graph/research/income-volatility-health/' },
+            { title: 'Income Volatility and Self-Reported Health', dates: 'Fall 2025', href: '/projects/income-volatility-health/' },
             { title: 'Sephora Product Review Analysis', dates: 'Spring 2025', href: '/projects/sephora-reviews/' },
-            { title: 'Global Economic Indicators Analysis', dates: '2025', href: '/graph/data-tools/global-economic-indicators/' },
+            { title: 'Global Economic Indicators Analysis', dates: '2025', href: '/projects/global-economic-indicators/' },
           ],
         },
         {
@@ -231,11 +234,11 @@ export const site: SiteContent = {
     },
   },
 
-  // The eight circles around the portrait. Their order and positions are fixed by the
-  // design; here you change their names, the small word on their line, and their items.
+  // The three circles around the portrait. Their positions are fixed by the design;
+  // here you change their names, the small word on their line, and their items.
   //
-  // Each item becomes a circle when its category is opened, and a page of its own.
-  // An item can have:
+  // Each item becomes a circle when its category is opened (up to six per category),
+  // and a page of its own. An item can have:
   //   title     (required) the name on the circle and the page heading. Keep it short.
   //   subtitle  optional line under the heading, e.g. 'Research assistant · 2026–present'
   //   summary   (required) the first paragraph on the page
@@ -243,45 +246,20 @@ export const site: SiteContent = {
   //   facts     optional figures shown as small cards: { value: '120+', label: 'Registrants' }
   //   sections  optional extra paragraphs with headings: { title: '…', text: '…' }
   //   links     optional links: { label: 'GitHub', href: 'https://…' }
-  //   draft     true hides the page from search engines and marks it as a placeholder
+  //   tags      optional data, tools and methods: ['Stata', 'R']. Tags on projects become
+  //             filters on the Projects page, and every tag links to the projects that use it.
+  //   inGraph   false keeps the item off the home graph (it still has a page and is listed)
+  //   draft     true hides the page from search engines and marks it as in progress
   categories: {
-    academics: {
-      label: 'Academics',
-      verb: 'studies',
-      items: [
-        {
-          title: 'Wesleyan University',
-          subtitle: 'Economics and French, Certificate in Data Science · 2024–2028',
-          summary: 'I’m a B.A. candidate in economics and French at Wesleyan, pursuing a certificate in data science on a full-ride scholarship.',
-          sections: [
-            { title: 'Coursework', text: 'My courses include econometrics, statistical consulting, machine learning, high-performance computing, knowledge graphs, applied data analysis, and microeconomic theory.' },
-            { title: 'Research training', text: 'Alongside my research work, I completed the CITI Program’s Social and Behavioral Responsible Conduct of Research course in September 2026.' },
-          ],
-        },
-        {
-          title: 'Study Abroad in Paris',
-          subtitle: 'Vassar-Wesleyan Program in Paris · Spring 2026',
-          summary: 'I spent January to May 2026 in Paris, learning economics in French and trying a very different kind of classroom in the studio.',
-          sections: [
-            { title: 'Economics in French', text: 'I took an upper-level course in Monetary Economics, Banking, and Finance at Université Paris Cité, with lectures and discussion sections taught in French.' },
-            { title: 'Language, theater, and art', text: 'I also studied French grammar and theater, and took drawing and painting classes at the Académie de la Grande Chaumière.' },
-          ],
-        },
-        {
-          title: 'Oxford for Romania',
-          subtitle: 'Summer school · August–September 2022',
-          summary: 'I was selected for the Oxford for Romania Summer School, a multidisciplinary program of seminars, workshops, and mentorship for 24 Romanian students.',
-        },
-      ],
-    },
-    research: {
-      label: 'Research',
-      verb: 'investigates',
+    experience: {
+      label: 'Experience',
+      verb: 'works_in',
       items: [
         {
           title: 'Temporary Trade Barriers',
           subtitle: 'Research assistant to Professor David Kuenzel · Wesleyan Economics and QAC · 2026–present',
           summary: 'I study how U.S. imports change before and after antidumping, countervailing-duty, and safeguard actions. For my summer poster, I linked trade-remedy cases to 35 years of import records and estimated models on 54.6 million observations.',
+          tags: ['Research', 'Stata', 'R', 'PPML', 'Census import data', 'Concordances'],
           facts: [
             { value: '35 years', label: 'Quarterly U.S. imports, 1990–2024' },
             { value: '54.6M', label: 'Observations in the poster regression' },
@@ -291,25 +269,15 @@ export const site: SiteContent = {
             { title: 'The data', text: 'The project uses quarterly U.S. Census import data built from monthly files compiled by Peter Schott, linked at the exporter × product × quarter level to the World Bank’s Temporary Trade Barriers Database. To follow products across changes in the tariff code system, I use HTS10 codes grouped into Pierce–Schott concordance families.' },
             { title: 'My part', text: 'Working with Professor David Kuenzel, I built binary and count measures for the three remedies across four stages: the year before an investigation, the formal investigation, preliminary duties, and final duties. I estimated Poisson pseudo-maximum likelihood (PPML) models with exporter–product, exporter–quarter, and product–quarter fixed effects in Stata and R, and plotted the value-weighted share of imports covered by these measures, including by exporter.' },
             { title: 'What the summer poster found', text: 'In that specification, final duties were associated with 26.5% lower import values overall: 44.5% lower for countervailing duties and 27.0% lower for antidumping duties. The safeguard estimate was small and not statistically significant. I presented the poster, “The Trade Effects of US Temporary Trade Barriers: When Do They Start and How Long Do They Last?”, in July 2026.' },
-            { title: 'Ongoing work', text: 'The project continues this academic year. Current work includes aggregating to HS6 products, constructing import unit values (value divided by reported quantity), and linking historical regular U.S. tariff rates to the import panel, starting from a 1990 pilot.' },
+            { title: 'Ongoing work', text: 'The project continues this academic year. Current work includes aggregating to HS6 products, constructing import unit values (value divided by reported quantity), and linking historical regular U.S. tariff rates to the import panel: a 1990 pilot using WITS/TRAINS data, crosswalks for trading partners, and documenting when each country’s tariff treatment changed.' },
           ],
           links: [{ label: 'Research update on LinkedIn', href: 'https://www.linkedin.com/feed/update/urn:li:activity:7502850491702304768/' }],
-        },
-        {
-          title: 'Income Volatility & Health',
-          subtitle: 'Course research project · QAC 201 · Fall 2025',
-          summary: 'Using the U.S. National Financial Well-Being Survey, I explored how income volatility, self-reported health, and living arrangements are related among non-retired respondents.',
-          facts: [{ value: '6,394', label: 'Survey observations' }],
-          sections: [
-            { title: 'Method', text: 'I cleaned and recoded the data in Stata, used chi-square tests and multivariable logistic regression, and designed the poster in Figma.' },
-            { title: 'What I found', text: 'High income volatility was more common among respondents reporting poor health. In a separate model of living arrangements, moderate volatility was associated with higher odds of living with someone, while high volatility showed no association. These are associations, not causal effects.' },
-          ],
-          links: [{ label: 'Poster and abstract', href: 'https://adatapostersfall2025.research.wesleyan.edu/2025/11/25/the-association-between-income-volatility-and-perceived-levels-of-health-among-non-retired-individuals-living-alone-and-living-with-someone-else/' }],
         },
         {
           title: 'Vocational Education Policy',
           subtitle: 'Research intern · Romanian Center for European Policies · Fall 2025',
           summary: 'I compared vocational education and professional competency certification across five EU countries, focusing on graduate employability and the move into the labor market.',
+          tags: ['Research', 'Excel', 'Policy analysis'],
           facts: [
             { value: '5', label: 'EU countries compared' },
             { value: '10', label: 'Cross-country datasets synthesized' },
@@ -317,6 +285,56 @@ export const site: SiteContent = {
           sections: [
             { title: 'The work', text: 'Using Excel, I synthesized ten cross-country datasets alongside prior research for a policy brief prepared for Romania’s Ministry of Education.' },
           ],
+        },
+        {
+          title: 'Instructional Media Services',
+          subtitle: 'Student General Manager · Wesleyan University · 2024–present',
+          summary: 'I started as a student technician in 2024, keeping Wesleyan’s classroom technology running, and since September 2025 I’ve managed the team of 30 student employees.',
+          tags: ['Team management', 'Classroom technology', 'Survey design'],
+          facts: [{ value: '30', label: 'Student employees' }],
+          sections: [
+            { title: 'As technician', text: 'I supported classroom projectors, touchscreens, AMX controls, Macs and PCs, and set up AV for events, recordings, and Zoom conferences.' },
+            { title: 'As general manager', text: 'I oversee operations, coordinate weekly meetings, and support hiring. I replaced manual spreadsheet tracking with a survey-based audit of classroom technology.' },
+          ],
+        },
+        {
+          title: 'Undergraduate Consulting',
+          subtitle: 'Consultant, then Manager · Wesleyan Undergraduate Consulting Group · 2025–present',
+          summary: 'For a career-center engagement project, our team looked at why international students weren’t making more use of career support, and what could change that.',
+          tags: ['Survey design', 'Engagement data', 'Consulting'],
+          facts: [
+            { value: '30+', label: 'International students surveyed' },
+            { value: '650+', label: 'Students’ Handshake engagement analyzed' },
+          ],
+          sections: [
+            { title: 'What we found', text: 'We identified four barriers, developed recommendations for career support and engagement, and briefed Career Center leadership.' },
+          ],
+        },
+        {
+          title: 'International Students',
+          subtitle: 'Co-chair, International Student Advisory Board · Wesleyan · 2024–present',
+          summary: 'I co-chair the board that helps international students settle in at Wesleyan, from the handbook they read before arriving to events once they’re here.',
+          tags: ['Leadership', 'Figma', 'Event planning'],
+          facts: [
+            { value: '49', label: 'Pages in the handbook’s second edition' },
+            { value: '95', label: 'Incoming international students supported' },
+          ],
+          sections: [
+            { title: 'The handbook', text: 'I led a team of 10 on the second edition of the international student handbook, which I designed in Figma.' },
+            { title: 'Beyond the handbook', text: 'Our work includes pairing new and current students, recruitment, and working with the Gordon Career Center, including an international alumni career panel on job searches and international career paths in November 2026.' },
+          ],
+        },
+        {
+          title: 'UNICEF Romania',
+          subtitle: 'National Children’s Board · 2021–2024',
+          summary: 'For three years I represented youth perspectives on children’s rights as a member of UNICEF Romania’s National Children’s Board.',
+          tags: ['Advocacy', 'Public speaking', 'Media literacy'],
+          sections: [
+            { title: 'Policy', text: 'I served on Bucharest’s Child Friendly Cities Initiative committee in 2022–23 and contributed youth input to national discussions on children’s rights strategy.' },
+            { title: 'Media literacy', text: 'In a program run by the Center for Independent Journalism and supported by UNICEF Romania, I trained 50+ young people aged 15–18 and worked with 20 teachers on fact-checking and misinformation, and spoke at the “Fake or News?” media education conference in May 2023.' },
+            { title: 'Speaking', text: 'I also spoke in TV interviews about volunteering, education, and children’s rights.' },
+          ],
+          links: [{ label: 'Center for Independent Journalism', href: 'https://www.cji.ro/' }],
         },
       ],
     },
@@ -328,6 +346,7 @@ export const site: SiteContent = {
           title: 'AirBox Bootcamp',
           subtitle: 'Project lead and Projects for Peace grantee · with Alacrity Education · 2026',
           summary: 'I partnered with Alacrity Education to run a free Romanian STEAM bootcamp where students built and deployed air-quality monitors. A $10,000 Projects for Peace grant supported the program, and the students’ readings contributed to a public air-quality dataset.',
+          tags: ['Air-quality sensors', 'Environmental data'],
           facts: [
             { value: '$10,000', label: 'Projects for Peace grant' },
             { value: '120+', label: 'Registrants' },
@@ -361,53 +380,10 @@ export const site: SiteContent = {
           links: [{ label: 'Opportunup on LinkedIn', href: 'https://www.linkedin.com/company/opportunup/' }],
         },
         {
-          title: 'Neo4j Demo',
-          subtitle: 'U.S. trade knowledge graph · Fall 2026',
-          summary: 'I built an exploratory graph database of U.S. import data, to see what trade looks like when you explore it through relationships rather than tables.',
-          sections: [
-            { title: 'Design', text: 'My first design represented exporter countries, detailed products, quarters, and trade-remedy stages as nodes. The working prototype is simpler: countries and broad industries (HS2 chapters) are nodes, linked by exports, with import value stored on each relationship. The simpler model also fit the relationship limits of the available Neo4j plan.' },
-            { title: 'An example question', text: 'One query the prototype answers directly: what are China’s total U.S. import values by HS2 industry?' },
-          ],
-        },
-        {
-          title: 'Data Visualizations',
-          subtitle: 'A gallery in progress',
-          summary: 'A collection of figures from my work, from runtime benchmarks to trade-remedy coverage charts. The images will be added here as I prepare them for the web.',
-          sections: [
-            { title: 'Coming here', text: 'The Stata runtime comparison from my high-performance computing project, the income-volatility poster, charts of the share of U.S. imports covered by trade remedies, and figures from my Sephora review and economic indicators analyses.' },
-          ],
-          links: [
-            { label: 'Income volatility poster', href: 'https://adatapostersfall2025.research.wesleyan.edu/2025/11/25/the-association-between-income-volatility-and-perceived-levels-of-health-among-non-retired-individuals-living-alone-and-living-with-someone-else/' },
-            { label: 'Stata runtime comparison on LinkedIn', href: 'https://www.linkedin.com/feed/update/urn:li:activity:7526015913842810881/' },
-          ],
-          draft: true,
-        },
-        {
-          title: 'EcoCrafting',
-          subtitle: 'Outreach with Alacrity Education · Planned for November 14–December 20, 2026',
-          summary: 'A free workshop series planned in Bucharest for students aged 14–19, who will turn plant ash into ceramic glazes, experiment in a lab, decorate clay pieces, and show their work in a public exhibition. I’m helping with outreach to schools.',
-          links: [{ label: 'Alacrity Education', href: 'https://alacrity.education/en' }],
-          draft: true,
-        },
-        {
-          title: 'Sephora Reviews',
-          subtitle: 'Data analysis · Wesleyan · Spring 2025',
-          summary: 'I analyzed 5,000+ Sephora product reviews to explore how ratings vary with brand, product category, and price.',
-          facts: [{ value: '5,000+', label: 'Product reviews analyzed' }],
-          sections: [
-            { title: 'Method', text: 'I used Python with pandas and NumPy for the analysis, and seaborn and Matplotlib to visualize the comparisons, including by reported skin tone and skin type where reviewers gave them. The result was a report with tables and graphics describing patterns in the ratings.' },
-          ],
-        },
-      ],
-    },
-    'data-tools': {
-      label: 'Data & Tools',
-      verb: 'uses',
-      items: [
-        {
           title: 'HPC for Stata',
           subtitle: 'High-performance computing · Wesleyan · Fall 2026',
           summary: 'I benchmarked large Stata PPML regressions on Wesleyan’s computing cluster to see how CPU counts, node allocation, and parallel execution affected runtime, and I updated a faculty guide to running Stata on the cluster.',
+          tags: ['Stata', 'PPML', 'Linux', 'Bash', 'Slurm', 'Benchmarking'],
           sections: [
             { title: 'What I did', text: 'In a two-month course covering Linux, Bash, and Slurm, I compared serial and parallel configurations using job logs and measured runtimes.' },
             { title: 'What I learned', text: 'Allocating more computing resources did not reliably shorten a run. Measuring before scaling up turned out to matter more than asking for more cores.' },
@@ -415,80 +391,70 @@ export const site: SiteContent = {
           links: [{ label: 'Benchmark post on LinkedIn', href: 'https://www.linkedin.com/feed/update/urn:li:activity:7526015913842810881/' }],
         },
         {
-          title: 'Trade Data & Concordances',
-          subtitle: 'Methods behind my trade research',
-          summary: 'Most of the work in trade research is in the data: lining up decades of import records, product codes that change over time, and the case records of trade investigations.',
+          title: 'Neo4j Demo',
+          subtitle: 'U.S. trade knowledge graph · Fall 2026',
+          summary: 'I built an exploratory graph database of U.S. import data, to see what trade looks like when you explore it through relationships rather than tables.',
+          tags: ['Neo4j', 'Graph databases', 'Census import data'],
           sections: [
-            { title: 'Sources', text: 'Quarterly U.S. Census import data compiled from monthly files by Peter Schott, the World Bank’s Temporary Trade Barriers Database, and Pierce–Schott concordances that follow products across changes in HTS codes.' },
-            { title: 'Linking historical tariffs', text: 'I’ve been working out how historical U.S. tariff schedules can be linked to the import panel: a 1990 pilot using WITS/TRAINS data, crosswalks for trading partners, and documenting when each country’s tariff treatment changed.' },
-            { title: 'A small habit that helps', text: 'Putting the reference year in every generated file name, so a pipeline built for one year can expand across many without overwriting itself.' },
+            { title: 'Design', text: 'My first design represented exporter countries, detailed products, quarters, and trade-remedy stages as nodes. The working prototype is simpler: countries and broad industries (HS2 chapters) are nodes, linked by exports, with import value stored on each relationship. The simpler model also fit the relationship limits of the available Neo4j plan.' },
+            { title: 'An example question', text: 'One query the prototype answers directly: what are China’s total U.S. import values by HS2 industry?' },
+          ],
+        },
+        {
+          title: 'Income Volatility & Health',
+          subtitle: 'Course research project · QAC 201 · Fall 2025',
+          summary: 'Using the U.S. National Financial Well-Being Survey, I explored how income volatility, self-reported health, and living arrangements are related among non-retired respondents.',
+          tags: ['Research', 'Stata', 'Logistic regression', 'Figma'],
+          facts: [{ value: '6,394', label: 'Survey observations' }],
+          sections: [
+            { title: 'Method', text: 'I cleaned and recoded the data in Stata, used chi-square tests and multivariable logistic regression, and designed the poster in Figma.' },
+            { title: 'What I found', text: 'High income volatility was more common among respondents reporting poor health. In a separate model of living arrangements, moderate volatility was associated with higher odds of living with someone, while high volatility showed no association. These are associations, not causal effects.' },
+          ],
+          links: [{ label: 'Poster and abstract', href: 'https://adatapostersfall2025.research.wesleyan.edu/2025/11/25/the-association-between-income-volatility-and-perceived-levels-of-health-among-non-retired-individuals-living-alone-and-living-with-someone-else/' }],
+        },
+        {
+          title: 'Sephora Reviews',
+          subtitle: 'Data analysis · Wesleyan · Spring 2025',
+          summary: 'I analyzed 5,000+ Sephora product reviews to explore how ratings vary with brand, product category, and price.',
+          tags: ['Python', 'pandas', 'NumPy', 'seaborn', 'Matplotlib'],
+          facts: [{ value: '5,000+', label: 'Product reviews analyzed' }],
+          sections: [
+            { title: 'Method', text: 'I used Python with pandas and NumPy for the analysis, and seaborn and Matplotlib to visualize the comparisons, including by reported skin tone and skin type where reviewers gave them. The result was a report with tables and graphics describing patterns in the ratings.' },
           ],
         },
         {
           title: 'Global Economic Indicators',
           subtitle: 'Excel and VBA analysis · Wesleyan · 2025',
           summary: 'I used Excel and VBA to explore 2014–2023 data from 150+ countries, comparing macroeconomic, governance, and social indicators.',
+          tags: ['Excel', 'VBA'],
           facts: [{ value: '150+', label: 'Countries, 2014–2023' }],
           sections: [
             { title: 'Method', text: 'I built charts and correlation analyses on topics such as trade flows and governance. In the course dataset, imports and exports moved closely together, as did government effectiveness and political stability.' },
           ],
+          inGraph: false,
         },
-      ],
-    },
-    music: {
-      label: 'Music Taste',
-      verb: 'listens_to',
-      items: [
         {
-          title: 'INNA — “Hot”',
-          summary: 'A favorite summer song, and a Romanian classic.',
-        },
-      ],
-    },
-    reading: {
-      label: 'Reading',
-      verb: 'reads',
-      items: [
-        {
-          title: 'Research References',
-          subtitle: 'What my trade research builds on',
-          summary: 'A few of the papers behind my work on U.S. temporary trade barriers.',
+          title: 'Data Visualizations',
+          subtitle: 'A gallery in progress',
+          summary: 'A collection of figures from my work, from runtime benchmarks to trade-remedy coverage charts. The images will be added here as I prepare them for the web.',
+          tags: ['Stata', 'R', 'Python', 'Figma'],
           sections: [
-            { title: 'Product codes', text: 'Pierce and Schott, on concording U.S. product codes over time, which makes it possible to follow a product across decades of changing classifications.' },
-            { title: 'Antidumping', text: 'Besedeš and Prusa, on the effects of antidumping duties on trade.' },
-            { title: 'Safeguards', text: 'Bown, on safeguards and temporary trade barriers more broadly.' },
+            { title: 'Coming here', text: 'The Stata runtime comparison from my high-performance computing project, the income-volatility poster, charts of the share of U.S. imports covered by trade remedies, and figures from my Sephora review and economic indicators analyses.' },
           ],
-        },
-        {
-          title: 'Personal Reading',
-          summary: 'Books and articles I’ve enjoyed will go here.',
+          links: [
+            { label: 'Income volatility poster', href: 'https://adatapostersfall2025.research.wesleyan.edu/2025/11/25/the-association-between-income-volatility-and-perceived-levels-of-health-among-non-retired-individuals-living-alone-and-living-with-someone-else/' },
+            { label: 'Stata runtime comparison on LinkedIn', href: 'https://www.linkedin.com/feed/update/urn:li:activity:7526015913842810881/' },
+          ],
+          inGraph: false,
           draft: true,
         },
-      ],
-    },
-    travel: {
-      label: 'Travel',
-      verb: 'explores',
-      items: [
         {
-          title: 'Paris',
-          subtitle: 'Spring 2026',
-          summary: 'Where I studied abroad: learning monetary economics in French at Université Paris Cité, and spending time in a painting studio at the Académie de la Grande Chaumière.',
-        },
-        {
-          title: 'Bucharest',
-          subtitle: 'Home base',
-          summary: 'Where most of my community work happened: the in-person week of AirBox Bootcamp, my internship at the Ministry of Research, Innovation and Digitalization, tutoring, and my years on UNICEF Romania’s National Children’s Board.',
-        },
-        {
-          title: 'Middletown',
-          subtitle: 'Wesleyan University · since 2024',
-          summary: 'Where I study, do research, work in classroom technology, and help welcome new international students each year.',
-        },
-        {
-          title: 'Oxford',
-          subtitle: 'Summer 2022',
-          summary: 'Where I spent the Oxford for Romania Summer School, with seminars, workshops, and mentorship alongside 23 other Romanian students.',
+          title: 'EcoCrafting',
+          subtitle: 'Outreach with Alacrity Education · Planned for November 14–December 20, 2026',
+          summary: 'A free workshop series planned in Bucharest for students aged 14–19, who will turn plant ash into ceramic glazes, experiment in a lab, decorate clay pieces, and show their work in a public exhibition. I’m helping with outreach to schools.',
+          links: [{ label: 'Alacrity Education', href: 'https://alacrity.education/en' }],
+          inGraph: false,
+          draft: true,
         },
       ],
     },

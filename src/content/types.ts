@@ -21,6 +21,10 @@ export interface ContentItem {
   facts?: readonly { value: string; label: string }[];
   sections?: readonly { title: string; text: string }[];
   links?: readonly ContentLink[];
+  /** Data, tools and methods used, shown as tags. Project tags become filters on the Projects page. */
+  tags?: readonly string[];
+  /** false keeps the item off the home graph; it still has its page and appears on listings. */
+  inGraph?: boolean;
   draft?: boolean;
 }
 
@@ -30,8 +34,7 @@ export interface ContentCategory {
   items: readonly ContentItem[];
 }
 
-export type CategoryId =
-  | 'academics' | 'research' | 'projects' | 'data-tools' | 'music' | 'reading' | 'travel' | 'interests';
+export type CategoryId = 'experience' | 'projects' | 'interests';
 
 export interface ContentPage {
   title: string;

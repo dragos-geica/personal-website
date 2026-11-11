@@ -2,6 +2,7 @@
 // One page per graph item. Everything shown here comes from src/content/site.ts.
 import SiteLayout from '../layouts/SiteLayout.astro';
 import type { ContentItem } from '../content/types';
+import { tagHref } from '../data/tags';
 
 interface Props {
   item: ContentItem;
@@ -17,6 +18,14 @@ const { item, category, back } = Astro.props;
     <p class="section-eyebrow">{item.draft ? `${category} · in progress` : category}</p>
     <h1 data-morph-heading tabindex="-1">{item.title}</h1>
     {item.subtitle && <p class="detail-subtitle">{item.subtitle}</p>}
+    {!!item.tags?.length && (
+      <ul class="tag-list" aria-label="Data, tools and methods">
+        {item.tags.map((tag) => {
+          const href = tagHref(tag);
+          return <li>{href ? <a class="tag" href={href}>{tag}</a> : <span class="tag">{tag}</span>}</li>;
+        })}
+      </ul>
+    )}
     <p class="detail-summary">{item.summary}</p>
     {item.image && <img class="project-image detail-image" src={item.image.src} alt={item.image.alt} decoding="async" />}
     {!!item.facts?.length && (

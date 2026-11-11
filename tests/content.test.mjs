@@ -38,3 +38,17 @@ test('every internal CV link points at a page that exists', async () => {
     }
   }
 });
+
+test('project tags become filters, and tagged research is listed', async () => {
+  const { projectTags, tagHref, itemsTagged } = await import('../src/data/tags.ts');
+  assert.ok(projectTags.includes('Stata') && projectTags.includes('Python'));
+  assert.equal(tagHref('Stata'), '/projects/?tag=Stata');
+  assert.equal(tagHref('Advocacy'), undefined, 'tags no project uses do not link to an empty filter');
+  assert.deepEqual(itemsTagged('Research').map(({ item }) => item.title),
+    ['Temporary Trade Barriers', 'Vocational Education Policy', 'Income Volatility & Health']);
+});
+
+test('the original project pages still exist', () => {
+  const slugs = site.categories.projects.items.map(({ title }) => slugify(title));
+  for (const slug of ['airbox-bootcamp', 'ecocrafting', 'neo4j-demo', 'data-visualizations']) assert.ok(slugs.includes(slug), slug);
+});
