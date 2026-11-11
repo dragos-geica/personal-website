@@ -108,6 +108,42 @@ body {
   letter-spacing: -.055em;
 }
 
+/* The name is a button: it reveals links to the other pages. */
+.name-toggle {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: .35rem;
+  text-decoration: underline transparent;
+  text-decoration-thickness: .06em;
+  text-underline-offset: .14em;
+  transition: text-decoration-color 180ms ease;
+}
+
+.name-toggle:hover, .name-toggle[aria-expanded="true"] {
+  text-decoration-color: color-mix(in srgb, var(--accent-ink) 45%, transparent);
+}
+
+.site-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .35rem 1.4rem;
+  margin: .55rem 0 .15rem;
+  font-size: clamp(.92rem, 1vw, 1.05rem);
+  font-weight: 560;
+}
+
+.site-links[hidden] { display: none; }
+.site-links a { padding: .2rem .1rem; color: var(--accent-ink); }
+.site-links a:hover { text-decoration: underline; text-underline-offset: .2em; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-links:not([hidden]) { animation: links-in 240ms var(--ease-enter, ease-out); }
+}
+@keyframes links-in { from { opacity: 0; translate: 0 -4px; } }
+
 .home-tagline {
   margin-top: .3rem;
   color: var(--accent-ink);

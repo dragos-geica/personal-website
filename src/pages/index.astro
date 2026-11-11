@@ -2,14 +2,46 @@
 import KnowledgeGraph from '../components/KnowledgeGraph';
 import SiteLayout from '../layouts/SiteLayout.astro';
 import { site } from '../content/site';
+
+const links = [
+  { label: site.pages.about.title, href: '/about/' },
+  { label: site.categories.projects.label, href: '/projects/' },
+  { label: site.pages.research.title, href: '/research/' },
+  { label: site.pages.cv.title, href: '/cv/' },
+];
 ---
 <SiteLayout title={`${site.name} — ${site.tagline}`}>
   <main id="main-content" class="home-scene" tabindex="-1" aria-labelledby="home-title">
     <header class="home-intro">
-      <h1 id="home-title">{site.name}</h1>
+      <h1 id="home-title">
+        <button type="button" class="name-toggle" aria-expanded="false" aria-controls="site-links">{site.name}</button>
+      </h1>
+      <nav id="site-links" class="site-links" aria-label="Pages" hidden>
+        {links.map(({ label, href }) => <a href={href}>{label}</a>)}
+      </nav>
       <p class="home-tagline">{site.tagline}</p>
       <p class="home-description">{site.intro}</p>
     </header>
     <KnowledgeGraph client:load transition:persist="knowledge-graph" />
   </main>
 </SiteLayout>
+
+<script>
+  // Clicking the name shows or hides the links to the other pages.
+  document.addEventListener('astro:page-load', () => {
+    const toggle = document.querySelector<HTMLButtonElement>('.name-toggle');
+    const links = document.getElementById('site-links');
+    if (!toggle || !links) return;
+    const set = (open: boolean) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      links.hidden = !open;
+    };
+    toggle.addEventListener('click', () => set(links.hidden));
+    links.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') { set(false); toggle.focus(); }
+    });
+    toggle.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') set(false);
+    });
+  });
+</script>
