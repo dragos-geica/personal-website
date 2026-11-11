@@ -1,10 +1,13 @@
-import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { branchReducer, type BranchAction, type BranchState } from '../data/branch-state';
+import { navigate } from 'astro:transitions/client';
 import { branchPath, readBranch } from '../data/branch-location';
 import ContentPanel from './ContentPanel';
 import GraphBranch from './GraphBranch';
 import { centerNode, graphCanvas, graphNodes, type GraphNode } from '../data/graph';
 import GraphIcon from './GraphIcon';
+import { moveBranchHub, PROJECT_HUB_X, BRANCH_TRAVEL_MS, sweepBranch } from '../scripts/branch-motion';
+import type { TransitionBeforePreparationEvent } from 'astro:transitions/client';
 
 const { width, height } = graphCanvas;
 
@@ -15,10 +18,8 @@ function coordinates(x: number, y: number): CSSProperties {
   } as CSSProperties;
 }
 
-const sparks = [[0, -1], [.8, -.6], [1, .1], [.58, .8], [-.42, .9], [-1, .18], [-.75, -.7]];
-
-function CategoryNode({ node, index, open, onToggle }: {
-  node: GraphNode; index: number; open: boolean; onToggle: () => void;
+function CategoryNode({ node, index, open, inactive, onToggle }: {
+  node: GraphNode; index: number; open: boolean; inactive: boolean; onToggle: () => void;
 }) {
   const style = {
     ...coordinates(...node.position),
@@ -28,24 +29,17 @@ function CategoryNode({ node, index, open, onToggle }: {
   } as CSSProperties;
 
   return (
-    <li className="category" style={style}>
+    <li className="category" style={style} data-active={open || undefined} data-muted={inactive || undefined} inert={inactive}>
       <svg className="graph-edges" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden="true">
         <path className="edge-line" d={node.curve} />
         <path className="edge-spark" d={node.curve} pathLength="100" />
-        {open && <path className="edge-spark activation-spark" d={node.curve} pathLength="100" />}
       </svg>
       <button id={`category-${node.id}`} className="node category-node" type="button" onClick={onToggle}
+        data-compact-label={['data-tools', 'interests'].includes(node.id) || undefined}
         aria-expanded={open} aria-controls={open ? `branch-${node.id}` : undefined}
         aria-describedby={`relationship-${node.id}`}>
         <GraphIcon id={node.id} /><span>{node.label}</span>
       </button>
-      {open && (
-        <span className="node-burst" aria-hidden="true">
-          {sparks.map(([dx, dy], index) => <i key={index} style={{
-            '--dx': `${dx * 86}px`, '--dy': `${dy * 86}px`,
-          } as CSSProperties} />)}
-        </span>
-      )}
       <span id={`relationship-${node.id}`} className="relationship" style={coordinates(...node.pill)}>{node.verb}</span>
     </li>
   );
@@ -54,10 +48,13 @@ function CategoryNode({ node, index, open, onToggle }: {
 export default function KnowledgeGraph() {
   const { x, y, size, label } = centerNode;
   const [branch, setBranch] = useState<BranchState>(null);
-  const [restored, setRestored] = useState(false);
+  const [revealBranch, setRevealBranch] = useState(false);
+  const graph = useRef<HTMLDivElement>(null);
+  const branchSweep = useRef<ReturnType<typeof sweepBranch> | null>(null);
   const currentBranch = useRef<BranchState>(null);
   const previewTitle = useRef<HTMLHeadingElement>(null);
-  const pendingFocus = useRef<{ id: string; scroll: boolean } | null>(null);
+  const pendingFocus = useRef<{ id: string; scroll: 'preview' | 'nearest' | 'none' } | null>(null);
+  const pendingNavigation = useRef<{ path: string } | null>(null);
 
   function restoreBranch(next: BranchState) {
     currentBranch.current = next;
@@ -65,20 +62,71 @@ export default function KnowledgeGraph() {
   }
 
   useEffect(() => {
-    function restoreFromLocation(event?: PopStateEvent) {
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const graphElement = graph.current;
+    const observer = new IntersectionObserver(([entry]) => {
+      graphElement?.toggleAttribute('data-graph-offscreen', !entry.isIntersecting);
+    });
+    if (graphElement) observer.observe(graphElement);
+
+    function restoreFromLocation(swap?: Event) {
       const next = readBranch(window.location.search);
-      const parent = next?.parent ?? currentBranch.current?.parent;
+      const previous = currentBranch.current;
+      if (branchPath(next) === branchPath(previous)) return;
+      const parent = next?.parent ?? previous?.parent;
+      const animate = Boolean(next && branchSweep.current && !reducedMotion.matches);
       if (parent) pendingFocus.current = {
         id: next?.selected ? 'preview-title' : `category-${parent}`,
-        scroll: Boolean(next?.selected || event),
+        scroll: next?.selected ? 'preview' : swap && !animate ? 'nearest' : 'none',
       };
-      setRestored(true);
+      setRevealBranch(animate);
       restoreBranch(next);
     }
 
+    function prepareNavigation(raw: Event) {
+      const event = raw as TransitionBeforePreparationEvent;
+      cancelBranchSweep();
+      // Route navigation owns the sweep, including browser Back and Forward.
+      // Starting it before navigate() left a window in which history could race it.
+      const next = readBranch(event.to.search);
+      if (reducedMotion.matches || event.from.pathname !== '/' || event.to.pathname !== '/'
+        || readBranch(event.from.search) || !next || !graph.current) return;
+      const hub = document.getElementById(`category-${next.parent}`);
+      if (!hub) return;
+      const sweep = sweepBranch(graph.current, hub);
+      branchSweep.current = sweep;
+      const cleanup = () => { if (branchSweep.current === sweep) cancelBranchSweep(); };
+      event.signal.addEventListener('abort', cleanup, { once: true });
+      const load = event.loader;
+      event.loader = async () => {
+        try {
+          const [, complete] = await Promise.all([load(), sweep.finished]);
+          if (!complete || event.defaultPrevented) cleanup();
+        } catch (error) {
+          cleanup();
+          throw error;
+        }
+      };
+    }
+
+    function onMotionPreferenceChange() {
+      if (reducedMotion.matches) {
+        cancelBranchSweep();
+        setRevealBranch(false);
+      }
+    }
+
     restoreFromLocation();
-    window.addEventListener('popstate', restoreFromLocation);
-    return () => window.removeEventListener('popstate', restoreFromLocation);
+    reducedMotion.addEventListener('change', onMotionPreferenceChange);
+    document.addEventListener('astro:after-swap', restoreFromLocation);
+    document.addEventListener('astro:before-preparation', prepareNavigation);
+    return () => {
+      reducedMotion.removeEventListener('change', onMotionPreferenceChange);
+      document.removeEventListener('astro:after-swap', restoreFromLocation);
+      document.removeEventListener('astro:before-preparation', prepareNavigation);
+      cancelBranchSweep();
+      observer.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -87,18 +135,47 @@ export default function KnowledgeGraph() {
     const element = target.id === 'preview-title' ? previewTitle.current : document.getElementById(target.id);
     if (!element) return;
     pendingFocus.current = null;
-    focusTarget(element, target.scroll);
+    if (element.closest('[data-morph-main="arriving"], [data-branch-return]')) return;
+    focusTarget(element, target.scroll === 'preview');
+    if (target.scroll === 'nearest') element.scrollIntoView({ block: 'nearest', behavior: 'instant' });
   }, [branch]);
+
+  useLayoutEffect(() => {
+    if (branch?.parent === readBranch(location.search)?.parent) {
+      delete document.documentElement.dataset.graphPending;
+      document.querySelector('main')?.removeAttribute('data-graph-pending');
+    }
+    if (branch && branchSweep.current) {
+      const { origin } = branchSweep.current;
+      cancelBranchSweep();
+      const hub = document.getElementById(`category-${branch.parent}`);
+      if (hub && revealBranch && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+        const motion = moveBranchHub(hub, origin);
+        return () => motion.cancel();
+      }
+    }
+  }, [branch, revealBranch]);
+
+  function cancelBranchSweep() {
+    branchSweep.current?.cleanup();
+    branchSweep.current = null;
+  }
 
   function updateBranch(action: BranchAction) {
     const previous = currentBranch.current;
     const next = branchReducer(previous, action);
     if (next === previous) return;
     const path = branchPath(next);
-    if (path !== branchPath(previous)) window.history.pushState(null, '', path);
-    if (action.type === 'toggle') setRestored(false);
-    if (action.type === 'select') pendingFocus.current = { id: 'preview-title', scroll: true };
-    restoreBranch(next);
+    if (path === branchPath(previous)) {
+      if (action.type === 'select' && previewTitle.current) focusTarget(previewTitle.current, true);
+      return;
+    }
+    if (pendingNavigation.current?.path === path) return;
+    const request = { path };
+    pendingNavigation.current = request;
+    void navigate(path).finally(() => {
+      if (pendingNavigation.current === request) pendingNavigation.current = null;
+    });
   }
   const active = graphNodes.find((node) => node.id === branch?.parent);
   const activeIndex = graphNodes.findIndex((node) => node.id === branch?.parent);
@@ -107,27 +184,41 @@ export default function KnowledgeGraph() {
 
   function closeBranch() {
     if (!branch) return;
-    document.getElementById(`category-${branch.parent}`)?.focus();
+    document.getElementById(`category-${branch.parent}`)?.focus({ preventScroll: true });
     updateBranch({ type: 'close' });
   }
 
   function returnToChild() {
-    const child = document.querySelector<HTMLButtonElement>('.child-node[aria-pressed="true"]');
+    const child = document.querySelector<HTMLButtonElement>('.child-node:is([aria-pressed="true"], [data-selected="true"])');
     if (child) focusTarget(child, true);
   }
 
   return (
     <>
-      <div id="knowledge-graph" className="knowledge-graph" tabIndex={-1} role="group" aria-label="Personal knowledge graph"
+      <div id="knowledge-graph" ref={graph} className="knowledge-graph" tabIndex={-1} role="group" aria-label="Personal knowledge graph"
         onKeyDown={(event) => {
-          if (event.key === 'Escape' && branch) {
+          const opening = !branch && (branchSweep.current || pendingNavigation.current);
+          if (event.key === 'Escape' && (branch || opening)) {
             event.preventDefault();
-            closeBranch();
+            if (opening) {
+              cancelBranchSweep();
+              pendingNavigation.current = null;
+              const { href } = location;
+              const { scrollX: left, scrollY: top } = window;
+              // Abort the pending route as well as its visual sweep.
+              void navigate(href, { history: 'replace' }).then(() => {
+                if (location.href === href && !pendingNavigation.current) window.scrollTo({ left, top, behavior: 'instant' });
+              });
+            } else closeBranch();
           }
         }}>
-        <div className="graph-primary" data-restored={restored ? 'true' : undefined}
+        <div className="graph-primary" style={{
+          '--projects-hub-x': `${PROJECT_HUB_X / width * 100}%`,
+          '--branch-travel': `${BRANCH_TRAVEL_MS}ms`,
+        } as CSSProperties}
+          data-branch-parent={branch?.parent} data-branch-reveal={revealBranch || undefined}
           data-branch-side={active ? active.position[0] < width / 2 ? 'left' : 'right' : undefined}>
-          <div className="center-orbit" style={{
+          <div className="center-orbit" inert={Boolean(active)} style={{
             ...coordinates(x, y),
             '--size': `${size / width * 100}cqw`,
           } as CSSProperties}>
@@ -150,9 +241,11 @@ export default function KnowledgeGraph() {
             {graphNodes.map((node, index) => (
               <Fragment key={node.id}>
                 <CategoryNode node={node} index={index} open={node.id === active?.id}
+                  inactive={Boolean(active && node.id !== active.id)}
                   onToggle={() => updateBranch({ type: 'toggle', parent: node.id })} />
                 {active && branch && index === branchAfter && (
                   <GraphBranch key={active.id} node={active} selected={branch.selected} onClose={closeBranch}
+                    revealBranch={revealBranch} onRevealComplete={() => setRevealBranch(false)}
                     onSelect={(child) => updateBranch({ type: 'select', parent: active.id, child })} />
                 )}
               </Fragment>

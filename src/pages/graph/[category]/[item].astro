@@ -1,0 +1,23 @@
+---
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import { graphDestinations } from '../../../data/node-destinations';
+
+export function getStaticPaths() {
+  return graphDestinations.map((item) => {
+    const [, , category, slug] = item.path.split('/');
+    return { params: { category, item: slug }, props: { item } };
+  });
+}
+
+const { item } = Astro.props;
+const description = 'Content placeholder. Notes and links for this item can be added here once they are available.';
+---
+<SiteLayout title={`DG — ${item.child}`} description={description} noindex>
+  <main id="main-content" class="section-page mx-auto" tabindex="-1">
+    <a class="explore-link leaf-back" href={item.back} data-morph-back><span aria-hidden="true">←</span> Back</a>
+    <p class="section-eyebrow">{item.parent}</p>
+    <h1 data-morph-heading tabindex="-1">{item.child}</h1>
+    <p>{description}</p>
+    {item.parent === 'Research' && <p><a class="back-link" href="/research/">Research overview</a></p>}
+  </main>
+</SiteLayout>

@@ -12,6 +12,6 @@ import SiteLayout from '../layouts/SiteLayout.astro';
         <a href="#knowledge-graph" class="explore-link">Explore the graph <span aria-hidden="true">→</span></a>
       </div>
     </section>
-    <KnowledgeGraph client:idle />
+    <KnowledgeGraph client:load transition:persist="knowledge-graph" />
   </main>
 </SiteLayout>

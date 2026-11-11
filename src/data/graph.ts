@@ -1,7 +1,7 @@
 import { projects } from './projects.ts';
 
 export const graphCanvas = { width: 1080, height: 815 };
-export const centerNode = { x: 531, y: 411, size: 212, label: 'Me' };
+export const centerNode = { x: 531, y: 411, size: 212, label: 'Dragos' };
 
 type Point = readonly [x: number, y: number];
 

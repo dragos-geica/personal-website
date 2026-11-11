@@ -249,8 +249,7 @@ astro-island { display: contents; }
 }
 
 .category-node span { max-width: 92%; text-wrap: balance; }
-#category-data-tools span,
-#category-interests span { max-width: 70%; }
+.category-node[data-compact-label] span { max-width: 70%; }
 
 .graph-icon { width: 32%; height: auto; }
 
@@ -323,16 +322,11 @@ astro-island { display: contents; }
 .graph-primary {
   position: absolute;
   inset: 0;
-  transition: left 360ms ease, right 360ms ease;
+  /* The hub uses a measured transform; layout itself changes only once. */
 }
 
 .graph-primary[data-branch-side="left"] { left: 22%; }
 .graph-primary[data-branch-side="right"] { right: 22%; }
-
-.graph-primary[data-branch-side] {
-  transition-duration: 220ms;
-  transition-delay: 200ms;
-}
 
 .graph-primary[data-branch-side] :is(.category-node, .center-orbit) {
   width: calc(var(--size) * .87);
@@ -350,12 +344,6 @@ astro-island { display: contents; }
   animation: graph-pulse var(--pulse-cycle) linear var(--pulse-delay) infinite;
 }
 
-.edge-spark.activation-spark {
-  stroke: #eff8ff;
-  stroke-width: 4;
-  animation: activation-pulse 315ms linear both;
-}
-
 @keyframes graph-pulse {
   0% { stroke-dashoffset: -100; opacity: 0; }
   5% { opacity: 1; }
@@ -363,12 +351,6 @@ astro-island { display: contents; }
   32%, 100% { stroke-dashoffset: 0; opacity: 0; }
 }
 
-
-@keyframes activation-pulse {
-  0% { stroke-dashoffset: -100; opacity: 0; }
-  12%, 83% { opacity: 1; }
-  100% { stroke-dashoffset: 0; opacity: 0; }
-}
 
 .category-node {
   cursor: pointer;
@@ -383,7 +365,8 @@ astro-island { display: contents; }
 
 .category-node[aria-expanded="true"] {
   z-index: 3;
-  animation: node-pop 550ms ease-out both;
+  animation: none;
+  scale: 1;
 }
 
 @keyframes node-breathe {
@@ -391,57 +374,6 @@ astro-island { display: contents; }
   50% { scale: 1.015; }
 }
 
-@keyframes node-pop {
-  0%, 13% { scale: 1; translate: 0; }
-  31% { scale: 1.075; translate: -2px 1px; }
-  39% { scale: 1.09; translate: 3px -1px; }
-  46% { translate: -2px 1px; }
-  53% { scale: 1.09; translate: 1px 0; }
-  60% { scale: .98; translate: 0; }
-  78% { scale: 1.035; }
-  100% { scale: 1.02; }
-}
-
-.node-burst {
-  position: absolute;
-  z-index: 4;
-  top: var(--y);
-  left: var(--x);
-  width: calc(var(--size) * .87);
-  aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-.node-burst::before {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  border: 2px solid var(--edge-active);
-  border-radius: 50%;
-  animation: pop-halo 260ms ease-out 300ms both;
-}
-
-.node-burst i {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 4px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--edge-active);
-  animation: pop-particle 250ms ease-out 310ms both;
-}
-
-@keyframes pop-halo {
-  from { opacity: .5; scale: 1; }
-  to { opacity: 0; scale: 1.37; }
-}
-
-@keyframes pop-particle {
-  from { opacity: .7; transform: translate(calc(var(--dx) * .64), calc(var(--dy) * .64)); }
-  to { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.4); }
-}
 
 .graph-branch {
   position: absolute;
@@ -496,17 +428,6 @@ astro-island { display: contents; }
   border-color: var(--edge-active);
   background: var(--accent);
   color: var(--accent-ink);
-}
-
-.child-node {
-  animation: child-reveal 235ms ease-out calc(450ms + var(--order) * 70ms) both;
-}
-
-.child-node:focus-visible { animation: none; }
-
-@keyframes child-reveal {
-  from { opacity: 0; visibility: hidden; }
-  to { opacity: 1; visibility: visible; }
 }
 
 .branch-actions {
@@ -593,14 +514,6 @@ astro-island { display: contents; }
   .graph-primary[data-branch-side] .category-node { width: min(100%, 35vw, 155px); }
 
   .graph-primary[data-branch-side] .center-orbit { width: clamp(125px, 39vw, 200px); }
-
-  .node-burst {
-    grid-area: 1 / 1;
-    position: relative;
-    inset: auto;
-    width: min(100%, 35vw, 155px);
-    transform: none;
-  }
 
   .category > .category-node { grid-area: 1 / 1; }
 
@@ -689,7 +602,7 @@ astro-island { display: contents; }
     transition: none !important;
   }
 
-  .edge-spark, .node-burst { display: none; }
+  .edge-spark { display: none; }
 }
 
 .site-nav a[data-section-active="true"] { border-bottom-color: currentColor; }
@@ -801,16 +714,9 @@ astro-island { display: contents; }
 
 .project-detail { padding-top: clamp(2rem, 5vw, 4rem); }
 
-.project-breadcrumb {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-  margin-bottom: 2rem;
-  color: var(--muted);
-  font-size: .86rem;
-}
+.leaf-back { margin-bottom: 1.35rem; }
 
-.project-breadcrumb a, .detail-section a, .project-directory a {
+.detail-section a, .project-directory a {
   color: var(--accent-ink);
   text-decoration: underline;
   text-underline-offset: .2em;
@@ -848,14 +754,225 @@ astro-island { display: contents; }
   .project-preview :is(.project-image-placeholder, .project-image) { aspect-ratio: 16 / 9; }
 }
 
-.graph-primary[data-restored="true"] {
+/* Fade the category as a group so a child animation cannot bring it back. */
+.category { transition: opacity 320ms ease; }
+.category > :is(.category-node, .relationship, .graph-edges), .center-orbit {
+  transition: opacity 320ms ease, box-shadow 150ms ease;
+}
+.category[data-muted],
+.graph-primary[data-branch-side] .center-orbit,
+.category[data-active] > :is(.relationship, .graph-edges) { opacity: 0; }
+.category[data-active] .category-node { top: 50%; left: 57.4074%; }
+.graph-primary[data-branch-side="left"] .category[data-active] .category-node { left: 42.5926%; }
+.child-node[data-selected="true"], .branch-preview-toggle[aria-pressed="true"] {
+  border-color: var(--edge-active);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.branch-preview-toggle { font-size: .72rem; }
+.branch-actions { width: 21cqw; }
+#center-label { font-size: 1.63em; }
+
+@media (max-width: 880px) {
+  .graph-primary[data-branch-side] .center-orbit,
+  .category[data-muted] { display: none; }
+  .category[data-active] { grid-column: 1 / -1; }
+  .graph-primary[data-branch-side] .category[data-active] .category-node { inset: auto; }
+  .category[data-active] .relationship { display: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .knowledge-graph { animation: network-enter 650ms cubic-bezier(.2,.68,.3,1); }
+}
+/* Invisible branches must not keep SVG pulse filters and breathing animations running. */
+.graph-primary[data-branch-side] .edge-spark,
+.knowledge-graph[data-branch-sweeping] .edge-spark { animation: none; }
+.graph-primary[data-branch-side] .category-node,
+.knowledge-graph[data-branch-sweeping] .category-node { animation: none; }
+.knowledge-graph[data-graph-offscreen] :is(.edge-spark, .category-node) { animation-play-state: paused; }
+@keyframes network-enter { from { opacity: 0; translate: 0 5px; } to { opacity: 1; translate: 0 0; } }
+
+#node-morph:not([hidden]), #branch-return:not([hidden]) {
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+}
+#node-morph > svg { position: absolute; inset: 0; overflow: visible; }
+#node-morph path { stroke: var(--edge-active); stroke-width: 1.35; fill: var(--node); stroke-linecap: round; }
+#node-morph > span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  will-change: transform, opacity;
+}
+main[data-morph-main="leaving"] { opacity: 0; pointer-events: none; transition: opacity 350ms ease-out; }
+main[data-morph-main="arriving"] { opacity: 0; pointer-events: none; }
+[data-morph-heading] { position: relative; }
+[data-morph-heading]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -7px;
+  width: min(100%, 460px);
+  height: 1px;
+  background: var(--border);
+}
+[data-morph-source] { visibility: hidden; }
+::view-transition-group(root), ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+
+html[data-graph-pending] .knowledge-graph,
+main[data-graph-pending] .knowledge-graph {
+  animation: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.branch-back-node {
+  width: clamp(56px, 7cqw, 78px);
+  gap: .2rem;
+  --order: 0;
+}
+
+@media (max-width: 880px) {
+  .branch-back { grid-column: 1 / -1; justify-self: center; }
+  .branch-back-node { width: 60px; min-height: 60px; border-radius: 50%; }
+}
+
+/* The expanding ring wipes away the old graph, then draws each new connection and node. */
+.knowledge-graph[data-branch-sweeping] {
+  mask-image: radial-gradient(circle at var(--sweep-center), transparent var(--sweep-inner), #000 calc(var(--sweep-inner) + 1px));
+}
+
+.branch-sweep-overlay, .branch-sweep-ring {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.branch-sweep-overlay { z-index: 7; }
+.branch-sweep-ring {
+  inset: auto;
+  background: radial-gradient(circle at var(--sweep-center),
+    transparent var(--sweep-inner),
+    color-mix(in srgb, #2466ee 83%, var(--accent)) calc(var(--sweep-inner) + 1px) var(--sweep-outer),
+    transparent calc(var(--sweep-outer) + 2px));
+}
+
+.category > .category-node[data-sweep-hub] { opacity: 0; transition: none; }
+
+.branch-sweep-anchor {
+  position: fixed;
+}
+
+.graph-primary[data-branch-parent="projects"] .category[data-active] .category-node { left: var(--projects-hub-x); }
+
+.graph-primary[data-branch-reveal] :is(.category[data-active] .category-node, .category[data-muted], .center-orbit) {
   transition: none;
 }
 
-.graph-primary[data-restored="true"] :is(.category-node[aria-expanded="true"], .child-node) {
-  animation: none;
+.branch-node-outline, .branch-mobile-edges { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .graph-branch[data-branch-reveal] {
+    --branch-outline: 145ms;
+    --branch-label: 115ms;
+    --branch-step: calc(var(--branch-outline) + var(--branch-label));
+  }
+
+  .graph-branch[data-branch-reveal] .branch-children li {
+    --branch-start: calc(var(--branch-travel) + var(--order) * var(--branch-step));
+  }
+
+  .graph-branch[data-branch-reveal] .branch-edge,
+  .graph-branch[data-branch-reveal] .branch-node-outline path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: branch-draw var(--branch-outline) ease-out var(--branch-start) both;
+  }
+
+  .graph-branch[data-branch-reveal] .branch-edge {
+    --branch-start: calc(var(--branch-travel) + var(--branch-node-count) * var(--branch-step));
+    animation-duration: 280ms;
+  }
+
+  .graph-branch[data-branch-reveal] .branch-node-outline {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    transform: rotate(180deg);
+  }
+
+  .graph-branch[data-branch-reveal] .branch-node-outline path {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 1.5;
+  }
+
+  .graph-branch[data-branch-reveal] :is(.child-node, .branch-label) {
+    animation-duration: var(--branch-label);
+    animation-delay: calc(var(--branch-start) + var(--branch-outline));
+    animation-fill-mode: both;
+  }
+
+  .graph-branch[data-branch-reveal] .child-node { animation-name: branch-node-ready; }
+  .graph-branch[data-branch-reveal] .branch-label { animation-name: branch-label-in; }
+  .graph-branch[data-branch-reveal] .branch-actions { visibility: hidden; }
 }
 
-.graph-primary[data-restored="true"] :is(.activation-spark, .node-burst) {
-  display: none;
+@media (min-width: 881px) {
+  .graph-branch[data-side="left"][data-branch-reveal] .branch-node-outline { transform: none; }
 }
+
+@keyframes branch-draw { to { stroke-dashoffset: 0; } }
+@keyframes branch-node-ready { from { visibility: hidden; } 1%, 100% { visibility: visible; } }
+@keyframes branch-label-in {
+  from { opacity: 0; scale: .82; }
+  70% { opacity: 1; scale: 1.06; }
+  to { opacity: 1; scale: 1; }
+}
+
+@media (max-width: 880px) {
+  .graph-primary[data-branch-parent="projects"] .category[data-active] .category-node { inset: auto; }
+
+  .graph-branch .branch-mobile-edges {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .graph-branch .branch-children li { position: relative; inset: auto; justify-self: center; }
+  .graph-branch .child-node {
+    width: clamp(86px, 25vw, 106px);
+    min-height: 0;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    padding: .25rem;
+    font-size: .75rem;
+  }
+  .graph-branch .branch-back-node { width: 60px; }
+  .graph-branch[data-branch-reveal] .branch-node-outline,
+  .graph-branch[data-branch-reveal] .branch-back .branch-node-outline { transform: rotate(-90deg); }
+}
+
+@media (max-width: 880px) {
+  .graph-branch[data-branch-reveal] li:nth-child(4) .branch-node-outline { transform: rotate(180deg); }
+  .graph-branch[data-branch-reveal] li:nth-child(5) .branch-node-outline { transform: none; }
+}
+
+main[data-branch-return] .knowledge-graph { visibility: hidden; animation: none; }
+
+.knowledge-graph[data-branch-revealing] {
+  animation: none;
+  mask-image: radial-gradient(circle at var(--sweep-center), #000 var(--sweep-inner), transparent calc(var(--sweep-inner) + 1px));
+}
+
+.knowledge-graph[data-home-restored] { animation: none; }

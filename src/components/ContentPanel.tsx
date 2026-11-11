@@ -26,7 +26,7 @@ export default function ContentPanel({ parent, child, titleRef, onReturn }: {
       )}
       <div className="preview-copy">
         <p className="section-eyebrow">{project ? 'Project' : parent}</p>
-        <h2 id="preview-title" ref={titleRef} tabIndex={-1}>{child}</h2>
+        <h2 id="preview-title" data-morph-preview ref={titleRef} tabIndex={-1}>{child}</h2>
         <p className="preview-summary">{project?.summary ?? 'Content placeholder. Notes and links for this item can be added here once they are available.'}</p>
         {!!project?.metrics.length && (
           <dl className="project-metrics">
@@ -37,7 +37,7 @@ export default function ContentPanel({ parent, child, titleRef, onReturn }: {
         )}
         <div className="preview-actions">
           {project && (
-            <a className="explore-link" href={projectPath(project.slug)}>
+            <a className="explore-link" data-morph-open href={projectPath(project.slug)}>
               {project.placeholder ? 'Open project placeholder' : 'View Case Study'} <span aria-hidden="true">→</span>
             </a>
           )}

@@ -2,7 +2,7 @@ import type { BranchState } from './branch-state.ts';
 import { graphNodes } from './graph.ts';
 import { projects } from './projects.ts';
 
-function childSlug(parent: string, child: string) {
+export function childSlug(parent: string, child: string) {
   if (parent === 'projects') {
     return projects.find(({ title }) => title === child)?.slug ?? '';
   }
