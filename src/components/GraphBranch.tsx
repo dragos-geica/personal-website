@@ -4,14 +4,13 @@ import { nodeDestination } from '../data/node-destinations';
 import { useEffect, useLayoutEffect, useRef, useState, type AnimationEvent } from 'react';
 import { PROJECT_HUB_X } from '../scripts/branch-motion';
 import NodeOutline from './NodeOutline';
+import { constellation } from '../data/branch-layout';
 
 const { width, height } = graphCanvas;
 // Coordinates are relative to the primary graph, which reserves room on the open side.
 const branchExtension = 300;
-const branchLayout = {
-  left: { inner: -45, outer: -150 },
-  right: { inner: width + 45, outer: width + 150 },
-};
+// Node centres stay this far inside the graph so a full circle always fits.
+const edgeMargin = 85;
 
 export default function GraphBranch({ node, selected, onSelect, onClose, revealBranch, onRevealComplete }: {
   node: GraphNode;
@@ -33,14 +32,15 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
   const y = height / 2;
   const side = originalX < width / 2 ? 'left' : 'right';
   const backX = x + (side === 'left' ? 225 : -225);
-  const { inner, outer } = branchLayout[side];
   const branchStart = side === 'left' ? -branchExtension : 0;
-  const fanCenter = Math.max(246, Math.min(height - 238, y));
-  const children = node.children.map((label, index) => {
-    const cx = index === 0 || index === node.children.length - 1 ? inner : outer;
-    const cy = fanCenter + (index - (node.children.length - 1) / 2) * 111;
-    return { label, index, cx, cy };
-  });
+  // The branch actions sit in the top corner on the open side; children keep clear of them.
+  const area = side === 'left'
+    ? { left: -branchExtension + edgeMargin, right: x - 200, top: 80, bottom: height - 80,
+        keepClear: { left: -Infinity, right: 60, top: -Infinity, bottom: 150 } }
+    : { left: x + 200, right: width + branchExtension - edgeMargin, top: 80, bottom: height - 80,
+        keepClear: { left: width - 40, right: Infinity, top: -Infinity, bottom: 150 } };
+  const children = constellation(node.id, node.children.length, { x, y }, side, area)
+    .map(({ x: cx, y: cy }, index) => ({ label: node.children[index], index, cx, cy }));
 
   useLayoutEffect(() => {
     const hub = document.getElementById(`category-${node.id}`);
@@ -61,19 +61,27 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
         });
       }
       if (getComputedStyle(desktop).display !== 'none') {
-        const unit = width / bounds.width;
-        const hubRadius = hub.offsetWidth * unit / 2;
-        const direction = side === 'left' ? -1 : 1;
+        // Canvas units are not square on screen, so aim and trim each edge in pixels.
+        // Positions come from the layout, not from measuring the hub, which may be
+        // mid-travel when this runs.
+        const scaleX = bounds.width / width;
+        const scaleY = bounds.height / height;
+        const hubRadius = hub.offsetWidth / 2;
         const curves = buttons.map((button, index) => {
-          const radius = button.offsetWidth * unit / 2;
-          if (index === 0) {
-            return `M ${x - direction * hubRadius} ${y} H ${backX + direction * radius}`;
-          } else {
-            const target = children[index - 1];
-            const startX = x + direction * hubRadius;
-            const endX = target.cx - direction * radius;
-            return `M ${startX} ${y} C ${startX + (endX - startX) * .55} ${y}, ${startX + (endX - startX) * .5} ${target.cy}, ${endX} ${target.cy}`;
-          }
+          const target = index === 0 ? { cx: backX, cy: y } : children[index - 1];
+          const radius = button.offsetWidth / 2;
+          const dx = (target.cx - x) * scaleX;
+          const dy = (target.cy - y) * scaleY;
+          const length = Math.hypot(dx, dy) || 1;
+          const [ux, uy] = [dx / length, dy / length];
+          const start = [x + ux * hubRadius / scaleX, y + uy * hubRadius / scaleY];
+          const end = [target.cx - ux * radius / scaleX, target.cy - uy * radius / scaleY];
+          const point = ([px, py]: number[]) => `${px.toFixed(1)} ${py.toFixed(1)}`;
+          if (index === 0) return `M ${point(start)} L ${point(end)}`;
+          // A slight alternating bow keeps the constellation organic rather than spoked.
+          const bow = (index % 2 ? 1 : -1) * Math.min(36, length * .07);
+          const middle = [(start[0] + end[0]) / 2 - uy * bow / scaleX, (start[1] + end[1]) / 2 + ux * bow / scaleY];
+          return `M ${point(start)} Q ${point(middle)} ${point(end)}`;
         });
         updatePaths(desktop, curves);
         return;
@@ -137,13 +145,11 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
         preserveAspectRatio="none" aria-hidden="true">
         <path className="branch-edge branch-back-edge" pathLength={1} style={{ '--order': 0 } as CSSProperties}
           d={`M ${x - direction * hubRadius} ${y} H ${backX + direction * 46}`} />
-        {children.map(({ label, index, cx, cy }) => {
-          const startX = x + direction * hubRadius;
-          const endX = cx - direction * 70;
-          return <path key={label} className="branch-edge" pathLength={1}
-            style={{ '--order': index + 1 } as CSSProperties}
-            d={`M ${startX} ${y} C ${startX + (endX - startX) * .55} ${y}, ${startX + (endX - startX) * .5} ${cy}, ${endX} ${cy}`} />;
-        })}
+        {/* Placeholder geometry; the layout effect trims these to the circles before paint. */}
+        {children.map(({ label, index, cx, cy }) => (
+          <path key={label} className="branch-edge" pathLength={1}
+            style={{ '--order': index + 1 } as CSSProperties} d={`M ${x} ${y} L ${cx} ${cy}`} />
+        ))}
       </svg>
       <svg className="branch-mobile-edges" ref={mobileEdges} aria-hidden="true">
         <path className="branch-edge branch-back-edge" pathLength={1} style={{ '--order': 0 } as CSSProperties} />
