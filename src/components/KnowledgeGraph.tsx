@@ -6,7 +6,7 @@ import ContentPanel from './ContentPanel';
 import GraphBranch from './GraphBranch';
 import { centerNode, graphCanvas, graphNodes, type GraphNode } from '../data/graph';
 import GraphIcon from './GraphIcon';
-import { moveBranchHub, PROJECT_HUB_X, BRANCH_TRAVEL_MS, sweepBranch } from '../scripts/branch-motion';
+import { moveBranchHub, PROJECT_HUB_X, sweepBranch, type BranchSweep } from '../scripts/branch-motion';
 import type { TransitionBeforePreparationEvent } from 'astro:transitions/client';
 
 const { width, height } = graphCanvas;
@@ -49,8 +49,9 @@ export default function KnowledgeGraph() {
   const { x, y, size, label } = centerNode;
   const [branch, setBranch] = useState<BranchState>(null);
   const [revealBranch, setRevealBranch] = useState(false);
+  const [leavingPanel, setLeavingPanel] = useState<{ parent: string; child: string } | null>(null);
   const graph = useRef<HTMLDivElement>(null);
-  const branchSweep = useRef<ReturnType<typeof sweepBranch> | null>(null);
+  const branchSweep = useRef<BranchSweep | null>(null);
   const currentBranch = useRef<BranchState>(null);
   const previewTitle = useRef<HTMLHeadingElement>(null);
   const pendingFocus = useRef<{ id: string; scroll: 'preview' | 'nearest' | 'none' } | null>(null);
@@ -100,7 +101,8 @@ export default function KnowledgeGraph() {
       const load = event.loader;
       event.loader = async () => {
         try {
-          const [, complete] = await Promise.all([load(), sweep.finished]);
+          // Swap as soon as the ring has cleared the old graph; it fades out over the new layout.
+          const [, complete] = await Promise.all([load(), sweep.covered]);
           if (!complete || event.defaultPrevented) cleanup();
         } catch (error) {
           cleanup();
@@ -146,8 +148,10 @@ export default function KnowledgeGraph() {
       document.querySelector('main')?.removeAttribute('data-graph-pending');
     }
     if (branch && branchSweep.current) {
-      const { origin } = branchSweep.current;
-      cancelBranchSweep();
+      const sweep = branchSweep.current;
+      branchSweep.current = null;
+      sweep.release();
+      const { origin } = sweep;
       const hub = document.getElementById(`category-${branch.parent}`);
       if (hub && revealBranch && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
         const motion = moveBranchHub(hub, origin);
@@ -179,6 +183,16 @@ export default function KnowledgeGraph() {
   }
   const active = graphNodes.find((node) => node.id === branch?.parent);
   const activeIndex = graphNodes.findIndex((node) => node.id === branch?.parent);
+  const shownPanel = active && branch?.selected ? { parent: active.label, child: branch.selected } : null;
+  const lastPanel = useRef(shownPanel);
+  // Keep a cleared preview mounted for its exit, whether Back, close or history cleared it.
+  useLayoutEffect(() => {
+    const previous = lastPanel.current;
+    lastPanel.current = shownPanel;
+    if (shownPanel) setLeavingPanel(null);
+    else if (previous && matchMedia('(prefers-reduced-motion: no-preference)').matches) setLeavingPanel(previous);
+  }, [shownPanel?.parent, shownPanel?.child]);
+
   // On mobile the branch takes a full grid row immediately after its parent’s row.
   const branchAfter = activeIndex + (1 - activeIndex % 2);
 
@@ -214,7 +228,6 @@ export default function KnowledgeGraph() {
         }}>
         <div className="graph-primary" style={{
           '--projects-hub-x': `${PROJECT_HUB_X / width * 100}%`,
-          '--branch-travel': `${BRANCH_TRAVEL_MS}ms`,
         } as CSSProperties}
           data-branch-parent={branch?.parent} data-branch-reveal={revealBranch || undefined}
           data-branch-side={active ? active.position[0] < width / 2 ? 'left' : 'right' : undefined}>
@@ -253,9 +266,11 @@ export default function KnowledgeGraph() {
           </ul>
         </div>
       </div>
-      {active && branch?.selected && (
-        <ContentPanel key={branch.selected} parent={active.label} child={branch.selected}
-          titleRef={previewTitle} onReturn={returnToChild} />
+      {shownPanel ? (
+        <ContentPanel key={shownPanel.child} {...shownPanel} titleRef={previewTitle} onReturn={returnToChild} />
+      ) : leavingPanel && (
+        <ContentPanel key={`leaving-${leavingPanel.child}`} {...leavingPanel} leaving onReturn={returnToChild}
+          onExited={() => setLeavingPanel(null)} />
       )}
     </>
   );

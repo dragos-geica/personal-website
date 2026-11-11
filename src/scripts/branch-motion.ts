@@ -1,7 +1,9 @@
 import { animateFrames } from './animation-frames';
+import { cubicBezier, durations, easings, moveCurve, onLayoutResize, sweepTimeAt } from './motion';
 
 export const PROJECT_HUB_X = 480;
-export const BRANCH_TRAVEL_MS = 620;
+
+const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)');
 
 export function createBranchAnchor(hub: HTMLElement, bounds: DOMRect) {
   const anchor = hub.cloneNode(true) as HTMLElement;
@@ -17,90 +19,185 @@ export function createBranchAnchor(hub: HTMLElement, bounds: DOMRect) {
   return anchor;
 }
 
-export function sweepBranch(graph: HTMLElement, hub: HTMLElement, direction: 'hide' | 'reveal' = 'hide') {
+interface SweepTarget { element: Element; near: number; far: number }
+
+const centerOf = (rect: DOMRect) => ({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+
+// Each graph element fades exactly while the ring's edge crosses it. Fading a
+// handful of elements is composited, unlike repainting a mask over the whole graph.
+function sweepTargets(graph: HTMLElement, hub: HTMLElement, x: number, y: number) {
+  const distance = (point: { x: number; y: number }) => Math.hypot(point.x - x, point.y - y);
+  const targets: SweepTarget[] = [];
+  const orbit = graph.querySelector<HTMLElement>('.center-orbit');
+  const orbitRect = orbit?.getBoundingClientRect();
+  for (const element of graph.querySelectorAll<HTMLElement>('.category-node, .relationship, .center-orbit')) {
+    if (element === hub) continue;
+    const rect = element.getBoundingClientRect();
+    // Hidden and off-screen elements need no fade, and must not hold up the swap.
+    if (!rect.width || rect.bottom < 0 || rect.top > innerHeight) continue;
+    const middle = distance(centerOf(rect));
+    const radius = Math.max(rect.width, rect.height) / 2;
+    targets.push({ element, near: middle - radius, far: middle + radius });
+  }
+  for (const edges of graph.querySelectorAll<SVGElement>('.graph-edges')) {
+    const node = edges.parentElement?.querySelector('.category-node');
+    if (!node || !orbitRect?.width || getComputedStyle(edges).display === 'none') continue;
+    const ends = [distance(centerOf(node.getBoundingClientRect())), distance(centerOf(orbitRect))];
+    targets.push({ element: edges, near: Math.min(...ends), far: Math.max(...ends) });
+  }
+  return targets;
+}
+
+const settle = (animations: Animation[]) =>
+  Promise.all(animations.map(({ finished }) => finished)).then(() => true, () => false);
+
+export interface BranchSweep {
+  origin: DOMRect;
+  /** Resolves once the ring has passed every graph element (true) or the sweep was cancelled (false). */
+  covered: Promise<boolean>;
+  /** Resolves when the ring itself has finished. */
+  finished: Promise<boolean>;
+  /** Hand the hub back to the page and let the ring fade out by itself. */
+  release: () => void;
+  /** Stop everything immediately and restore the graph. */
+  cleanup: () => void;
+}
+
+export function sweepBranch(graph: HTMLElement, hub: HTMLElement, direction: 'hide' | 'reveal' = 'hide'): BranchSweep {
+  // A ring left over from the previous sweep must not overlap this one.
+  document.querySelectorAll('.branch-sweep-overlay').forEach((overlay) => overlay.remove());
   const origin = hub.getBoundingClientRect();
   const bounds = graph.getBoundingClientRect();
-  const x = origin.x + origin.width / 2;
-  const y = origin.y + origin.height / 2;
+  const { x, y } = centerOf(origin);
   const left = Math.max(0, bounds.left);
   const top = Math.max(0, bounds.top);
   const right = Math.min(innerWidth, bounds.right);
   const bottom = Math.min(innerHeight, bounds.bottom);
-  const horizontalReach = Math.max(x - left, right - x);
-  const verticalReach = Math.max(y - top, bottom - y);
-  const radius = Math.hypot(horizontalReach, verticalReach) + 120;
+  const startRadius = origin.width / 2;
+  const radius = Math.max(startRadius + 1,
+    Math.hypot(Math.max(x - left, right - x), Math.max(y - top, bottom - y)) + 24);
 
   const overlay = document.createElement('div');
   overlay.className = 'branch-sweep-overlay';
   overlay.setAttribute('aria-hidden', 'true');
-
+  // The clip softly fades the ring out towards the graph's edges, so it never shows
+  // a cut edge and never washes over the intro text beside the graph.
+  const clip = document.createElement('div');
+  clip.className = 'branch-sweep-clip';
+  Object.assign(clip.style, {
+    left: `${left}px`, top: `${top}px`, width: `${Math.max(0, right - left)}px`, height: `${Math.max(0, bottom - top)}px`,
+  });
   const ring = document.createElement('div');
   ring.className = 'branch-sweep-ring';
   Object.assign(ring.style, {
-    left: `${left}px`, top: `${top}px`, width: `${Math.max(0, right - left)}px`, height: `${Math.max(0, bottom - top)}px`,
+    left: `${x - left - radius}px`, top: `${y - top - radius}px`, width: `${radius * 2}px`, height: `${radius * 2}px`,
   });
-  ring.style.setProperty('--sweep-center', `${x - left}px ${y - top}px`);
-
+  clip.append(ring);
   const anchor = createBranchAnchor(hub, origin);
-  overlay.append(ring, anchor);
+  overlay.append(clip, anchor);
   document.body.append(overlay);
   if (direction === 'reveal') graph.dataset.branchRevealing = '';
   else graph.dataset.branchSweeping = '';
   hub.dataset.sweepHub = '';
-  graph.style.setProperty('--sweep-center', `${x - bounds.left}px ${y - bounds.top}px`);
 
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  const controller = new AbortController();
-  const { scrollX: startX, scrollY: startY } = window;
-  const finished = animateFrames(controller.signal, 440, (progress) => {
-    // Widen the blue band as it travels, leaving the wiped graph behind it.
-    const outer = origin.width / 2 + (radius - origin.width / 2) * progress;
-    const inner = outer - Math.min(90, 9 + outer * .16);
-    graph.style.setProperty('--sweep-inner', `${inner}px`);
-    ring.style.setProperty('--sweep-inner', `${inner}px`);
-    ring.style.setProperty('--sweep-outer', `${outer}px`);
+  const ringAnimation = ring.animate([
+    { transform: `scale(${startRadius / radius})`, opacity: 1 },
+    { opacity: 1, offset: .8 },
+    { transform: 'scale(1)', opacity: 0 },
+  ], { duration: durations.sweep, easing: easings.enter, fill: 'forwards' });
+  const fades = sweepTargets(graph, hub, x, y).map(({ element, near, far }) => {
+    const start = sweepTimeAt(near, startRadius, radius);
+    const end = sweepTimeAt(far, startRadius, radius);
+    const timing = { delay: start, duration: Math.max(90, end - start), easing: 'ease-out' };
+    return direction === 'hide'
+      ? element.animate([{ opacity: 0 }], { ...timing, fill: 'forwards' })
+      : element.animate([{ opacity: 0, offset: 0 }], { ...timing, fill: 'backwards' });
   });
+  const covered = settle(fades);
+  const finished = settle([ringAnimation, ...fades]);
 
-  function cleanup() {
-    controller.abort();
-    overlay.remove();
+  const motion = reducedMotion();
+  const { scrollX: startX, scrollY: startY } = window;
+  let released = false;
+  let stopResize = () => {};
+
+  function releaseHub() {
+    fades.forEach((animation) => animation.cancel());
+    anchor.remove();
     delete graph.dataset.branchSweeping;
     delete graph.dataset.branchRevealing;
     delete hub.dataset.sweepHub;
-    graph.style.removeProperty('--sweep-center');
-    graph.style.removeProperty('--sweep-inner');
-    reducedMotion.removeEventListener('change', onMotionPreferenceChange);
-    window.removeEventListener('resize', cleanup);
+  }
+
+  function cleanup() {
+    ringAnimation.cancel();
+    releaseHub();
+    overlay.remove();
+    motion.removeEventListener('change', onMotionPreferenceChange);
+    stopResize();
     window.removeEventListener('scroll', onScroll);
   }
 
+  function release() {
+    if (released) return;
+    released = true;
+    releaseHub();
+    void ringAnimation.finished.then(cleanup, cleanup);
+  }
+
   function onMotionPreferenceChange() {
-    if (reducedMotion.matches) {
-      cleanup();
-    }
+    if (motion.matches) cleanup();
   }
 
+  // Keep the fixed ring attached to the graph instead of cancelling on scroll.
   function onScroll() {
-    if (scrollX !== startX || scrollY !== startY) cleanup();
+    overlay.style.translate = `${startX - scrollX}px ${startY - scrollY}px`;
   }
 
-  reducedMotion.addEventListener('change', onMotionPreferenceChange);
-  // Resizing invalidates the measured clipping geometry; reveal the real layout.
-  window.addEventListener('resize', cleanup, { once: true });
+  motion.addEventListener('change', onMotionPreferenceChange);
+  // A real layout change invalidates the measured geometry. Toolbar resizes do not.
+  stopResize = onLayoutResize(cleanup);
   window.addEventListener('scroll', onScroll, { passive: true });
-  return { origin, finished, cleanup };
+  return { origin, covered, finished, release, cleanup };
 }
 
+const moveEase = cubicBezier(...moveCurve);
+
+/**
+ * Animate the hub from where the sweep measured it into its branch position.
+ * On narrow screens the page scrolls in the same motion, so the hub glides
+ * into view instead of the page snapping between sweep and reveal.
+ */
 export function moveBranchHub(hub: HTMLElement, origin: DOMRect) {
-  if (matchMedia('(max-width: 880px)').matches) {
-    const target = hub.getBoundingClientRect();
-    window.scrollBy({ top: target.y + target.height / 2 - innerHeight / 2, behavior: 'instant' });
-  }
   const destination = hub.getBoundingClientRect();
-  const dx = origin.x + origin.width / 2 - destination.x - destination.width / 2;
-  const dy = origin.y + origin.height / 2 - destination.y - destination.height / 2;
-  return hub.animate([
-    { translate: `${dx}px ${dy}px`, scale: String(origin.width / destination.width) },
+  let scrollBy = 0;
+  if (matchMedia('(max-width: 880px)').matches) {
+    const root = document.scrollingElement ?? document.documentElement;
+    const wanted = destination.top + destination.height / 2 - innerHeight * .32;
+    scrollBy = Math.max(-scrollY, Math.min(root.scrollHeight - innerHeight - scrollY, wanted));
+  }
+  const from = centerOf(origin);
+  const to = centerOf(destination);
+  const animation = hub.animate([
+    { translate: `${from.x - to.x}px ${from.y - to.y}px`, scale: String(origin.width / destination.width) },
     { translate: '0px 0px', scale: '1' },
-  ], { duration: BRANCH_TRAVEL_MS, easing: 'cubic-bezier(.45,0,.22,1)' });
+  ], { duration: durations.travel, easing: easings.move });
+
+  const controller = new AbortController();
+  if (Math.abs(scrollBy) >= 1) {
+    const startY = scrollY;
+    const stop = () => controller.abort();
+    // The visitor's own scroll gesture wins over the scripted one.
+    const gestures = ['wheel', 'touchstart', 'keydown'] as const;
+    gestures.forEach((type) => window.addEventListener(type, stop, { passive: true, once: true, signal: controller.signal }));
+    void animateFrames(controller.signal, durations.travel, (progress) => {
+      window.scrollTo({ left: scrollX, top: startY + scrollBy * moveEase(progress), behavior: 'instant' });
+    }).then(stop);
+  }
+  return {
+    cancel() {
+      controller.abort();
+      animation.cancel();
+    },
+  };
 }

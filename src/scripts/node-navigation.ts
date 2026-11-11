@@ -3,6 +3,7 @@ import { readBranch } from '../data/branch-location';
 import { graphNodes } from '../data/graph';
 import { nodeDestination } from '../data/node-destinations';
 import { animateFrames } from './animation-frames';
+import { contentStartFraction, durations, easings, onLayoutResize } from './motion';
 import { waitForElement } from './wait-for-element';
 
 type Surface = 'node' | 'heading' | 'preview';
@@ -159,6 +160,7 @@ function clean(shot: Morph) {
   document.querySelector('[data-morph-source]')?.removeAttribute('data-morph-source');
   const main = document.querySelector<HTMLElement>('[data-morph-main]');
   main?.style.removeProperty('opacity');
+  main?.style.removeProperty('--morph-leave');
   main?.removeAttribute('data-morph-main');
   morph = undefined;
 }
@@ -183,7 +185,8 @@ reducedMotion.addEventListener('change', () => {
   cancelContentAnimations();
   settleMorph();
 });
-window.addEventListener('resize', settleMorph);
+// Toolbar show/hide on mobile resizes the viewport; only a real layout change ends the morph.
+onLayoutResize(settleMorph);
 
 document.addEventListener('astro:before-preparation', (raw) => {
   const event = raw as TransitionBeforePreparationEvent;
@@ -228,12 +231,15 @@ document.addEventListener('astro:before-preparation', (raw) => {
   styleLabel(shot.labels[0], shot.start, source);
   layer.hidden = false;
   source.setAttribute('data-morph-source', '');
-  document.querySelector('main')?.setAttribute('data-morph-main', 'leaving');
+  const leaving = document.querySelector<HTMLElement>('main');
+  const leaveDuration = reverse ? durations.morphReturnLeave : durations.morphLeave;
+  leaving?.style.setProperty('--morph-leave', `${leaveDuration}ms`);
+  leaving?.setAttribute('data-morph-main', 'leaving');
   event.signal.addEventListener('abort', () => clean(shot), { once: true });
   const load = event.loader;
   event.loader = async () => {
     try {
-      await Promise.all([load(), animate(shot, reverse ? 240 : 440, (time) => {
+      await Promise.all([load(), animate(shot, leaveDuration, (time) => {
         draw(shot, shot.start, shot.start, 0, from === 'node' ? ease(Math.max(0, time - .5) * .58) : 1,
           from === 'node' ? 1 - ease(Math.min(1, time * 1.7)) : 0);
       })]);
@@ -249,7 +255,8 @@ document.addEventListener('astro:before-swap', (raw) => {
   const event = raw as TransitionBeforeSwapEvent;
   // A newer navigation can skip Astro’s native snapshot while the swap is pending.
   void event.viewTransition.ready.catch((error: unknown) => {
-    if (!(error instanceof DOMException && error.name === 'AbortError')) console.error(error);
+    // Browsers also refuse a transition while the document is hidden; both are harmless skips.
+    if (!(error instanceof DOMException && ['AbortError', 'InvalidStateError'].includes(error.name))) console.error(error);
   });
   // The custom morph owns the visual handoff. A native snapshot can paint the old graph again.
   event.viewTransition.skipTransition();
@@ -277,10 +284,22 @@ document.addEventListener('astro:after-swap', () => {
   }
 });
 
+function revealContent(main: HTMLElement, target: HTMLElement) {
+  main.style.opacity = '1';
+  const children = [...main.children].filter((element) => element !== target);
+  children.forEach((element, index) => {
+    const animation = element.animate([{ opacity: 0, transform: 'translateY(7px)' }, { opacity: 1, transform: 'none' }],
+      { duration: durations.content, delay: Math.min(index, 5) * durations.contentStagger, fill: 'backwards', easing: easings.enter });
+    contentAnimations.add(animation);
+    void animation.finished.then(() => contentAnimations.delete(animation), () => contentAnimations.delete(animation));
+  });
+}
+
 async function finish(shot: Morph) {
   const target = await waitForElement(shot.controller.signal, shot.findTarget);
   if (morph !== shot || shot.signal.aborted) return;
-  const main = document.querySelector('main');
+  const main = document.querySelector<HTMLElement>('main');
+  let contentShown = false;
   if (target) {
     if (shot.reverse) target.scrollIntoView({ block: 'nearest', behavior: 'instant' });
     const end = getPose(target, shot.to);
@@ -288,7 +307,7 @@ async function finish(shot: Morph) {
     if (shot.reverse) target.setAttribute('data-morph-source', '');
     // Expand a short underline into the divider while the title settles.
     const shortWidth = Math.min(end.w, 100);
-    await animate(shot, shot.reverse ? 720 : 850, (time) => {
+    await animate(shot, shot.reverse ? durations.morphReturnTravel : durations.morphTravel, (time) => {
       const move = ease(Math.min(1, time / .72));
       const flatten = shot.to === 'node' ? 1 - ease(time)
         : shot.from === 'node' ? lerp(ease(.29), 1, ease(Math.min(1, time / .75))) : 1;
@@ -300,18 +319,15 @@ async function finish(shot: Morph) {
       };
       draw(shot, shot.start, endPose, move, flatten, shot.to === 'node' ? ease(Math.max(0, (time - .7) / .3)) : 0);
       if (shot.reverse && main) main.style.opacity = String(ease(Math.max(0, (time - .62) / .38)));
+      // Bring the page in while the title is still settling instead of after it.
+      if (!shot.reverse && main && !contentShown && time >= contentStartFraction) {
+        contentShown = true;
+        revealContent(main, target);
+      }
     });
   }
   if (morph !== shot) return;
   clean(shot);
   if (target) target.focus({ preventScroll: true });
-  if (main && !shot.reverse && target) {
-    const children = [...main.children].filter((element) => element !== target);
-    children.forEach((element, index) => {
-      const animation = element.animate([{ opacity: 0, transform: 'translateY(7px)' }, { opacity: 1, transform: 'none' }],
-        { duration: 380, delay: Math.min(index, 5) * 48, fill: 'backwards', easing: 'ease-out' });
-      contentAnimations.add(animation);
-      void animation.finished.then(() => contentAnimations.delete(animation), () => contentAnimations.delete(animation));
-    });
-  }
+  if (main && !shot.reverse && target && !contentShown) revealContent(main, target);
 }

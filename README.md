@@ -37,6 +37,7 @@ Open the address printed by `npm run preview`. The build output is in `dist/`.
 - Select a category to focus its branch, then choose a child to open its section. Use **Preview mode** in a branch for the original inline content panel. Browser Back and Forward restore the previous route and graph level.
 - `src/scripts/node-navigation.ts` handles the SVG outline and label shared by the graph and section heading. Existing Astro URLs remain directly addressable.
 - Opening and closing a category follows the same sequence for clicks and browser history. Reduced motion skips the graph sweep and title morph while keeping navigation and focus working.
+- Motion durations and easing curves live in `src/scripts/motion.ts`, which also publishes them as `--motion-*` and `--ease-*` CSS custom properties for the stylesheet.
 
 ## Deployment guidance
 

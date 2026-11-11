@@ -74,14 +74,20 @@ const navigation = [
 </html>
 
 <script>
+  import { applyMotionProperties } from '../scripts/motion';
   import '../scripts/node-navigation';
   import '../scripts/branch-return-motion';
   import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
+
+  // Durations and easings come from one module and are mirrored as CSS custom properties.
+  applyMotionProperties(document.documentElement);
 
   document.addEventListener('astro:before-swap', (event) => {
     const next = (event as TransitionBeforeSwapEvent).newDocument.documentElement;
     const theme = document.documentElement.dataset.theme;
     if (theme) next.dataset.theme = theme;
+    // Astro swaps the root element's attributes, including the motion properties.
+    applyMotionProperties(next);
   });
 
   document.addEventListener('astro:page-load', () => {

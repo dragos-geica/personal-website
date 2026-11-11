@@ -1,5 +1,6 @@
 import type { TransitionBeforePreparationEvent, TransitionBeforeSwapEvent } from 'astro:transitions/client';
-import { BRANCH_TRAVEL_MS, createBranchAnchor, sweepBranch } from './branch-motion';
+import { createBranchAnchor, sweepBranch, type BranchSweep } from './branch-motion';
+import { durations, easings } from './motion';
 import { readBranch } from '../data/branch-location';
 import { waitForElement } from './wait-for-element';
 
@@ -12,7 +13,7 @@ interface ReturnMotion {
   anchor: HTMLElement;
   animations: Set<Animation>;
   paused: Animation[];
-  sweep?: ReturnType<typeof sweepBranch>;
+  sweep?: BranchSweep;
 }
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -43,19 +44,23 @@ async function hideBranch(motion: ReturnMotion) {
   const svg = [...branch.querySelectorAll('svg.branch-edges, svg.branch-mobile-edges')]
     .find((element) => getComputedStyle(element).display !== 'none');
   const edges = [...(svg?.querySelectorAll('.branch-edge') ?? [])];
+  const nodes = [...branch.querySelectorAll<HTMLElement>('.branch-children > li')];
   const offsets = edges.map((edge) => getComputedStyle(edge).strokeDashoffset);
-  await Promise.all(edges.map((edge, index) => play(motion, edge, [
-    { strokeDasharray: '1', strokeDashoffset: offsets[index] },
-    { strokeDasharray: '1', strokeDashoffset: '1' },
-  ], { duration: 280, easing: 'ease-in' })));
+  // The reverse of the reveal: the last item leaves first, each node fading
+  // before its edge retracts into the hub.
+  await Promise.all(nodes.flatMap((node, index) => {
+    const delay = (nodes.length - 1 - index) * durations.closeStagger;
+    const edge = edges[index];
+    return [
+      play(motion, node, [{ opacity: getComputedStyle(node).opacity }, { opacity: 0, scale: '.9' }],
+        { duration: durations.closeNode, delay, easing: easings.exit }),
+      edge && play(motion, edge, [
+        { strokeDasharray: '1', strokeDashoffset: offsets[index] },
+        { strokeDasharray: '1', strokeDashoffset: '1' },
+      ], { duration: durations.closeEdge, delay: delay + durations.closeNode / 2, easing: easings.exit }),
+    ];
+  }));
 
-  if (active !== motion) return;
-  if (!reducedMotion.matches) {
-    const nodes = [...branch.querySelectorAll('.branch-children li')].reverse();
-    await Promise.all(nodes.map((node, index) => play(motion, node,
-      [{ opacity: 1 }, { opacity: 0, scale: '.9' }],
-      { duration: 180, delay: index * 130, easing: 'ease-in' })));
-  }
   if (active !== motion || reducedMotion.matches) return;
   const current = hub.getBoundingClientRect();
   Object.assign(anchor.style, {
@@ -131,7 +136,7 @@ async function restoreHome(motion: ReturnMotion) {
         translate: `${to.left + to.width / 2 - from.left - from.width / 2}px ${to.top + to.height / 2 - from.top - from.height / 2}px`,
         scale: String(to.width / from.width),
       },
-    ], { duration: BRANCH_TRAVEL_MS, easing: 'cubic-bezier(.45,0,.22,1)' });
+    ], { duration: durations.travel, easing: easings.move });
   }
   if (active !== motion || motion.signal.aborted) return;
   if (!reducedMotion.matches) {

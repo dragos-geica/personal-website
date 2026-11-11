@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import { graphCanvas, type GraphNode } from '../data/graph';
 import { nodeDestination } from '../data/node-destinations';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type AnimationEvent } from 'react';
 import { PROJECT_HUB_X } from '../scripts/branch-motion';
 import NodeOutline from './NodeOutline';
 
@@ -22,6 +22,9 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
   onRevealComplete: () => void;
 }) {
   const [preview, setPreview] = useState(Boolean(selected));
+  // The hub lands where the cursor was, so a child can appear under a resting pointer.
+  // Hover styling waits for the reveal to finish and the pointer to move.
+  const [hoverLocked, setHoverLocked] = useState(revealBranch);
   const mobileEdges = useRef<SVGSVGElement>(null);
   const desktopEdges = useRef<SVGSVGElement>(null);
   const isProjects = node.id === 'projects';
@@ -64,7 +67,7 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
         const curves = buttons.map((button, index) => {
           const radius = button.offsetWidth * unit / 2;
           if (index === 0) {
-            return `M ${backX + direction * radius} ${y} H ${x - direction * hubRadius}`;
+            return `M ${x - direction * hubRadius} ${y} H ${backX + direction * radius}`;
           } else {
             const target = children[index - 1];
             const startX = x + direction * hubRadius;
@@ -76,23 +79,21 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
         return;
       }
 
+      // A spine runs straight down from the hub through the gap between the two
+      // columns; each child branches off it with a short bend into its inner side.
       const source = category.getBoundingClientRect();
       const startX = source.left + source.width / 2 - bounds.left;
       const startY = source.top + hub.offsetHeight / 2 - bounds.top;
-      const curves = buttons.map((button, index) => {
+      const curves = buttons.map((button) => {
         const rect = button.getBoundingClientRect();
-        const targetX = rect.left + rect.width / 2 - bounds.left;
-        const targetY = rect.top - bounds.top;
-        const midpoint = (startY + targetY) / 2;
-        let curve = `M ${startX} ${startY} C ${startX} ${midpoint} ${targetX} ${midpoint} ${targetX} ${targetY}`;
-        if (index >= 3) {
-          const side = targetX < startX ? -1 : 1;
-          const edge = targetX + side * rect.width / 2;
-          const bend = edge + side * 16;
-          const centerY = targetY + rect.height / 2;
-          curve = `M ${startX} ${startY} C ${bend} ${startY} ${bend} ${midpoint} ${bend} ${centerY - 30} Q ${bend} ${centerY} ${edge} ${centerY}`;
-        }
-        return curve;
+        const centerX = rect.left + rect.width / 2 - bounds.left;
+        const top = rect.top - bounds.top;
+        if (Math.abs(centerX - startX) < rect.width / 4) return `M ${startX} ${startY} V ${top}`;
+        const toward = centerX < startX ? -1 : 1;
+        const innerX = centerX - toward * rect.width / 2;
+        const centerY = top + rect.height / 2;
+        const bend = Math.max(0, Math.min(12, Math.abs(innerX - startX) / 2));
+        return `M ${startX} ${startY} V ${centerY - bend} Q ${startX} ${centerY} ${startX + toward * bend} ${centerY} H ${innerX}`;
       });
       updatePaths(mobile, curves);
     }
@@ -104,17 +105,26 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
     return () => observer.disconnect();
   }, [node.id, preview]);
 
+  useEffect(() => {
+    if (revealBranch || !hoverLocked) return;
+    const unlock = () => setHoverLocked(false);
+    window.addEventListener('pointermove', unlock, { once: true, passive: true });
+    return () => window.removeEventListener('pointermove', unlock);
+  }, [revealBranch, hoverLocked]);
+
+  function onRevealEvent(event: AnimationEvent) {
+    // The last child's label is the final step of the reveal.
+    if (revealBranch && event.animationName === 'branch-label-in'
+      && (event.target as Element).closest('.branch-children > li:last-child')) onRevealComplete();
+  }
+
   const direction = side === 'left' ? -1 : 1;
   const hubRadius = node.size * .87 / .78 / 2;
 
   return (
     <li id={`branch-${node.id}`} className="graph-branch" data-side={side}
-      data-branch-reveal={revealBranch || undefined}
-      style={{ '--branch-node-count': node.children.length + 1 } as CSSProperties}
-      onAnimationEnd={(event) => {
-        if (revealBranch && event.animationName === 'branch-draw'
-          && (event.target as Element).classList.contains('branch-back-edge')) onRevealComplete();
-      }}>
+      data-branch-reveal={revealBranch || undefined} data-hover-locked={hoverLocked || undefined}
+      onAnimationEnd={onRevealEvent}>
       <div className="branch-actions">
         <button type="button" className="branch-close branch-preview-toggle" aria-pressed={preview}
           onClick={() => setPreview(!preview)}>Preview mode</button>
@@ -126,7 +136,7 @@ export default function GraphBranch({ node, selected, onSelect, onClose, revealB
         style={{ left: `${branchStart / width * 100}%`, width: `${(width + branchExtension) / width * 100}%` }}
         preserveAspectRatio="none" aria-hidden="true">
         <path className="branch-edge branch-back-edge" pathLength={1} style={{ '--order': 0 } as CSSProperties}
-          d={`M ${backX + direction * 46} ${y} H ${x - direction * hubRadius}`} />
+          d={`M ${x - direction * hubRadius} ${y} H ${backX + direction * 46}`} />
         {children.map(({ label, index, cx, cy }) => {
           const startX = x + direction * hubRadius;
           const endX = cx - direction * 70;
