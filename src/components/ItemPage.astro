@@ -14,8 +14,9 @@ const { item, category, back } = Astro.props;
 <SiteLayout title={`${item.title} — ${category}`} description={item.summary} noindex={item.draft}>
   <main id="main-content" class="section-page project-detail mx-auto" tabindex="-1">
     <a class="explore-link leaf-back" href={back} data-morph-back><span aria-hidden="true">←</span> Back</a>
-    <p class="section-eyebrow">{item.draft ? `${category} · placeholder` : category}</p>
+    <p class="section-eyebrow">{item.draft ? `${category} · in progress` : category}</p>
     <h1 data-morph-heading tabindex="-1">{item.title}</h1>
+    {item.subtitle && <p class="detail-subtitle">{item.subtitle}</p>}
     <p class="detail-summary">{item.summary}</p>
     {item.image && <img class="project-image detail-image" src={item.image.src} alt={item.image.alt} decoding="async" />}
     {!!item.facts?.length && (

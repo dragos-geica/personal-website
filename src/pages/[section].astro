@@ -1,6 +1,7 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
 import { projects, projectPath } from '../data/projects';
+import { nodeDestination } from '../data/node-destinations';
 import { site } from '../content/site';
 
 export function getStaticPaths() {
@@ -8,26 +9,67 @@ export function getStaticPaths() {
 }
 
 const { section } = Astro.params;
-const isProjects = section === 'projects';
-const page = isProjects
-  ? { title: site.categories.projects.label, paragraphs: ['Explore the projects featured in the knowledge graph.'] }
-  : site.pages[section as 'about' | 'research' | 'cv'];
+const { about, research, cv } = site.pages;
+const title = section === 'projects' ? site.categories.projects.label : site.pages[section as 'about' | 'research' | 'cv'].title;
+const description = section === 'about' ? about.paragraphs[0] : section === 'research' ? research.paragraphs[0]
+  : section === 'cv' ? `${cv.name} — CV` : 'Projects featured in the knowledge graph.';
+const researchItems = site.categories.research.items.filter(({ draft }) => !draft);
 ---
-<SiteLayout title={`${page.title} — ${site.name}`} description={page.paragraphs[0]} noindex={!isProjects}>
-  <main id="main-content" class="section-page mx-auto" tabindex="-1">
-    <p class="section-eyebrow">{site.name}</p>
-    <h1>{page.title}</h1>
-    {page.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-    {isProjects && (
+<SiteLayout title={`${title} — ${site.name}`} description={description}>
+  <main id="main-content" class={section === 'cv' ? 'section-page cv-page mx-auto' : 'section-page mx-auto'} tabindex="-1">
+    <p class="section-eyebrow">{section === 'cv' ? cv.name : site.name}</p>
+    <h1>{title}</h1>
+
+    {section === 'about' && (
+      <>
+        {about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+        {!!about.links?.length && (
+          <p class="page-links">{about.links.map(({ label, href }) => <a href={href}>{label}</a>)}</p>
+        )}
+      </>
+    )}
+
+    {section === 'research' && (
+      <>
+        {research.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+        <ul class="project-directory" aria-label="Research projects">
+          {researchItems.map((item) => (
+            <li>
+              <a href={nodeDestination('research', item.title)}>{item.title}</a>
+              {item.subtitle && <p>{item.subtitle}</p>}
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+
+    {section === 'projects' && (
       <ul class="project-directory" aria-label="Projects">
         {projects.map((project) => (
           <li>
             <a href={projectPath(project.slug)}>{project.title}</a>
-            <p>{project.draft ? 'Project placeholder' : 'Case study'}</p>
+            <p>{project.draft ? 'In progress' : project.subtitle ?? 'Project'}</p>
           </li>
         ))}
       </ul>
     )}
+
+    {section === 'cv' && cv.sections.map(({ heading, entries }) => (
+      <section class="cv-section">
+        <h2>{heading}</h2>
+        {entries.map((entry) => (
+          <article class="cv-entry">
+            <div class="cv-entry-head">
+              <h3>{entry.href ? <a href={entry.href}>{entry.title}</a> : entry.title}</h3>
+              {entry.dates && <p class="cv-dates">{entry.dates}</p>}
+            </div>
+            {entry.org && <p class="cv-org">{entry.org}</p>}
+            {!!entry.points?.length && <ul>{entry.points.map((point) => <li>{point}</li>)}</ul>}
+          </article>
+        ))}
+      </section>
+    ))}
+
     <a class="back-link" href="/">← Back to the knowledge graph</a>
   </main>
 </SiteLayout>

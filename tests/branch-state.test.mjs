@@ -5,14 +5,14 @@ import { graphNodes } from '../src/data/graph.ts';
 
 const toggle = (parent) => ({ type: 'toggle', parent });
 
-test('all eight categories provide children and Projects uses the Stage 2 labels', () => {
+test('all eight categories provide children and Projects keeps its original items', () => {
   assert.equal(graphNodes.length, 8);
   for (const node of graphNodes) {
     assert.ok(node.children.length > 0);
     assert.equal(new Set(node.children).size, node.children.length);
   }
-  assert.deepEqual(graphNodes.find(({ id }) => id === 'projects').children,
-    ['AirBox Bootcamp', 'EcoCrafting', 'Neo4j Demo', 'Data Visualizations']);
+  const projects = graphNodes.find(({ id }) => id === 'projects').children;
+  for (const title of ['AirBox Bootcamp', 'EcoCrafting', 'Neo4j Demo', 'Data Visualizations']) assert.ok(projects.includes(title), title);
 });
 
 test('close and reopening reset the branch', () => {

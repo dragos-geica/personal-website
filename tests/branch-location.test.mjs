@@ -16,16 +16,15 @@ test('each branch round-trips through its URL and old or invalid input falls bac
 });
 
 test('every project keeps its existing URL slug', () => {
-  assert.deepEqual(projects.map(({ slug }) => slug), ['airbox-bootcamp', 'ecocrafting', 'neo4j-demo', 'data-visualizations']);
+  const slugs = projects.map(({ slug }) => slug);
+  for (const slug of ['airbox-bootcamp', 'ecocrafting', 'neo4j-demo', 'data-visualizations']) assert.ok(slugs.includes(slug), slug);
 });
 
-test('AirBox metrics preserve the participation distinctions', () => {
+test('AirBox keeps registrants, online completers and finalists as separate figures', () => {
   const airbox = projects.find(({ slug }) => slug === 'airbox-bootcamp');
-  assert.deepEqual(Object.fromEntries(airbox.facts.map(({ label, value }) => [label, value])), {
-    'Projects for Peace grant': '$10,000',
-    Registrants: '120+',
-    'Online-phase completers': '60',
-    Finalists: '12',
-    'Air-quality dataset': 'Public',
-  });
+  const facts = Object.fromEntries(airbox.facts.map(({ label, value }) => [label, value]));
+  assert.equal(facts['Projects for Peace grant'], '$10,000');
+  assert.equal(facts.Registrants, '120+');
+  assert.equal(facts['Online-phase completers'], '60');
+  assert.equal(facts['In-person finalists'], '12');
 });

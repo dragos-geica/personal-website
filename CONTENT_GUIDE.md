@@ -17,7 +17,8 @@ You can change it without touching any other code.
 |---|---|
 | Your name, the tagline, the intro sentence | `name`, `tagline`, `intro` at the top |
 | The photo in the centre circle | `portrait` |
-| About, Research and CV pages | `pages` |
+| About and Research pages | `pages` → `about`, `research` |
+| The CV | `pages` → `cv` → `sections` (see below) |
 | A category's name or the small word on its line | `categories` → e.g. `music` → `label`, `verb` |
 | The circles that appear when a category opens | that category's `items` |
 
@@ -25,7 +26,8 @@ Each **item** becomes a circle in its category and its own page:
 
 ```ts
 {
-  title: 'AirBox Bootcamp',                       // circle label and page heading (required)
+  title: 'AirBox Bootcamp',                       // circle label and page heading (required, keep it short)
+  subtitle: 'Project lead · 2026',               // small line under the heading
   summary: 'One or two sentences about it.',     // first paragraph on the page (required)
   image: { src: '/images/airbox.jpg', alt: 'Students assembling an air monitor' },
   facts: [
@@ -42,6 +44,23 @@ Each **item** becomes a circle in its category and its own page:
 
 Only `title` and `summary` are required; leave out anything you don't need.
 Add `draft: true` to mark an item as a placeholder (search engines will skip its page).
+
+## Editing the CV
+
+The CV is a list of `sections`, each with a `heading` and `entries`. An entry looks like:
+
+```ts
+{
+  title: 'Student General Manager',
+  org: 'Instructional Media Services, Wesleyan University',
+  dates: 'September 2025–present',
+  points: ['One bullet point.', 'Another bullet point.'],
+  href: '/projects/airbox-bootcamp/',   // optional: makes the title a link
+},
+```
+
+Only `title` is required. To add a role, copy an entry and edit it; to add a section, copy a whole
+`{ heading: …, entries: [ … ] },` block. `npm test` checks that links to item pages still exist.
 
 ## Adding a photo
 

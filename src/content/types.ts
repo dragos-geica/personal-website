@@ -7,13 +7,20 @@ export interface ContentImage {
   alt: string;
 }
 
+export interface ContentLink {
+  label: string;
+  href: string;
+}
+
 export interface ContentItem {
   title: string;
+  /** A short line under the heading, e.g. role, place and dates. */
+  subtitle?: string;
   summary: string;
   image?: ContentImage;
   facts?: readonly { value: string; label: string }[];
   sections?: readonly { title: string; text: string }[];
-  links?: readonly { label: string; href: string }[];
+  links?: readonly ContentLink[];
   draft?: boolean;
 }
 
@@ -29,6 +36,25 @@ export type CategoryId =
 export interface ContentPage {
   title: string;
   paragraphs: readonly string[];
+  links?: readonly ContentLink[];
+}
+
+export interface CvEntry {
+  /** Role, degree or award. */
+  title: string;
+  /** Organisation and place. */
+  org?: string;
+  dates?: string;
+  points?: readonly string[];
+  /** Optional link, e.g. to the matching project page ('/projects/airbox-bootcamp/'). */
+  href?: string;
+}
+
+export interface CvPage {
+  title: string;
+  /** The name shown at the top of the CV. */
+  name: string;
+  sections: readonly { heading: string; entries: readonly CvEntry[] }[];
 }
 
 export interface SiteContent {
@@ -36,6 +62,6 @@ export interface SiteContent {
   tagline: string;
   intro: string;
   portrait: ContentImage;
-  pages: { about: ContentPage; research: ContentPage; cv: ContentPage };
+  pages: { about: ContentPage; research: ContentPage; cv: CvPage };
   categories: Record<CategoryId, ContentCategory>;
 }

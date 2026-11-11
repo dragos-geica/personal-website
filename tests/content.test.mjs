@@ -28,3 +28,13 @@ test('every category has items with a title and summary, and no two items share 
     }
   }
 });
+
+test('every internal CV link points at a page that exists', async () => {
+  const { nodeDestination } = await import('../src/data/node-destinations.ts');
+  const pages = new Set(Object.entries(site.categories).flatMap(([id, { items }]) => items.map(({ title }) => nodeDestination(id, title))));
+  for (const { entries } of site.pages.cv.sections) {
+    for (const { title, href } of entries) {
+      if (href?.startsWith('/')) assert.ok(pages.has(href), `CV entry "${title}" links to ${href}, which is not an item page`);
+    }
+  }
+});
