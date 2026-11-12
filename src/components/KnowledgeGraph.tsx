@@ -7,7 +7,7 @@ import GraphBranch from './GraphBranch';
 import { branchSide, centerNode, graphCanvas, graphNodes, type GraphNode } from '../data/graph';
 import GraphIcon from './GraphIcon';
 import { site } from '../content/site';
-import { togglePortraitBurst } from '../scripts/portrait-burst';
+import { prepareIntro, togglePortraitBurst } from '../scripts/portrait-burst';
 import { moveBranchHub, PROJECT_HUB_X, sweepBranch, type BranchSweep } from '../scripts/branch-motion';
 import type { TransitionBeforePreparationEvent } from 'astro:transitions/client';
 
@@ -67,6 +67,11 @@ export default function KnowledgeGraph() {
   const [branch, setBranch] = useState<BranchState>(null);
   const [revealBranch, setRevealBranch] = useState(false);
   const graph = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const portrait = graph.current?.querySelector<HTMLElement>('.center-node');
+    if (portrait) prepareIntro(portrait);
+  }, []);
   const branchSweep = useRef<BranchSweep | null>(null);
   const currentBranch = useRef<BranchState>(null);
   const pendingFocus = useRef<{ id: string; scroll: 'nearest' | 'none' } | null>(null);
@@ -238,6 +243,11 @@ export default function KnowledgeGraph() {
               onClick={(event) => togglePortraitBurst(event.currentTarget)}>
               <img src={site.portrait.src} alt="" width="480" height="480" decoding="async" />
             </button>
+            {/* Shown only on the first visit, while the portrait is alone on the page. */}
+            <span className="intro-hint" aria-hidden="true">
+              <span className="intro-hint-click">Click the circle</span>
+              <span className="intro-hint-tap">Tap the circle</span>
+            </span>
           </div>
 
           <ul className="graph-categories" role="list" aria-label="Knowledge categories">

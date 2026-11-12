@@ -2,6 +2,10 @@
 // shakes harder and harder in step with the sound; at the sound's peak it bursts, and
 // a ring of light clears everything else off the screen. Clicking it again, or Escape,
 // brings the page back.
+//
+// On a first visit the page opens on the portrait alone (html[data-intro], set in SiteLayout).
+// Then the same burst works the other way: the ring brings the name and the graph in as it
+// passes, which also shows a new visitor that the circles are what you press.
 import { playSound } from './branch-sound';
 import { cubicBezierInverse } from './motion';
 
@@ -31,6 +35,7 @@ interface Run { cancel: () => void }
 let running: Run | null = null;
 
 const scene = () => document.querySelector<HTMLElement>('main.home-scene');
+const intro = () => document.documentElement.dataset.intro !== undefined;
 
 function loudness(time: number) {
   const position = time / STEP;
@@ -166,7 +171,7 @@ function ringOverlay(x: number, y: number, radius: number) {
   return { overlay, rings };
 }
 
-function burst(portrait: HTMLElement) {
+function burst(portrait: HTMLElement, reveal = false) {
   const main = scene();
   if (!main || running) return;
   const reduced = reducedMotion();
@@ -225,9 +230,18 @@ function burst(portrait: HTMLElement) {
     resetPortrait();
     main!.style.setProperty('--charge', '1');
     const { bounds, x, y, startRadius, radius, timeAt } = geometry(portrait);
+    if (reveal) {
+      // Uncover the page now; each part stays invisible until the ring reaches it.
+      delete main!.dataset.portraitBurst;
+      main!.style.removeProperty('--charge');
+      endIntro(portrait);
+    }
     const fades = targets(x, y).map(({ element, near, far }) => {
       const [from, to] = reduced ? [0, 260] : [timeAt(near), timeAt(far)];
-      return element.animate([{ opacity: 0 }], { delay: from, duration: Math.max(180, to - from), easing: 'ease-out', fill: 'forwards' });
+      const duration = Math.max(180, to - from);
+      return reveal
+        ? element.animate([{ opacity: 0 }, { opacity: 1 }], { delay: from, duration: duration + 220, easing: 'ease-out', fill: 'backwards' })
+        : element.animate([{ opacity: 0 }], { delay: from, duration, easing: 'ease-out', fill: 'forwards' });
     });
     animations.push(...fades);
 
@@ -254,6 +268,12 @@ function burst(portrait: HTMLElement) {
       const jolt = [0, 1, 2, 3].map(() => `${(Math.random() * 12 - 6).toFixed(1)}px ${(Math.random() * 10 - 5).toFixed(1)}px`);
       animations.push(main!.animate([{ translate: '0 0' }, ...jolt.map((translate) => ({ translate })), { translate: '0 0' }],
         { duration: 260, easing: 'linear' }));
+    }
+
+    if (reveal) {
+      // Everything is back once the last part has faded in.
+      void Promise.all(animations.map(({ finished }) => finished)).then(() => run.cancel(), () => {});
+      return;
     }
 
     timer = window.setTimeout(() => {
@@ -306,9 +326,28 @@ function restore(portrait: HTMLElement) {
   void Promise.all(animations.map(({ finished }) => finished)).then(() => run.cancel(), () => {});
 }
 
-/** The portrait's click handler: burst, or bring the page back once it has burst. */
+/** While only the portrait is showing, tell screen reader users what pressing it does. */
+export function prepareIntro(portrait: HTMLElement) {
+  if (!intro() || portrait.dataset.label) return;
+  portrait.dataset.label = portrait.getAttribute('aria-label') ?? '';
+  portrait.setAttribute('aria-label', portrait.dataset.label.replace(/\. .*$/, '. Press it to open the site.'));
+}
+
+/** The first visit is over: the page stays revealed for the rest of the visit. */
+function endIntro(portrait: HTMLElement) {
+  delete document.documentElement.dataset.intro;
+  try {
+    sessionStorage.setItem('graph-revealed', '1');
+  } catch {
+    // Private browsing can refuse storage; the intro then simply shows again next time.
+  }
+  if (portrait.dataset.label) portrait.setAttribute('aria-label', portrait.dataset.label);
+}
+
+/** The portrait's click handler: reveal the page, burst, or bring the page back once it has burst. */
 export function togglePortraitBurst(portrait: HTMLElement) {
-  if (scene()?.dataset.portraitEgg !== undefined) restore(portrait);
+  if (intro()) burst(portrait, true);
+  else if (scene()?.dataset.portraitEgg !== undefined) restore(portrait);
   else burst(portrait);
 }
 

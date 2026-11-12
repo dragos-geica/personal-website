@@ -30,6 +30,11 @@ const canonical = Astro.site && new URL(Astro.url.pathname, Astro.site);
     <script is:inline>
       if (location.pathname === '/' && new URLSearchParams(location.search).has('branch')) {
         document.documentElement.dataset.graphPending = '';
+      } else if (location.pathname === '/') {
+        // A first visit opens on the portrait alone; pressing it reveals the graph (portrait-burst.ts).
+        try {
+          if (!sessionStorage.getItem('graph-revealed')) document.documentElement.dataset.intro = '';
+        } catch {}
       }
     </script>
   </head>
