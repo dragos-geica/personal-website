@@ -1,5 +1,6 @@
-// Sounds: a short sweep when a category opens, the same sweep reversed when it closes,
-// and the portrait's burst (see portrait-burst.ts).
+// Sounds: the portrait's burst (see portrait-burst.ts), and for the categories a short,
+// softer cut of that same whoosh: just its release, with no build-up. Opening plays it,
+// closing plays it reversed.
 // Browsers only allow sound after the visitor has interacted with the page, so the audio
 // is set up on the first pointer or key press and the clips are decoded once, up front.
 import type { TransitionBeforePreparationEvent } from 'astro:transitions/client';
@@ -11,7 +12,8 @@ const clips = {
   burst: '/sounds/portrait-burst.m4a',
 } as const;
 export type SoundName = keyof typeof clips;
-const VOLUME = .5;
+/** Categories sit at half the portrait burst's volume (.7), so the burst stays the big moment. */
+const VOLUME = .35;
 
 let context: AudioContext | undefined;
 const buffers = new Map<SoundName, Promise<AudioBuffer | undefined>>();
