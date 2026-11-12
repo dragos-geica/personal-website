@@ -6,6 +6,9 @@
       "title": "AirBox Bootcamp",
       "subtitle": "Project lead and Projects for Peace grantee · with Alacrity Education · 2026",
       "summary": "I partnered with Alacrity Education to run a free Romanian STEAM bootcamp where students built and deployed air-quality monitors. A $10,000 Projects for Peace grant supported the program, and the students’ readings contributed to a public air-quality dataset.",
+      "image": {
+        "src": "/images/Airbox/img1792.jpg"
+      },
       "tags": [
         "Air-quality sensors",
         "Environmental data"
@@ -59,7 +62,9 @@
           "label": "Alacrity Education",
           "href": "https://alacrity.education/en"
         }
-      ]
+      ],
+      "hideFromGraph": false,
+      "draft": false
     },
     {
       "title": "Opportunup",
@@ -90,7 +95,9 @@
           "label": "Opportunup on LinkedIn",
           "href": "https://www.linkedin.com/company/opportunup/"
         }
-      ]
+      ],
+      "hideFromGraph": false,
+      "draft": false
     },
     {
       "title": "HPC for Stata",
@@ -119,7 +126,9 @@
           "label": "Benchmark post on LinkedIn",
           "href": "https://www.linkedin.com/feed/update/urn:li:activity:7526015913842810881/"
         }
-      ]
+      ],
+      "hideFromGraph": false,
+      "draft": false
     },
     {
       "title": "Neo4j Demo",
@@ -139,7 +148,9 @@
           "title": "An example question",
           "text": "One query the prototype answers directly: what are China’s total U.S. import values by HS2 industry?"
         }
-      ]
+      ],
+      "hideFromGraph": false,
+      "draft": false
     },
     {
       "title": "Income Volatility & Health",
@@ -172,7 +183,9 @@
           "label": "Poster and abstract",
           "href": "https://adatapostersfall2025.research.wesleyan.edu/2025/11/25/the-association-between-income-volatility-and-perceived-levels-of-health-among-non-retired-individuals-living-alone-and-living-with-someone-else/"
         }
-      ]
+      ],
+      "hideFromGraph": false,
+      "draft": false
     },
     {
       "title": "Sephora Reviews",
@@ -196,7 +209,9 @@
           "title": "Method",
           "text": "I used Python with pandas and NumPy for the analysis, and seaborn and Matplotlib to visualize the comparisons, including by reported skin tone and skin type where reviewers gave them. The result was a report with tables and graphics describing patterns in the ratings."
         }
-      ]
+      ],
+      "hideFromGraph": false,
+      "draft": false
     },
     {
       "title": "Global Economic Indicators",
@@ -218,7 +233,8 @@
           "text": "I built charts and correlation analyses on topics such as trade flows and governance. In the course dataset, imports and exports moved closely together, as did government effectiveness and political stability."
         }
       ],
-      "hideFromGraph": true
+      "hideFromGraph": true,
+      "draft": false
     },
     {
       "title": "Data Visualizations",
