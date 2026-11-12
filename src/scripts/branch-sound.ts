@@ -27,8 +27,15 @@ function download() {
 }
 
 function unlock() {
-  if (context || typeof AudioContext === 'undefined') return;
+  // Safari only lets audio start or resume inside the gesture itself, not a moment later,
+  // so every click, tap and key press wakes the audio if the browser has paused it.
+  if (context) {
+    if (context.state !== 'running') void context.resume();
+    return;
+  }
+  if (typeof AudioContext === 'undefined') return;
   context = new AudioContext();
+  if (context.state !== 'running') void context.resume();
   const audio = context;
   const downloaded = download();
   for (const name of Object.keys(clips) as SoundName[]) {
@@ -62,7 +69,7 @@ if (typeof window !== 'undefined') {
   if ('requestIdleCallback' in window) requestIdleCallback(() => void download(), { timeout: 4000 });
   else setTimeout(() => void download(), 1500);
 
-  for (const type of ['pointerdown', 'keydown'] as const) {
+  for (const type of ['pointerdown', 'pointerup', 'click', 'touchend', 'keydown'] as const) {
     addEventListener(type, unlock, { capture: true, passive: true });
   }
 
