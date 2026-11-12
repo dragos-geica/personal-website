@@ -65,24 +65,6 @@ body {
 
 .skip-link:focus { clip-path: none; }
 
-.theme-toggle {
-  position: fixed;
-  z-index: 9;
-  top: 14px;
-  right: 16px;
-  display: grid;
-  width: 40px;
-  height: 40px;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.theme-toggle[hidden], .moon-icon, [data-theme="dark"] .sun-icon { display: none; }
-[data-theme="dark"] .moon-icon { display: block; }
-.theme-toggle:hover { background: var(--accent); }
-.theme-toggle svg { width: 21px; height: 21px; }
 
 .home-scene {
   display: grid;
@@ -993,6 +975,9 @@ main[data-portrait-burst] .center-node {
 }
 .portrait-burst-overlay { z-index: 7; }
 .portrait-burst-echo { opacity: .5; }
+
+/* The graph clips its overflow; the lifted portrait's glow reaches past its top edge. */
+main:is([data-portrait-burst], [data-portrait-egg]) .knowledge-graph { overflow: visible; }
 
 /* After the burst only the portrait is left, breathing softly. */
 main[data-portrait-egg] :is(.home-intro, .graph-categories > .category, .center-orbit > .orbit) {

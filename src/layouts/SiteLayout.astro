@@ -13,10 +13,11 @@ const { title, description = site.intro, noindex } = Astro.props;
 const canonical = Astro.site && new URL(Astro.url.pathname, Astro.site);
 ---
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -30,24 +31,10 @@ const canonical = Astro.site && new URL(Astro.url.pathname, Astro.site);
       if (location.pathname === '/' && new URLSearchParams(location.search).has('branch')) {
         document.documentElement.dataset.graphPending = '';
       }
-      try {
-        if (localStorage.getItem('dg-theme') === 'dark') document.documentElement.dataset.theme = 'dark';
-      } catch {
-        // The theme can still be switched for this page if storage is unavailable.
-      }
     </script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
-    <button type="button" class="theme-toggle" aria-label="Dark theme" aria-pressed="false" hidden>
-      <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="4" />
-        <path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5" />
-      </svg>
-      <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true">
-        <path d="M20 15A8.5 8.5 0 0 1 9 4a8.5 8.5 0 1 0 11 11Z" />
-      </svg>
-    </button>
     <slot />
     <div id="node-morph" transition:persist="node-morph" aria-hidden="true" hidden></div>
     <div id="branch-return" transition:persist="branch-return" aria-hidden="true" hidden></div>
@@ -66,27 +53,7 @@ const canonical = Astro.site && new URL(Astro.url.pathname, Astro.site);
 
   document.addEventListener('astro:before-swap', (event) => {
     const next = (event as TransitionBeforeSwapEvent).newDocument.documentElement;
-    const theme = document.documentElement.dataset.theme;
-    if (theme) next.dataset.theme = theme;
     // Astro swaps the root element's attributes, including the motion properties.
     applyMotionProperties(next);
-  });
-
-  document.addEventListener('astro:page-load', () => {
-    const toggle = document.querySelector<HTMLButtonElement>('.theme-toggle');
-    if (!toggle) return;
-    const root = document.documentElement;
-    toggle.setAttribute('aria-pressed', String(root.dataset.theme === 'dark'));
-    toggle.hidden = false;
-    toggle.addEventListener('click', () => {
-      const dark = root.dataset.theme !== 'dark';
-      root.dataset.theme = dark ? 'dark' : 'light';
-      toggle.setAttribute('aria-pressed', String(dark));
-      try {
-        localStorage.setItem('dg-theme', root.dataset.theme);
-      } catch {
-        // Keep the current page usable when storage is blocked.
-      }
-    });
   });
 </script>
