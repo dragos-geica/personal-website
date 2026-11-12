@@ -1,4 +1,5 @@
 import type { TransitionBeforePreparationEvent, TransitionBeforeSwapEvent } from 'astro:transitions/client';
+import { restoreFocus } from './input-modality';
 import { createBranchAnchor, sweepBranch, type BranchSweep } from './branch-motion';
 import { durations, easings } from './motion';
 import { readBranch } from '../data/branch-location';
@@ -147,7 +148,7 @@ async function restoreHome(motion: ReturnMotion) {
   }
   if (active !== motion) return;
   cleanup(motion);
-  target.focus({ preventScroll: true });
+  restoreFocus(target, { preventScroll: true });
 }
 
 reducedMotion.addEventListener('change', () => {

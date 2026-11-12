@@ -1,4 +1,5 @@
 import type { TransitionBeforePreparationEvent, TransitionBeforeSwapEvent } from 'astro:transitions/client';
+import { restoreFocus } from './input-modality';
 import { readBranch } from '../data/branch-location';
 import { graphNodes } from '../data/graph';
 import { nodeDestination } from '../data/node-destinations';
@@ -172,7 +173,7 @@ function settleMorph() {
   clean(shot);
   if (!shot.swapped) return;
   void waitForElement(shot.signal, shot.findTarget).then((target) => {
-    if (!shot.signal.aborted) target?.focus({ preventScroll: true });
+    if (!shot.signal.aborted) restoreFocus(target, { preventScroll: true });
   });
 }
 
@@ -271,7 +272,7 @@ document.addEventListener('astro:after-swap', () => {
   } else if (focus) {
     const { signal, findTarget } = focus;
     void waitForElement(signal, findTarget).then((target) => {
-      if (!signal.aborted) target?.focus();
+      if (!signal.aborted) restoreFocus(target);
     });
   }
 });
@@ -320,6 +321,6 @@ async function finish(shot: Morph) {
   }
   if (morph !== shot) return;
   clean(shot);
-  if (target) target.focus({ preventScroll: true });
+  restoreFocus(target, { preventScroll: true });
   if (main && !shot.reverse && target && !contentShown) revealContent(main, target);
 }

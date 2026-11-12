@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import { restoreFocus } from '../scripts/input-modality';
 import { branchReducer, type BranchAction, type BranchState } from '../data/branch-state';
 import { navigate } from 'astro:transitions/client';
 import { branchPath, readBranch } from '../data/branch-location';
@@ -149,7 +150,7 @@ export default function KnowledgeGraph() {
     if (!element) return;
     pendingFocus.current = null;
     if (element.closest('[data-morph-main="arriving"], [data-branch-return]')) return;
-    element.focus({ preventScroll: true });
+    restoreFocus(element, { preventScroll: true });
     if (target.scroll === 'nearest') element.scrollIntoView({ block: 'nearest', behavior: 'instant' });
   }, [branch]);
 
@@ -196,7 +197,7 @@ export default function KnowledgeGraph() {
 
   function closeBranch() {
     if (!branch) return;
-    document.getElementById(`category-${branch.parent}`)?.focus({ preventScroll: true });
+    restoreFocus(document.getElementById(`category-${branch.parent}`), { preventScroll: true });
     updateBranch({ type: 'close' });
   }
 
