@@ -1058,11 +1058,12 @@ html[data-portrait-egg] { overflow: hidden; }
 /* Heading first, then the line under it, then the invitation and email. */
 @media (prefers-reduced-motion: no-preference) {
   .portrait-egg[data-shown] > * { animation: egg-line-in 620ms cubic-bezier(.2,.7,.3,1) backwards; }
-  .portrait-egg[data-shown] > :nth-child(1) { animation-delay: 380ms; }
-  /* Let each part land: the sentence 1.5 s after the heading, the email 2 s after that. */
-  .portrait-egg[data-shown] > :nth-child(2) { animation-delay: 1900ms; }
-  .portrait-egg[data-shown] > :nth-child(3) { animation-delay: 3900ms; }
-  .portrait-egg[data-shown] > :nth-child(4) { animation-delay: 4100ms; }
+  /* The portrait glides up for 760 ms (portrait-burst.ts); the heading waits half a second
+     after it settles. Then the sentence 1.5 s after the heading, the email 2 s after that. */
+  .portrait-egg[data-shown] > :nth-child(1) { animation-delay: 1260ms; }
+  .portrait-egg[data-shown] > :nth-child(2) { animation-delay: 2760ms; }
+  .portrait-egg[data-shown] > :nth-child(3) { animation-delay: 4760ms; }
+  .portrait-egg[data-shown] > :nth-child(4) { animation-delay: 4960ms; }
 }
 @keyframes egg-line-in { from { opacity: 0; translate: 0 10px; filter: blur(4px); } }
 @media (max-width: 480px) {
