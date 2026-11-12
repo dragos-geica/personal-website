@@ -70,12 +70,9 @@ export function sweepBranch(graph: HTMLElement, hub: HTMLElement, direction: 'hi
   // A ring left over from the previous sweep must not overlap this one.
   document.querySelectorAll('.branch-sweep-overlay').forEach((overlay) => overlay.remove());
   const origin = hub.getBoundingClientRect();
-  const bounds = graph.getBoundingClientRect();
   const { x, y } = centerOf(origin);
-  const left = Math.max(0, bounds.left);
-  const top = Math.max(0, bounds.top);
-  const right = Math.min(innerWidth, bounds.right);
-  const bottom = Math.min(innerHeight, bounds.bottom);
+  // The ring spreads across the whole screen, not just the graph's box.
+  const [left, top, right, bottom] = [0, 0, innerWidth, innerHeight];
   // The band's inner edge starts on the clicked node's circle, so the ring visibly
   // leaves from the node itself rather than appearing partway out.
   const startRadius = origin.width / 2 / RING_INNER;
@@ -85,8 +82,7 @@ export function sweepBranch(graph: HTMLElement, hub: HTMLElement, direction: 'hi
   const overlay = document.createElement('div');
   overlay.className = 'branch-sweep-overlay';
   overlay.setAttribute('aria-hidden', 'true');
-  // The clip softly fades the ring out towards the graph's edges, so it never shows
-  // a cut edge and never washes over the intro text beside the graph.
+  // The clip softly fades the ring out at the screen's edges, so it never shows a cut edge.
   const clip = document.createElement('div');
   clip.className = 'branch-sweep-clip';
   Object.assign(clip.style, {
