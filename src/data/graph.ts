@@ -88,7 +88,7 @@ function hintLines([x, y]: Point, size: number) {
 
 export const graphNodes: readonly GraphNode[] = layout.map(({ id, position, size, bow }) => {
   const content = site.categories[id];
-  const children = content.items.filter(({ inGraph }) => inGraph !== false).slice(0, MAX_GRAPH_ITEMS);
+  const children = content.items.filter(({ hideFromGraph }) => !hideFromGraph).slice(0, MAX_GRAPH_ITEMS);
   return {
     id, position, size, ...connect(position, size, bow), hints: hintLines(position, size),
     label: content.label, verb: content.verb, children: children.map(({ title }) => title),

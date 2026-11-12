@@ -1,0 +1,261 @@
+{
+  "title": "CV",
+  "name": "Dragoș-Andrei Geică",
+  "sections": [
+    {
+      "heading": "Education",
+      "entries": [
+        {
+          "title": "B.A. candidate, Economics and French; Certificate in Data Science",
+          "org": "Wesleyan University, Middletown, CT",
+          "dates": "2024–2028 (expected)",
+          "points": [
+            "Full-ride scholarship.",
+            "Selected coursework: econometrics, statistical consulting, machine learning, high-performance computing, knowledge graphs, applied data analysis, microeconomic theory."
+          ]
+        },
+        {
+          "title": "Vassar-Wesleyan Program in Paris",
+          "org": "Paris, France",
+          "dates": "January–May 2026",
+          "points": [
+            "Upper-level Monetary Economics, Banking, and Finance, taught in French at Université Paris Cité.",
+            "French grammar, theater, and studio art, including drawing and painting at the Académie de la Grande Chaumière."
+          ]
+        },
+        {
+          "title": "Oxford for Romania Summer School",
+          "org": "Oxford, United Kingdom",
+          "dates": "August–September 2022",
+          "points": [
+            "Selected for a multidisciplinary program of seminars, workshops, and mentorship for 24 Romanian students."
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Research experience",
+      "entries": [
+        {
+          "title": "Economics Research Assistant to Professor David Kuenzel",
+          "org": "Wesleyan University, Economics and Quantitative Analysis Center",
+          "dates": "June 2026–present",
+          "points": [
+            "Study how U.S. imports change before and after antidumping, countervailing-duty, and safeguard actions; began with the QAC summer apprenticeship.",
+            "Linked trade-remedy cases to quarterly U.S. import records from 1990 to 2024 and estimated PPML models with high-dimensional fixed effects on 54.6 million observations in Stata and R.",
+            "Presented the poster “The Trade Effects of US Temporary Trade Barriers: When Do They Start and How Long Do They Last?” in July 2026."
+          ],
+          "href": "/graph/experience/temporary-trade-barriers/"
+        },
+        {
+          "title": "Research Intern",
+          "org": "Romanian Center for European Policies",
+          "dates": "Fall 2025",
+          "points": [
+            "Compared vocational education and professional certification across five EU countries for a policy brief prepared for Romania’s Ministry of Education."
+          ],
+          "href": "/graph/experience/vocational-education-policy/"
+        }
+      ]
+    },
+    {
+      "heading": "Work experience",
+      "entries": [
+        {
+          "title": "Student General Manager",
+          "org": "Instructional Media Services, Wesleyan University",
+          "dates": "September 2025–present",
+          "href": "/graph/experience/instructional-media-services/",
+          "points": [
+            "Oversee operations for a team of 30 student employees, coordinate weekly meetings, and support hiring.",
+            "Replaced manual spreadsheet tracking with a survey-based classroom technology audit."
+          ]
+        },
+        {
+          "title": "Student Technician",
+          "org": "Instructional Media Services, Wesleyan University",
+          "dates": "September 2024–September 2025",
+          "points": [
+            "Supported classroom projectors, touchscreens, AMX controls, Macs and PCs, and set up AV for events, recordings, and Zoom conferences."
+          ]
+        },
+        {
+          "title": "Consultant, then Manager",
+          "org": "Wesleyan Undergraduate Consulting Group",
+          "href": "/graph/experience/undergraduate-consulting/",
+          "dates": "September 2025–present",
+          "points": [
+            "For a career-center engagement project, surveyed 30+ international students, analyzed Handshake engagement data for 650+ students, identified four barriers, and briefed Career Center leadership on recommendations."
+          ]
+        },
+        {
+          "title": "Educational Consultant",
+          "org": "Julia Boca Academy",
+          "dates": "June 2024–March 2025",
+          "points": [
+            "Gave free weekly one-on-one support to high-achieving, low-income scholars applying to U.S. colleges: college lists, essays, interviews, financial aid, and scholarships."
+          ]
+        },
+        {
+          "title": "Digital SAT English Tutor",
+          "org": "Julia Boca Academy, Bucharest",
+          "dates": "April–August 2024",
+          "points": [
+            "Tutored 12 Romanian students with personalized English practice materials, curriculum presentations, and study strategies."
+          ]
+        },
+        {
+          "title": "Intern",
+          "org": "Romanian Ministry of Research, Innovation and Digitalization, Bucharest",
+          "dates": "July–September 2023",
+          "points": [
+            "Helped develop and test the online application platform for the Henri Coandă National Research Scholarship, with weekly testing and debugging before the application cycle."
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Leadership and community",
+      "entries": [
+        {
+          "title": "Project lead, AirBox Bootcamp",
+          "org": "With Alacrity Education, Romania",
+          "dates": "2026",
+          "points": [
+            "Secured a $10,000 Projects for Peace grant and led a free STEAM bootcamp where students built and deployed air-quality monitors."
+          ],
+          "href": "/projects/airbox-bootcamp/"
+        },
+        {
+          "title": "Co-chair, International Student Advisory Board",
+          "org": "Wesleyan University",
+          "href": "/graph/experience/international-students/",
+          "dates": "September 2024–present",
+          "points": [
+            "Led a team of 10 on the second edition of a 49-page international student handbook, designed in Figma, supporting a cohort of 95 incoming international students.",
+            "Student pairing, recruitment, and collaboration with the Gordon Career Center, including an international alumni career panel in November 2026."
+          ]
+        },
+        {
+          "title": "Co-moderator, Eastern European LGBTQ+ advocacy panel",
+          "org": "Wesleyan University",
+          "dates": "December 2025",
+          "points": [
+            "Co-moderated a discussion with Hungarian and Romanian activists, organized by the Adelphic Educational Fund, for 20+ students and faculty."
+          ]
+        },
+        {
+          "title": "Founder and volunteer coordinator, Opportunup",
+          "org": "Romania",
+          "dates": "2023–24",
+          "points": [
+            "Built a platform helping young people find free programs, civic opportunities, and fully funded scholarships, and coordinated a nationwide volunteer team."
+          ],
+          "href": "/projects/opportunup/"
+        },
+        {
+          "title": "Member, National Children’s Board",
+          "org": "UNICEF Romania",
+          "href": "/graph/experience/unicef-romania/",
+          "dates": "January 2021–April 2024",
+          "points": [
+            "Represented youth perspectives on children’s rights; served on Bucharest’s Child Friendly Cities Initiative committee in 2022–23.",
+            "Contributed youth input to national children’s rights strategy discussions and spoke in TV interviews on volunteering, education, and children’s rights."
+          ]
+        },
+        {
+          "title": "Media literacy trainer",
+          "org": "Center for Independent Journalism, with UNICEF Romania",
+          "dates": "January–May 2023",
+          "points": [
+            "Trained 50+ young people aged 15–18 and worked with 20 teachers on fact-checking and misinformation; spoke at the “Fake or News?” media education conference."
+          ]
+        },
+        {
+          "title": "Youth jury member, Principal of the Year Awards",
+          "org": "AVE România",
+          "dates": "September 2023",
+          "points": [
+            "Interviewed candidates and helped select national finalists from 72 regional finalists."
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Selected projects",
+      "entries": [
+        {
+          "title": "High-Performance Computing for Stata",
+          "dates": "Fall 2026",
+          "href": "/projects/hpc-for-stata/"
+        },
+        {
+          "title": "Neo4j trade knowledge graph",
+          "dates": "Fall 2026",
+          "href": "/projects/neo4j-demo/"
+        },
+        {
+          "title": "Income Volatility and Self-Reported Health",
+          "dates": "Fall 2025",
+          "href": "/projects/income-volatility-health/"
+        },
+        {
+          "title": "Sephora Product Review Analysis",
+          "dates": "Spring 2025",
+          "href": "/projects/sephora-reviews/"
+        },
+        {
+          "title": "Global Economic Indicators Analysis",
+          "dates": "2025",
+          "href": "/projects/global-economic-indicators/"
+        }
+      ]
+    },
+    {
+      "heading": "Honors and certifications",
+      "entries": [
+        {
+          "title": "Projects for Peace grantee",
+          "org": "Middlebury College",
+          "dates": "2026",
+          "points": [
+            "$10,000 for AirBox Bootcamp."
+          ]
+        },
+        {
+          "title": "Third place nationally, Romanian Debate Olympiad",
+          "dates": "May 2024"
+        },
+        {
+          "title": "Julia Boca Academy Scholar",
+          "dates": "August 2023–March 2024",
+          "points": [
+            "One of two scholars selected for a fully funded U.S. college application advising program."
+          ]
+        },
+        {
+          "title": "Social and Behavioral Responsible Conduct of Research",
+          "org": "CITI Program",
+          "dates": "September 2026"
+        }
+      ]
+    },
+    {
+      "heading": "Languages and tools",
+      "entries": [
+        {
+          "title": "Languages",
+          "points": [
+            "Romanian (native), English (full professional proficiency), French (professional working proficiency)."
+          ]
+        },
+        {
+          "title": "Tools",
+          "points": [
+            "Stata, R, Python (pandas, NumPy, Matplotlib, seaborn), Excel and VBA, Neo4j, Linux, Bash and Slurm, Figma."
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 An Astro portfolio with a React knowledge graph, expandable branches, and a page for every item.
 
-**To edit text and photos, see [CONTENT_GUIDE.md](CONTENT_GUIDE.md).** Everything you write lives in `src/content/site.ts`.
+**To edit text and photos, use the editor at `/admin` (Pages CMS); see [CONTENT_GUIDE.md](CONTENT_GUIDE.md).** Everything you write lives in the JSON files in `src/content/`.
 
 ## Run locally
 
@@ -31,10 +31,10 @@ Open the address printed by `npm run preview`. The build output is in `dist/`.
 
 ## Edit content
 
-- `src/content/site.ts` holds every word and photo: your name and intro, the portrait, the simple pages, and each category's items. `src/data/projects.ts` adds URL slugs (made from titles) for project pages.
+- `src/content/*.json` hold every word and photo (home, about, research, cv, and one file per category); `src/content/site.ts` puts them together and drops blank fields. `.pages.yml` describes them to the editor. `src/data/projects.ts` adds URL slugs (made from titles) for project pages.
 - AirBox uses the facts in the Stage 3 brief. Its photo is a labeled placeholder. Add the public dataset URL to `links` once you have the verified address.
-- Photos go in `public/images/` and are referenced from `site.ts` as `/images/…`. `npm test` checks that every referenced photo exists.
-- `src/data/graph.ts` holds graph positions and line shapes only; labels come from `site.ts`.
+- Photos go in `public/images/` and are referenced from the content files as `/images/…`. `npm test` checks that every referenced photo exists.
+- `src/data/graph.ts` holds graph positions and line shapes only; labels come from the content files.
 - `src/pages/[section].astro` holds the Projects directory and the Research, About, and CV placeholders. The current placeholders carry a `noindex` directive.
 - Select a category to focus its branch, then choose a child to open its page. Browser Back and Forward restore the previous route and graph level.
 - `src/scripts/node-navigation.ts` handles the SVG outline and label shared by the graph and section heading. Existing Astro URLs remain directly addressable.

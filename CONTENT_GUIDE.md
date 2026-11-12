@@ -1,105 +1,72 @@
 # Editing the website's content
 
-All the words and photos on the site live in **one file**: [`src/content/site.ts`](src/content/site.ts).
-You can change it without touching any other code.
+All the words and photos on the site are edited in a form-based editor, **Pages CMS**. There is no code to touch.
+Behind the scenes the content lives in small files in [`src/content/`](src/content/), one per part of the site.
 
-## Quick start
+## Editing with the editor
 
-1. Start the site: `PATH="$PWD/.local-tools/node-v24.16.0-darwin-arm64/bin:$PATH" npm run dev`
-2. Open http://127.0.0.1:4321/
-3. Edit `src/content/site.ts` and save. The browser updates by itself.
-4. When you are done, run `npm test` and `npm run check` (with the same `PATH=…` prefix).
-   They tell you if a photo is missing or something is mistyped, and on which line.
+1. Go to **yoursite/admin** and click **Open the editor**, or go straight to https://app.pagescms.org.
+2. Sign in with GitHub. The first time, Pages CMS asks to install its GitHub app: allow it for the
+   `personal-website` repository.
+3. Open **dragos-geica/personal-website**. The sidebar lists the parts of the site:
 
-## What you can change
-
-| What | Where in `site.ts` |
+| In the editor | What it changes |
 |---|---|
-| Your name, the tagline, the intro sentence | `name`, `tagline`, `intro` at the top |
-| The photo in the centre circle | `portrait` |
-| The message after clicking your photo, and your email | `easterEgg` |
-| About and Research pages | `pages` → `about`, `research` |
-| The CV | `pages` → `cv` → `sections` (see below) |
-| A category's name or the small word on its line | `categories` → `experience`, `projects` or `interests` → `label`, `verb` |
-| The circles that appear when a category opens | that category's `items` |
+| Home page | Your name, the line under it, the introduction, the portrait, and the message after clicking the portrait (with your email) |
+| About page, Research page | The page title, its paragraphs and links |
+| CV | Sections and entries |
+| Experience, Projects, Other Interests | The category's name, and its items (each item is a circle and its own page) |
 
-Each **item** becomes a circle in its category and its own page:
+4. Change what you like and click **Save**. That publishes it: Cloudflare rebuilds the site, and the change is
+   live about a minute later.
 
-```ts
-{
-  title: 'AirBox Bootcamp',                       // circle label and page heading (required, keep it short)
-  subtitle: 'Project lead · 2026',               // small line under the heading
-  summary: 'One or two sentences about it.',     // first paragraph on the page (required)
-  image: { src: '/images/airbox.jpg', alt: 'Students assembling an air monitor' },
-  facts: [
-    { value: '120+', label: 'Registrants' },
-  ],
-  sections: [
-    { title: 'What we built', text: 'A paragraph of detail.' },
-  ],
-  links: [
-    { label: 'GitHub', href: 'https://github.com/…' },
-  ],
-  tags: ['Stata', 'R', 'Python'],                // data, tools and methods
-  inGraph: false,                                 // keep it off the home graph
-},
-```
+Only people with access to the GitHub repository can sign in, which right now is only you.
 
-Only `title` and `summary` are required; leave out anything you don't need.
+## Items
 
-**Tags** list the data, tools and methods behind an item. Every tag used by a project becomes a filter
-on the Projects page, and tags on any page link to the projects that use them. Spell a tool the same way
-everywhere (`'Stata'`, not `'stata'`) so it groups together. Tag research work `'Research'` to list it on
-the Research page.
+Each item becomes a circle in its category and its own page. Only **Title** and **Summary** are required; leave the
+rest blank if you don't need them. Blank fields are simply not shown.
 
-**The graph shows up to six circles per category**, in the order they appear in the file. Put `inGraph: false`
-on items you want only on the Projects page; it still has its own page.
-Add `draft: true` to mark an item as a placeholder (search engines will skip its page).
+- **Title:** the circle label and page heading. Keep it short. The page's web address is made from it
+  ("Neo4j Demo" becomes `/projects/neo4j-demo/`), so renaming an item changes its address.
+- **Tags:** the data, tools and methods behind the item. Every tag used by a project becomes a filter on the
+  Projects page. Spell a tool the same way everywhere (`Stata`, not `stata`) so it groups together.
+  Tag research work `Research` to list it on the Research page.
+- **Hide from the home graph:** the graph shows up to six circles per category, in the order of the list.
+  Tick this to keep an item off the graph; it still has its page and appears on the Projects page.
+- **Work in progress:** marks the item "in progress" and hides its page from search engines.
 
-## Editing the CV
+To reorder items, drag them in the list. To add one, use the add button under the list.
 
-The CV is a list of `sections`, each with a `heading` and `entries`. An entry looks like:
+## Photos
 
-```ts
-{
-  title: 'Student General Manager',
-  org: 'Instructional Media Services, Wesleyan University',
-  dates: 'September 2025–present',
-  points: ['One bullet point.', 'Another bullet point.'],
-  href: '/projects/airbox-bootcamp/',   // optional: makes the title a link
-},
-```
+Use any photo field's upload button. Photos are stored in `public/images/`. Keep them reasonably small (about
+1600 px wide at most; JPEG or WebP), and always fill in the **description**: it is read aloud to blind visitors.
+The portrait should be square.
 
-Only `title` is required. To add a role, copy an entry and edit it; to add a section, copy a whole
-`{ heading: …, entries: [ … ] },` block. `npm test` checks that links to item pages still exist.
+## The CV
 
-## Adding a photo
+The CV is a list of sections, each with entries. An entry's **Link** is optional: to link a role to its page,
+use the page's address, for example `/projects/airbox-bootcamp/` or `/graph/experience/unicef-romania/`.
+The automatic checks (below) tell you if a link points at a page that doesn't exist.
 
-1. Put the file in `public/images/`, e.g. `public/images/airbox.jpg`.
-   Keep photos reasonably small (about 1600 px wide at most; JPEG or WebP).
-2. Refer to it **without** `public`: `image: { src: '/images/airbox.jpg', alt: '…' }`.
-3. Always write a short `alt` describing the photo. It is read aloud to blind visitors.
+## If something looks wrong
 
-To change your portrait, replace `public/images/portrait.jpg` with a square photo of the same name.
+Every save runs through GitHub, so nothing is lost: each change is a commit you can undo there
+(the repository's history, then **Revert**). If a save makes the site fail to build, Cloudflare keeps
+showing the last working version, and its deployment log says what went wrong.
 
-## Adding or removing an item
+## Editing the files directly (optional)
 
-Copy an existing item, from `{` to its closing `},`, paste it into the list and edit it.
-To remove one, delete it from `{` to `},`. A category needs at least one item.
+You can also edit the `.json` files in `src/content/` by hand. Text goes between double quotes, entries are
+separated by commas, and the last entry in a list has no comma. Then run `npm test` and `npm run check`
+(with `PATH="$PWD/.local-tools/node-v24.16.0-darwin-arm64/bin:$PATH"` in front): they name the file and field
+if something is off.
 
-The item's web address is made from its title (for example "Neo4j Demo" becomes `/projects/neo4j-demo/`),
-so renaming an item also changes its address.
+The editor's forms are described in [`.pages.yml`](.pages.yml). Adding a new field to the site needs a code change
+there and in [`src/content/types.ts`](src/content/types.ts).
 
-## Common mistakes
+## What the editor does not control
 
-- **An apostrophe inside text** ends the text early: write `'Dragos\'s notes'` or use a curly `’`.
-- **A missing comma** after `}` or `'…'` between entries.
-- **A photo path with `public` in it**: use `/images/…`, not `public/images/…`.
-
-If the page turns blank or shows an error, the terminal running `npm run dev` names the file and line.
-Undo your last change, or fix that line, and save again.
-
-## What this file does not control
-
-The positions of the eight categories, colours, and animations are part of the design code.
-The three categories (Experience, Projects, Other Interests) are fixed; you can rename them, but adding one needs a code change.
+Positions on the graph, colours, animations and sounds are part of the design code. The three categories
+(Experience, Projects, Other Interests) are fixed; you can rename them, but adding one needs a code change.

@@ -1,0 +1,195 @@
+{
+  "label": "Experience",
+  "verb": "works_in",
+  "items": [
+    {
+      "title": "Temporary Trade Barriers",
+      "subtitle": "Research assistant to Professor David Kuenzel · Wesleyan Economics and QAC · 2026–present",
+      "summary": "I study how U.S. imports change before and after antidumping, countervailing-duty, and safeguard actions. For my summer poster, I linked trade-remedy cases to 35 years of import records and estimated models on 54.6 million observations.",
+      "tags": [
+        "Research",
+        "Stata",
+        "R",
+        "PPML",
+        "Census import data",
+        "Concordances"
+      ],
+      "facts": [
+        {
+          "value": "35 years",
+          "label": "Quarterly U.S. imports, 1990–2024"
+        },
+        {
+          "value": "54.6M",
+          "label": "Observations in the poster regression"
+        },
+        {
+          "value": "3",
+          "label": "Remedies: antidumping, countervailing duties, safeguards"
+        }
+      ],
+      "sections": [
+        {
+          "title": "The data",
+          "text": "The project uses quarterly U.S. Census import data built from monthly files compiled by Peter Schott, linked at the exporter × product × quarter level to the World Bank’s Temporary Trade Barriers Database. To follow products across changes in the tariff code system, I use HTS10 codes grouped into Pierce–Schott concordance families."
+        },
+        {
+          "title": "My part",
+          "text": "Working with Professor David Kuenzel, I built binary and count measures for the three remedies across four stages: the year before an investigation, the formal investigation, preliminary duties, and final duties. I estimated Poisson pseudo-maximum likelihood (PPML) models with exporter–product, exporter–quarter, and product–quarter fixed effects in Stata and R, and plotted the value-weighted share of imports covered by these measures, including by exporter."
+        },
+        {
+          "title": "What the summer poster found",
+          "text": "In that specification, final duties were associated with 26.5% lower import values overall: 44.5% lower for countervailing duties and 27.0% lower for antidumping duties. The safeguard estimate was small and not statistically significant. I presented the poster, “The Trade Effects of US Temporary Trade Barriers: When Do They Start and How Long Do They Last?”, in July 2026."
+        },
+        {
+          "title": "Ongoing work",
+          "text": "The project continues this academic year. Current work includes aggregating to HS6 products, constructing import unit values (value divided by reported quantity), and linking historical regular U.S. tariff rates to the import panel: a 1990 pilot using WITS/TRAINS data, crosswalks for trading partners, and documenting when each country’s tariff treatment changed."
+        }
+      ],
+      "links": [
+        {
+          "label": "Research update on LinkedIn",
+          "href": "https://www.linkedin.com/feed/update/urn:li:activity:7502850491702304768/"
+        }
+      ]
+    },
+    {
+      "title": "Vocational Education Policy",
+      "subtitle": "Research intern · Romanian Center for European Policies · Fall 2025",
+      "summary": "I compared vocational education and professional competency certification across five EU countries, focusing on graduate employability and the move into the labor market.",
+      "tags": [
+        "Research",
+        "Excel",
+        "Policy analysis"
+      ],
+      "facts": [
+        {
+          "value": "5",
+          "label": "EU countries compared"
+        },
+        {
+          "value": "10",
+          "label": "Cross-country datasets synthesized"
+        }
+      ],
+      "sections": [
+        {
+          "title": "The work",
+          "text": "Using Excel, I synthesized ten cross-country datasets alongside prior research for a policy brief prepared for Romania’s Ministry of Education."
+        }
+      ]
+    },
+    {
+      "title": "Instructional Media Services",
+      "subtitle": "Student General Manager · Wesleyan University · 2024–present",
+      "summary": "I started as a student technician in 2024, keeping Wesleyan’s classroom technology running, and since September 2025 I’ve managed the team of 30 student employees.",
+      "tags": [
+        "Team management",
+        "Classroom technology",
+        "Survey design"
+      ],
+      "facts": [
+        {
+          "value": "30",
+          "label": "Student employees"
+        }
+      ],
+      "sections": [
+        {
+          "title": "As technician",
+          "text": "I supported classroom projectors, touchscreens, AMX controls, Macs and PCs, and set up AV for events, recordings, and Zoom conferences."
+        },
+        {
+          "title": "As general manager",
+          "text": "I oversee operations, coordinate weekly meetings, and support hiring. I replaced manual spreadsheet tracking with a survey-based audit of classroom technology."
+        }
+      ]
+    },
+    {
+      "title": "Undergraduate Consulting",
+      "subtitle": "Consultant, then Manager · Wesleyan Undergraduate Consulting Group · 2025–present",
+      "summary": "For a career-center engagement project, our team looked at why international students weren’t making more use of career support, and what could change that.",
+      "tags": [
+        "Survey design",
+        "Engagement data",
+        "Consulting"
+      ],
+      "facts": [
+        {
+          "value": "30+",
+          "label": "International students surveyed"
+        },
+        {
+          "value": "650+",
+          "label": "Students’ Handshake engagement analyzed"
+        }
+      ],
+      "sections": [
+        {
+          "title": "What we found",
+          "text": "We identified four barriers, developed recommendations for career support and engagement, and briefed Career Center leadership."
+        }
+      ]
+    },
+    {
+      "title": "International Students",
+      "subtitle": "Co-chair, International Student Advisory Board · Wesleyan · 2024–present",
+      "summary": "I co-chair the board that helps international students settle in at Wesleyan, from the handbook they read before arriving to events once they’re here.",
+      "tags": [
+        "Leadership",
+        "Figma",
+        "Event planning"
+      ],
+      "facts": [
+        {
+          "value": "49",
+          "label": "Pages in the handbook’s second edition"
+        },
+        {
+          "value": "95",
+          "label": "Incoming international students supported"
+        }
+      ],
+      "sections": [
+        {
+          "title": "The handbook",
+          "text": "I led a team of 10 on the second edition of the international student handbook, which I designed in Figma."
+        },
+        {
+          "title": "Beyond the handbook",
+          "text": "Our work includes pairing new and current students, recruitment, and working with the Gordon Career Center, including an international alumni career panel on job searches and international career paths in November 2026."
+        }
+      ]
+    },
+    {
+      "title": "UNICEF Romania",
+      "subtitle": "National Children’s Board · 2021–2024",
+      "summary": "For three years I represented youth perspectives on children’s rights as a member of UNICEF Romania’s National Children’s Board.",
+      "tags": [
+        "Advocacy",
+        "Public speaking",
+        "Media literacy"
+      ],
+      "sections": [
+        {
+          "title": "Policy",
+          "text": "I served on Bucharest’s Child Friendly Cities Initiative committee in 2022–23 and contributed youth input to national discussions on children’s rights strategy."
+        },
+        {
+          "title": "Media literacy",
+          "text": "In a program run by the Center for Independent Journalism and supported by UNICEF Romania, I trained 50+ young people aged 15–18 and worked with 20 teachers on fact-checking and misinformation, and spoke at the “Fake or News?” media education conference in May 2023."
+        },
+        {
+          "title": "Speaking",
+          "text": "I also spoke in TV interviews about volunteering, education, and children’s rights."
+        }
+      ],
+      "links": [
+        {
+          "label": "Center for Independent Journalism",
+          "href": "https://www.cji.ro/"
+        }
+      ]
+    }
+  ]
+}

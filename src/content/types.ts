@@ -1,4 +1,4 @@
-// The shape of src/content/site.ts. You should not need to edit this file.
+// The shape of the content files in this folder (put together in site.ts). You should not need to edit this file.
 
 export interface ContentImage {
   /** Path under public/, e.g. '/images/airbox.jpg'. */
@@ -23,8 +23,8 @@ export interface ContentItem {
   links?: readonly ContentLink[];
   /** Data, tools and methods used, shown as tags. Project tags become filters on the Projects page. */
   tags?: readonly string[];
-  /** false keeps the item off the home graph; it still has its page and appears on listings. */
-  inGraph?: boolean;
+  /** true keeps the item off the home graph; it still has its page and appears on listings. */
+  hideFromGraph?: boolean;
   draft?: boolean;
 }
 

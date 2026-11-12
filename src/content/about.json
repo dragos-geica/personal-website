@@ -1,0 +1,15 @@
+{
+  "title": "About",
+  "paragraphs": [
+    "I’m Dragoș-Andrei Geică, a Wesleyan University student from Romania studying economics and French and pursuing a certificate in data science.",
+    "I work with Professor David Kuenzel on how U.S. trade remedies affect imports, and I like building tools and projects that make data easier to use.",
+    "In Romania, I partnered with Alacrity Education to lead AirBox Bootcamp, where students built air-quality monitors and contributed readings to a public dataset. At Wesleyan, I also work in classroom technology and help organize programs for international students.",
+    "I spent spring 2026 in Paris, where I studied monetary economics and took drawing and painting classes in French."
+  ],
+  "links": [
+    {
+      "label": "LinkedIn",
+      "href": "https://www.linkedin.com/in/dragosgeica/"
+    }
+  ]
+}

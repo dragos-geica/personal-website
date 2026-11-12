@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { test } from 'node:test';
-import { site } from '../src/content/site.ts';
+import { site, tidy } from '../src/content/site.ts';
 import { slugify } from '../src/data/projects.ts';
 
 const publicFile = (src) => new URL(`../public${src}`, import.meta.url);
@@ -51,4 +51,16 @@ test('project tags become filters, and tagged research is listed', async () => {
 test('the original project pages still exist', () => {
   const slugs = site.categories.projects.items.map(({ title }) => slugify(title));
   for (const slug of ['airbox-bootcamp', 'ecocrafting', 'neo4j-demo', 'data-visualizations']) assert.ok(slugs.includes(slug), slug);
+});
+
+test('fields left blank in the editor behave as if they were not there', () => {
+  assert.deepEqual(tidy({
+    title: ' Debate ', subtitle: '', summary: 'x', image: { src: '', alt: '' }, tags: [], links: [{ label: '', href: '' }],
+    sections: [{ title: 'A', text: 'B' }], hideFromGraph: false, facts: null, paragraphs: ['One', ''],
+  }), { title: 'Debate', summary: 'x', sections: [{ title: 'A', text: 'B' }], hideFromGraph: false, paragraphs: ['One'] });
+});
+
+test('items stay on the graph unless hidden', () => {
+  const hidden = site.categories.projects.items.filter(({ hideFromGraph }) => hideFromGraph).map(({ title }) => title);
+  assert.deepEqual(hidden, ['Global Economic Indicators', 'Data Visualizations', 'EcoCrafting']);
 });

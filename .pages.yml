@@ -1,0 +1,441 @@
+# Pages CMS: the editor at https://app.pagescms.org (linked from /admin on the site).
+# It describes each content file in src/content/ as a form. Saving commits to GitHub,
+# and Cloudflare rebuilds the site about a minute later.
+
+media:
+  input: public/images
+  output: /images
+  categories:
+    - image
+  rename: safe
+content:
+  - name: home
+    label: Home page
+    type: file
+    path: src/content/home.json
+    format: json
+    fields:
+      - name: name
+        label: Your name
+        type: string
+        required: true
+      - name: tagline
+        label: Line under your name
+        type: string
+      - name: intro
+        label: Introduction
+        type: text
+      - name: portrait
+        label: Portrait (centre circle)
+        type: object
+        fields:
+          - name: src
+            label: Photo (square)
+            type: image
+          - name: alt
+            label: Photo description (read aloud to blind visitors)
+            type: string
+      - name: easterEgg
+        label: Message after clicking the portrait
+        type: object
+        fields:
+          - name: title
+            label: Heading
+            type: string
+          - name: text
+            label: Sentence
+            type: text
+          - name: invite
+            label: Line above the email
+            type: string
+          - name: email
+            label: Email address
+            type: string
+  - name: about
+    label: About page
+    type: file
+    path: src/content/about.json
+    format: json
+    fields:
+      - name: title
+        label: Page title
+        type: string
+        required: true
+      - name: paragraphs
+        label: Paragraphs
+        type: text
+        list: true
+      - name: links
+        label: Links
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{label}"
+        fields:
+          - name: label
+            label: Text
+            type: string
+          - name: href
+            label: Address (https://… or mailto:…)
+            type: string
+  - name: research
+    label: Research page
+    type: file
+    path: src/content/research.json
+    format: json
+    fields:
+      - name: title
+        label: Page title
+        type: string
+        required: true
+      - name: paragraphs
+        label: Paragraphs
+        type: text
+        list: true
+      - name: links
+        label: Links
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{label}"
+        fields:
+          - name: label
+            label: Text
+            type: string
+          - name: href
+            label: Address (https://… or mailto:…)
+            type: string
+  - name: cv
+    label: CV
+    type: file
+    path: src/content/cv.json
+    format: json
+    fields:
+      - name: title
+        label: Page title
+        type: string
+        required: true
+      - name: name
+        label: Name at the top
+        type: string
+      - name: sections
+        label: Sections
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{heading}"
+        fields:
+          - name: heading
+            label: Heading
+            type: string
+          - name: entries
+            label: Entries
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{title}"
+            fields:
+              - name: title
+                label: Role
+                degree or award: null
+                type: string
+                required: true
+              - name: org
+                label: Organisation and place
+                type: string
+              - name: dates
+                label: Dates
+                type: string
+              - name: points
+                label: Bullet points
+                type: text
+                list: true
+              - name: href
+                label: Link (optional, e.g. /projects/airbox-bootcamp/)
+                type: string
+  - name: experience
+    label: Experience
+    type: file
+    path: src/content/experience.json
+    format: json
+    fields:
+      - name: label
+        label: Category name
+        type: string
+        required: true
+      - name: verb
+        label: Small word on its line (e.g. works_in)
+        type: string
+      - name: items
+        label: Items (the first six appear as circles)
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{title}"
+        fields:
+          - name: title
+            label: Title (keep it short; renaming changes its web address)
+            type: string
+            required: true
+          - name: subtitle
+            label: Line under the heading (role · place · dates)
+            type: string
+          - name: summary
+            label: Summary
+            type: text
+            required: true
+          - name: image
+            label: Photo
+            type: object
+            fields:
+              - name: src
+                label: Photo
+                type: image
+              - name: alt
+                label: Photo description
+                type: string
+          - name: tags
+            label: Tags (tools, data, methods; "Research" lists it on the Research page)
+            type: string
+            list: true
+          - name: facts
+            label: Key numbers
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{value} {label}"
+            fields:
+              - name: value
+                label: Number
+                type: string
+              - name: label
+                label: What it counts
+                type: string
+          - name: sections
+            label: Sections
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{title}"
+            fields:
+              - name: title
+                label: Heading
+                type: string
+              - name: text
+                label: Text
+                type: text
+          - name: links
+            label: Links
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{label}"
+            fields:
+              - name: label
+                label: Text
+                type: string
+              - name: href
+                label: Address
+                type: string
+          - name: hideFromGraph
+            label: Hide from the home graph (keeps its page)
+            type: boolean
+          - name: draft
+            label: Work in progress (hidden from search engines)
+            type: boolean
+  - name: projects
+    label: Projects
+    type: file
+    path: src/content/projects.json
+    format: json
+    fields:
+      - name: label
+        label: Category name
+        type: string
+        required: true
+      - name: verb
+        label: Small word on its line (e.g. works_in)
+        type: string
+      - name: items
+        label: Items (the first six appear as circles)
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{title}"
+        fields:
+          - name: title
+            label: Title (keep it short; renaming changes its web address)
+            type: string
+            required: true
+          - name: subtitle
+            label: Line under the heading (role · place · dates)
+            type: string
+          - name: summary
+            label: Summary
+            type: text
+            required: true
+          - name: image
+            label: Photo
+            type: object
+            fields:
+              - name: src
+                label: Photo
+                type: image
+              - name: alt
+                label: Photo description
+                type: string
+          - name: tags
+            label: Tags (tools, data, methods; "Research" lists it on the Research page)
+            type: string
+            list: true
+          - name: facts
+            label: Key numbers
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{value} {label}"
+            fields:
+              - name: value
+                label: Number
+                type: string
+              - name: label
+                label: What it counts
+                type: string
+          - name: sections
+            label: Sections
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{title}"
+            fields:
+              - name: title
+                label: Heading
+                type: string
+              - name: text
+                label: Text
+                type: text
+          - name: links
+            label: Links
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{label}"
+            fields:
+              - name: label
+                label: Text
+                type: string
+              - name: href
+                label: Address
+                type: string
+          - name: hideFromGraph
+            label: Hide from the home graph (keeps its page)
+            type: boolean
+          - name: draft
+            label: Work in progress (hidden from search engines)
+            type: boolean
+  - name: interests
+    label: Other Interests
+    type: file
+    path: src/content/interests.json
+    format: json
+    fields:
+      - name: label
+        label: Category name
+        type: string
+        required: true
+      - name: verb
+        label: Small word on its line (e.g. works_in)
+        type: string
+      - name: items
+        label: Items (the first six appear as circles)
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{title}"
+        fields:
+          - name: title
+            label: Title (keep it short; renaming changes its web address)
+            type: string
+            required: true
+          - name: subtitle
+            label: Line under the heading (role · place · dates)
+            type: string
+          - name: summary
+            label: Summary
+            type: text
+            required: true
+          - name: image
+            label: Photo
+            type: object
+            fields:
+              - name: src
+                label: Photo
+                type: image
+              - name: alt
+                label: Photo description
+                type: string
+          - name: tags
+            label: Tags (tools, data, methods; "Research" lists it on the Research page)
+            type: string
+            list: true
+          - name: facts
+            label: Key numbers
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{value} {label}"
+            fields:
+              - name: value
+                label: Number
+                type: string
+              - name: label
+                label: What it counts
+                type: string
+          - name: sections
+            label: Sections
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{title}"
+            fields:
+              - name: title
+                label: Heading
+                type: string
+              - name: text
+                label: Text
+                type: text
+          - name: links
+            label: Links
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{label}"
+            fields:
+              - name: label
+                label: Text
+                type: string
+              - name: href
+                label: Address
+                type: string
+          - name: hideFromGraph
+            label: Hide from the home graph (keeps its page)
+            type: boolean
+          - name: draft
+            label: Work in progress (hidden from search engines)
+            type: boolean

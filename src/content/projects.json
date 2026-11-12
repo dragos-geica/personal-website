@@ -1,0 +1,266 @@
+{
+  "label": "Projects",
+  "verb": "works_on",
+  "items": [
+    {
+      "title": "AirBox Bootcamp",
+      "subtitle": "Project lead and Projects for Peace grantee · with Alacrity Education · 2026",
+      "summary": "I partnered with Alacrity Education to run a free Romanian STEAM bootcamp where students built and deployed air-quality monitors. A $10,000 Projects for Peace grant supported the program, and the students’ readings contributed to a public air-quality dataset.",
+      "tags": [
+        "Air-quality sensors",
+        "Environmental data"
+      ],
+      "facts": [
+        {
+          "value": "$10,000",
+          "label": "Projects for Peace grant"
+        },
+        {
+          "value": "120+",
+          "label": "Registrants"
+        },
+        {
+          "value": "60",
+          "label": "Online-phase completers"
+        },
+        {
+          "value": "12",
+          "label": "In-person finalists"
+        }
+      ],
+      "sections": [
+        {
+          "title": "Why",
+          "text": "The goal was to widen access to hands-on science and engineering and help young people collect and understand data about the air where they live. The grant project’s full title is “AirBox Bootcamp: Peace through Environmental Justice and Data Democracy.” The idea grew out of a youth-led climate advocacy training I took part in in April 2024, which got me thinking about pairing practical climate education with community data collection."
+        },
+        {
+          "title": "My role",
+          "text": "I secured the grant through Projects for Peace, hosted by Middlebury College, with Wesleyan as the nominating institution. I worked with Alacrity Education on the budget, partnerships, outreach, participant selection, and running the program. Alacrity Education designed the original AirBox device."
+        },
+        {
+          "title": "The program",
+          "text": "The online phase ran from June 22 to July 12 and covered programming, electronics, physics, chemistry, and science communication. The twelve finalists then spent July 24–31 in Bucharest soldering, 3D printing, assembling, testing, and deploying their monitors. Participation was free, and a recorded welcome message from Nobel laureate Kip Thorne opened the program."
+        },
+        {
+          "title": "Result",
+          "text": "The students deployed their monitors, and their readings now feed a public air-quality database."
+        }
+      ],
+      "links": [
+        {
+          "label": "Middlebury 2026 Projects for Peace cohort",
+          "href": "https://www.middlebury.edu/projects-for-peace/summer-grants/2026-grantee-cohort"
+        },
+        {
+          "label": "Launch post on LinkedIn",
+          "href": "https://www.linkedin.com/posts/dragosgeica_im-excited-to-share-that-i-was-awarded-a-activity-7476004066859417600-zipq"
+        },
+        {
+          "label": "Alacrity Education",
+          "href": "https://alacrity.education/en"
+        }
+      ]
+    },
+    {
+      "title": "Opportunup",
+      "subtitle": "Founder and volunteer coordinator · Romania · 2023–24",
+      "summary": "I built a platform that helped young people in Romania discover free programs, civic and volunteer opportunities, and fully funded scholarships.",
+      "facts": [
+        {
+          "value": "100+",
+          "label": "Civic opportunities promoted"
+        },
+        {
+          "value": "$110,000+",
+          "label": "In scholarship opportunities promoted"
+        },
+        {
+          "value": "20,000+",
+          "label": "People reached"
+        }
+      ],
+      "sections": [
+        {
+          "title": "How it worked",
+          "text": "I coordinated a nationwide team of volunteers, ran biweekly meetings, and over time shifted the initiative toward a community-based model, where members shared opportunities with each other. Posts ranged from scholarships to local volunteering, such as supporting children with disabilities in Iași and Bucharest."
+        }
+      ],
+      "links": [
+        {
+          "label": "Opportunup on LinkedIn",
+          "href": "https://www.linkedin.com/company/opportunup/"
+        }
+      ]
+    },
+    {
+      "title": "HPC for Stata",
+      "subtitle": "High-performance computing · Wesleyan · Fall 2026",
+      "summary": "I benchmarked large Stata PPML regressions on Wesleyan’s computing cluster to see how CPU counts, node allocation, and parallel execution affected runtime, and I updated a faculty guide to running Stata on the cluster.",
+      "tags": [
+        "Stata",
+        "PPML",
+        "Linux",
+        "Bash",
+        "Slurm",
+        "Benchmarking"
+      ],
+      "sections": [
+        {
+          "title": "What I did",
+          "text": "In a two-month course covering Linux, Bash, and Slurm, I compared serial and parallel configurations using job logs and measured runtimes."
+        },
+        {
+          "title": "What I learned",
+          "text": "Allocating more computing resources did not reliably shorten a run. Measuring before scaling up turned out to matter more than asking for more cores."
+        }
+      ],
+      "links": [
+        {
+          "label": "Benchmark post on LinkedIn",
+          "href": "https://www.linkedin.com/feed/update/urn:li:activity:7526015913842810881/"
+        }
+      ]
+    },
+    {
+      "title": "Neo4j Demo",
+      "subtitle": "U.S. trade knowledge graph · Fall 2026",
+      "summary": "I built an exploratory graph database of U.S. import data, to see what trade looks like when you explore it through relationships rather than tables.",
+      "tags": [
+        "Neo4j",
+        "Graph databases",
+        "Census import data"
+      ],
+      "sections": [
+        {
+          "title": "Design",
+          "text": "My first design represented exporter countries, detailed products, quarters, and trade-remedy stages as nodes. The working prototype is simpler: countries and broad industries (HS2 chapters) are nodes, linked by exports, with import value stored on each relationship. The simpler model also fit the relationship limits of the available Neo4j plan."
+        },
+        {
+          "title": "An example question",
+          "text": "One query the prototype answers directly: what are China’s total U.S. import values by HS2 industry?"
+        }
+      ]
+    },
+    {
+      "title": "Income Volatility & Health",
+      "subtitle": "Course research project · QAC 201 · Fall 2025",
+      "summary": "Using the U.S. National Financial Well-Being Survey, I explored how income volatility, self-reported health, and living arrangements are related among non-retired respondents.",
+      "tags": [
+        "Research",
+        "Stata",
+        "Logistic regression",
+        "Figma"
+      ],
+      "facts": [
+        {
+          "value": "6,394",
+          "label": "Survey observations"
+        }
+      ],
+      "sections": [
+        {
+          "title": "Method",
+          "text": "I cleaned and recoded the data in Stata, used chi-square tests and multivariable logistic regression, and designed the poster in Figma."
+        },
+        {
+          "title": "What I found",
+          "text": "High income volatility was more common among respondents reporting poor health. In a separate model of living arrangements, moderate volatility was associated with higher odds of living with someone, while high volatility showed no association. These are associations, not causal effects."
+        }
+      ],
+      "links": [
+        {
+          "label": "Poster and abstract",
+          "href": "https://adatapostersfall2025.research.wesleyan.edu/2025/11/25/the-association-between-income-volatility-and-perceived-levels-of-health-among-non-retired-individuals-living-alone-and-living-with-someone-else/"
+        }
+      ]
+    },
+    {
+      "title": "Sephora Reviews",
+      "subtitle": "Data analysis · Wesleyan · Spring 2025",
+      "summary": "I analyzed 5,000+ Sephora product reviews to explore how ratings vary with brand, product category, and price.",
+      "tags": [
+        "Python",
+        "pandas",
+        "NumPy",
+        "seaborn",
+        "Matplotlib"
+      ],
+      "facts": [
+        {
+          "value": "5,000+",
+          "label": "Product reviews analyzed"
+        }
+      ],
+      "sections": [
+        {
+          "title": "Method",
+          "text": "I used Python with pandas and NumPy for the analysis, and seaborn and Matplotlib to visualize the comparisons, including by reported skin tone and skin type where reviewers gave them. The result was a report with tables and graphics describing patterns in the ratings."
+        }
+      ]
+    },
+    {
+      "title": "Global Economic Indicators",
+      "subtitle": "Excel and VBA analysis · Wesleyan · 2025",
+      "summary": "I used Excel and VBA to explore 2014–2023 data from 150+ countries, comparing macroeconomic, governance, and social indicators.",
+      "tags": [
+        "Excel",
+        "VBA"
+      ],
+      "facts": [
+        {
+          "value": "150+",
+          "label": "Countries, 2014–2023"
+        }
+      ],
+      "sections": [
+        {
+          "title": "Method",
+          "text": "I built charts and correlation analyses on topics such as trade flows and governance. In the course dataset, imports and exports moved closely together, as did government effectiveness and political stability."
+        }
+      ],
+      "hideFromGraph": true
+    },
+    {
+      "title": "Data Visualizations",
+      "subtitle": "A gallery in progress",
+      "summary": "A collection of figures from my work, from runtime benchmarks to trade-remedy coverage charts. The images will be added here as I prepare them for the web.",
+      "tags": [
+        "Stata",
+        "R",
+        "Python",
+        "Figma"
+      ],
+      "sections": [
+        {
+          "title": "Coming here",
+          "text": "The Stata runtime comparison from my high-performance computing project, the income-volatility poster, charts of the share of U.S. imports covered by trade remedies, and figures from my Sephora review and economic indicators analyses."
+        }
+      ],
+      "links": [
+        {
+          "label": "Income volatility poster",
+          "href": "https://adatapostersfall2025.research.wesleyan.edu/2025/11/25/the-association-between-income-volatility-and-perceived-levels-of-health-among-non-retired-individuals-living-alone-and-living-with-someone-else/"
+        },
+        {
+          "label": "Stata runtime comparison on LinkedIn",
+          "href": "https://www.linkedin.com/feed/update/urn:li:activity:7526015913842810881/"
+        }
+      ],
+      "hideFromGraph": true,
+      "draft": true
+    },
+    {
+      "title": "EcoCrafting",
+      "subtitle": "Outreach with Alacrity Education · Planned for November 14–December 20, 2026",
+      "summary": "A free workshop series planned in Bucharest for students aged 14–19, who will turn plant ash into ceramic glazes, experiment in a lab, decorate clay pieces, and show their work in a public exhibition. I’m helping with outreach to schools.",
+      "links": [
+        {
+          "label": "Alacrity Education",
+          "href": "https://alacrity.education/en"
+        }
+      ],
+      "hideFromGraph": true,
+      "draft": true
+    }
+  ]
+}

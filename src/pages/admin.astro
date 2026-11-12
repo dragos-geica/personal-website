@@ -1,0 +1,17 @@
+---
+// A doorway to the content editor (Pages CMS). The editor itself runs on pagescms.org and signs in
+// with GitHub, so only people with access to the repository can change anything.
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+const editor = 'https://app.pagescms.org/';
+---
+<SiteLayout title="Edit the site" noindex>
+  <main id="main-content" class="section-page admin-page mx-auto" tabindex="-1">
+    <p class="section-eyebrow">Admin</p>
+    <h1>Edit the site</h1>
+    <p>The editor opens on Pages CMS. Sign in with your GitHub account, open
+      <strong>dragos-geica/personal-website</strong>, and change any text or photo. Saving publishes it:
+      the site updates about a minute later.</p>
+    <p><a class="explore-link" href={editor}>Open the editor <span aria-hidden="true">→</span></a></p>
+  </main>
+</SiteLayout>

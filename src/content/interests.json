@@ -1,0 +1,24 @@
+{
+  "label": "Other Interests",
+  "verb": "curious_about",
+  "items": [
+    {
+      "title": "Debate",
+      "summary": "I placed third nationally at the Romanian Debate Olympiad in May 2024."
+    },
+    {
+      "title": "Studio Art",
+      "summary": "In Paris I took drawing and painting classes at the Académie de la Grande Chaumière, a very different way of learning from economics and data."
+    },
+    {
+      "title": "Alphabet Systems",
+      "summary": "I’m curious about writing systems and linguistics: how alphabets work and how they differ. More here soon.",
+      "draft": true
+    },
+    {
+      "title": "Retro Game Emulation",
+      "summary": "I like getting old video games running again through emulation. More here soon.",
+      "draft": true
+    }
+  ]
+}
