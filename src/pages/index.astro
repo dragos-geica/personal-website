@@ -22,7 +22,9 @@ const links = [
       <p class="home-tagline">{site.tagline}</p>
       <p class="home-description">{site.intro}</p>
     </header>
-    <KnowledgeGraph client:load transition:persist="knowledge-graph" />
+    <div class="graph-stage">
+      <KnowledgeGraph client:load transition:persist="knowledge-graph" />
+    </div>
   </main>
 </SiteLayout>
 

@@ -31,6 +31,21 @@ function CategoryNode({ node, index, open, inactive, onToggle }: {
   return (
     <li className="category" style={style} data-active={open || undefined} data-muted={inactive || undefined} inert={inactive}>
       <svg className="graph-edges" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          {node.hints.map(({ from, to }, hint) => (
+            <linearGradient key={hint} id={`hint-${node.id}-${hint}`} gradientUnits="userSpaceOnUse"
+              x1={from[0]} y1={from[1]} x2={to[0]} y2={to[1]}>
+              <stop offset="0" stopColor="currentColor" stopOpacity=".9" />
+              <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+            </linearGradient>
+          ))}
+        </defs>
+        <g className="edge-hints">
+          {node.hints.map(({ d }, hint) => (
+            <path key={hint} d={d} pathLength="1" stroke={`url(#hint-${node.id}-${hint})`}
+              style={{ '--hint-delay': `${hint * 140}ms` } as CSSProperties} />
+          ))}
+        </g>
         <path className="edge-line" d={node.curve} />
         <path className="edge-spark" d={node.curve} pathLength="100" />
       </svg>

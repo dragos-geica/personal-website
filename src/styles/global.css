@@ -91,7 +91,7 @@ body {
   gap: clamp(.25rem, 1.6vh, 1.25rem);
   min-height: 100svh;
   padding: clamp(1.75rem, 5vh, 3.5rem) 4% 3vw;
-  background: radial-gradient(ellipse at 50% 62%, color-mix(in srgb, var(--accent) 35%, var(--paper)), transparent 55%);
+  background: radial-gradient(ellipse at 50% 52%, color-mix(in srgb, var(--accent) 35%, var(--paper)), transparent 55%);
 }
 
 /* Name and introduction, centred above the graph. */
@@ -181,7 +181,7 @@ astro-island { display: contents; }
 .knowledge-graph {
   position: relative;
   /* Fill the space under the intro without pushing the graph below the fold. */
-  width: min(100%, 1240px, calc((100svh - 12.5rem) * 1.22));
+  width: min(100%, 1240px);
   aspect-ratio: 1.22;
   min-width: 0;
   container-type: inline-size;
@@ -190,6 +190,44 @@ astro-island { display: contents; }
 }
 
 .knowledge-graph:focus-visible { outline-offset: 0; }
+
+.graph-stage { display: grid; justify-items: center; width: 100%; min-width: 0; }
+
+/* On a computer the whole home page fits on one screen: the graph takes the height
+   left under the introduction, and shrinks to keep its proportions. */
+@media (min-width: 881px) {
+  .home-scene {
+    height: 100svh;
+    min-height: 34rem;
+    grid-template-rows: auto minmax(0, 1fr);
+    align-content: stretch;
+    padding-bottom: clamp(.75rem, 2.5vh, 1.5rem);
+  }
+  .graph-stage { container-type: size; min-height: 0; align-items: start; }
+  .knowledge-graph { width: min(100cqw, 1240px, 100cqh * 1.22); }
+}
+
+/* Faint lines leaving each category and fading out: there is more behind every circle. */
+.edge-hints {
+  color: var(--edge);
+  opacity: .55;
+  transition: opacity 220ms ease, color 220ms ease;
+}
+.edge-hints path {
+  fill: none;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.category:has(.category-node:is(:hover, :focus-visible)) .edge-hints { color: var(--edge-active); opacity: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .edge-hints path {
+    stroke-dasharray: 1;
+    animation: hint-draw 900ms var(--ease-enter, ease-out) calc(450ms + var(--hint-delay, 0ms)) backwards;
+  }
+}
+@keyframes hint-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
 .graph-edges, .graph-categories { position: absolute; inset: 0; }
 
