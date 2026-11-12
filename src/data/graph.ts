@@ -1,5 +1,6 @@
 import { site } from '../content/site.ts';
 import type { CategoryId } from '../content/types.ts';
+import type { BranchSide } from './branch-layout.ts';
 
 export const graphCanvas = { width: 1080, height: 815 };
 export const centerNode = { x: 531, y: 318, size: 212 };
@@ -93,3 +94,12 @@ export const graphNodes: readonly GraphNode[] = layout.map(({ id, position, size
     label: content.label, verb: content.verb, children: children.map(({ title }) => title),
   };
 });
+
+/**
+ * Which way a category opens, keeping its place from the home graph: categories beside the
+ * portrait spread sideways, one below it spreads downwards.
+ */
+export function branchSide({ position: [x, y] }: GraphNode): BranchSide {
+  if (y > centerNode.y + 120) return 'down';
+  return x < graphCanvas.width / 2 ? 'left' : 'right';
+}

@@ -1,13 +1,19 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { CANVAS_ASPECT, CHILD_SPACING, HUB_CLEARANCE, constellation } from '../src/data/branch-layout.ts';
-import { graphCanvas, graphNodes } from '../src/data/graph.ts';
+import { branchSide, graphCanvas, graphNodes } from '../src/data/graph.ts';
 
 const { width, height } = graphCanvas;
 const distance = (a, b) => Math.hypot(a.x - b.x, (a.y - b.y) * CANVAS_ASPECT);
 
 // Mirrors the areas GraphBranch passes in.
 function layout(id, count, side = 'right', hubX = side === 'left' ? 460 : 620) {
+  if (side === 'down') {
+    const hub = { x: 540, y: 150 };
+    const area = { left: 125, right: width - 125, top: hub.y + 160, bottom: height - 70,
+      keepClear: { left: Infinity, right: -Infinity, top: 0, bottom: 0 } };
+    return { hub, area, points: constellation(id, count, hub, side, area) };
+  }
   const hub = { x: hubX, y: height / 2 };
   const area = side === 'left'
     ? { left: -215, right: hubX - 200, top: 80, bottom: height - 80,
@@ -20,13 +26,20 @@ function layout(id, count, side = 'right', hubX = side === 'left' ? 460 : 620) {
 const cases = [
   ...graphNodes.map((node) => ({
     id: node.id, count: node.children.length,
-    side: node.position[0] < width / 2 ? 'left' : 'right',
+    side: branchSide(node),
     hubX: node.id === 'projects' ? 480 : undefined,
   })),
   // Room to grow: up to five children on the narrower left side, six on the right (Projects).
   ...[1, 3, 5].map((count) => ({ id: `extra-${count}-left`, count, side: 'left' })),
   ...[1, 3, 5, 6].map((count) => ({ id: `extra-${count}-right`, count, side: 'right', hubX: 480 })),
+  // Other Interests opens downwards; it has room for up to five.
+  ...[1, 3, 5].map((count) => ({ id: `extra-${count}-down`, count, side: 'down' })),
 ];
+
+test('Other Interests opens downwards; the others open sideways', () => {
+  assert.deepEqual(graphNodes.map((node) => [node.id, branchSide(node)]),
+    [['experience', 'left'], ['projects', 'right'], ['interests', 'down']]);
+});
 
 test('children never crowd each other, the hub or the branch actions', () => {
   for (const { id, count, side, hubX } of cases) {
@@ -39,7 +52,8 @@ test('children never crowd each other, the hub or the branch actions', () => {
       assert.ok(point.y >= area.top - 1 && point.y <= area.bottom + 1, `${label} y ${point.y} is outside`);
       const clear = area.keepClear;
       assert.ok(!(point.x > clear.left && point.x < clear.right && point.y < clear.bottom), `${label} covers the actions`);
-      assert.ok((point.x - hub.x) * (side === 'left' ? -1 : 1) > 0, `${label} is behind the hub`);
+      const ahead = side === 'down' ? point.y - hub.y : (point.x - hub.x) * (side === 'left' ? -1 : 1);
+      assert.ok(ahead > 0, `${label} is behind the hub`);
       points.slice(index + 1).forEach((other) => {
         assert.ok(distance(point, other) >= CHILD_SPACING - 2, `${id}: children are ${Math.round(distance(point, other))} apart`);
       });

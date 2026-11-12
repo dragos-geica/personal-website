@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { graphCanvas, type GraphNode } from '../data/graph';
+import { branchSide, graphCanvas, type GraphNode } from '../data/graph';
 import { nodeDestination } from '../data/node-destinations';
 import { useEffect, useLayoutEffect, useRef, useState, type AnimationEvent } from 'react';
 import { PROJECT_HUB_X } from '../scripts/branch-motion';
@@ -11,6 +11,8 @@ const { width, height } = graphCanvas;
 const branchExtension = 300;
 // Node centres stay this far inside the graph so a full circle always fits.
 const edgeMargin = 85;
+/** Where a downward-opening hub sits: top centre (matches its CSS in global.css). */
+export const DOWN_HUB = { x: 540, y: 150 };
 
 export default function GraphBranch({ node, onClose, revealBranch, onRevealComplete }: {
   node: GraphNode;
@@ -23,15 +25,18 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
   const [hoverLocked, setHoverLocked] = useState(revealBranch);
   const mobileEdges = useRef<SVGSVGElement>(null);
   const desktopEdges = useRef<SVGSVGElement>(null);
-  const isProjects = node.id === 'projects';
-  const [originalX] = node.position;
-  const x = isProjects ? PROJECT_HUB_X : originalX < width / 2 ? 460 : 620;
-  const y = height / 2;
-  const side = originalX < width / 2 ? 'left' : 'right';
-  const branchStart = side === 'left' ? -branchExtension : 0;
+  const side = branchSide(node);
+  // The hub's place while open; it must match the open hub's CSS position.
+  const [x, y] = side === 'down' ? [DOWN_HUB.x, DOWN_HUB.y]
+    : [node.id === 'projects' ? PROJECT_HUB_X : side === 'left' ? 460 : 620, height / 2];
+  // Sideways branches borrow room beyond the graph's edge; a downward one stays inside it.
+  const extension = side === 'down' ? 0 : branchExtension;
+  const branchStart = side === 'left' ? -extension : 0;
   const area = side === 'left'
-    ? { left: -branchExtension + edgeMargin, right: x - 200, top: 80, bottom: height - 80 }
-    : { left: x + 200, right: width + branchExtension - edgeMargin, top: 80, bottom: height - 80 };
+    ? { left: -extension + edgeMargin, right: x - 200, top: 80, bottom: height - 80 }
+    : side === 'right'
+      ? { left: x + 200, right: width + extension - edgeMargin, top: 80, bottom: height - 80 }
+      : { left: edgeMargin + 40, right: width - edgeMargin - 40, top: y + 160, bottom: height - 70 };
   const children = constellation(node.id, node.children.length, { x, y }, side, area)
     .map(({ x: cx, y: cy }, index) => ({ label: node.children[index], index, cx, cy }));
 
@@ -122,8 +127,8 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
     <li id={`branch-${node.id}`} className="graph-branch" data-side={side}
       data-branch-reveal={revealBranch || undefined} data-hover-locked={hoverLocked || undefined}
       onAnimationEnd={onRevealEvent}>
-      <svg className="branch-edges" ref={desktopEdges} viewBox={`${branchStart} 0 ${width + branchExtension} ${height}`}
-        style={{ left: `${branchStart / width * 100}%`, width: `${(width + branchExtension) / width * 100}%` }}
+      <svg className="branch-edges" ref={desktopEdges} viewBox={`${branchStart} 0 ${width + extension} ${height}`}
+        style={{ left: `${branchStart / width * 100}%`, width: `${(width + extension) / width * 100}%` }}
         preserveAspectRatio="none" aria-hidden="true">
         {/* Placeholder geometry; the layout effect trims these to the circles before paint. */}
         {children.map(({ label, index, cx, cy }) => (

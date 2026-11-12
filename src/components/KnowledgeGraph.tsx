@@ -3,7 +3,7 @@ import { branchReducer, type BranchAction, type BranchState } from '../data/bran
 import { navigate } from 'astro:transitions/client';
 import { branchPath, readBranch } from '../data/branch-location';
 import GraphBranch from './GraphBranch';
-import { centerNode, graphCanvas, graphNodes, type GraphNode } from '../data/graph';
+import { branchSide, centerNode, graphCanvas, graphNodes, type GraphNode } from '../data/graph';
 import GraphIcon from './GraphIcon';
 import { site } from '../content/site';
 import { togglePortraitBurst } from '../scripts/portrait-burst';
@@ -223,7 +223,7 @@ export default function KnowledgeGraph() {
           '--projects-hub-x': `${PROJECT_HUB_X / width * 100}%`,
         } as CSSProperties}
           data-branch-parent={branch?.parent} data-branch-reveal={revealBranch || undefined}
-          data-branch-side={active ? active.position[0] < width / 2 ? 'left' : 'right' : undefined}>
+          data-branch-side={active ? branchSide(active) : undefined}>
           <div className="center-orbit" inert={Boolean(active)} style={{
             ...coordinates(x, y),
             '--size': `${size / width * 100}cqw`,

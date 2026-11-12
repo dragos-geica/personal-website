@@ -36,16 +36,21 @@ function seeded(text: string) {
   };
 }
 
-export function constellation(seed: string, count: number, hub: Point, side: 'left' | 'right', area: ConstellationArea): Point[] {
+/** Which way an open category's children spread from its hub. */
+export type BranchSide = 'left' | 'right' | 'down';
+
+export function constellation(seed: string, count: number, hub: Point, side: BranchSide, area: ConstellationArea): Point[] {
   const random = seeded(seed);
-  const outward = side === 'left' ? -1 : 1;
+  // The direction children spread in, and the one they fan out along.
+  const [du, dv] = side === 'left' ? [-1, 0] : side === 'right' ? [1, 0] : [0, 1];
+  const [pu, pv] = side === 'down' ? [1, 0] : [0, 1];
   const k = CANVAS_ASPECT;
   // Work in a square space: u is horizontal units, v is vertical units scaled by k.
   const bounds = { left: area.left, right: area.right, top: area.top * k, bottom: area.bottom * k };
   const clear = area.keepClear && {
     left: area.keepClear.left, right: area.keepClear.right, top: area.keepClear.top * k, bottom: area.keepClear.bottom * k,
   };
-  const reach = Math.max(area.right - hub.x, hub.x - area.left);
+  const reach = side === 'down' ? area.bottom * k - hub.y * k : Math.max(area.right - hub.x, hub.x - area.left);
   const near = HUB_CLEARANCE + 30;
   const far = Math.max(near + 60, Math.min(reach - 40, near + 330));
   const spread = Math.min(1.2, .4 + count * .2);
@@ -57,7 +62,8 @@ export function constellation(seed: string, count: number, hub: Point, side: 'le
     // Alternate inner and outer orbits, each with its own wobble, so no two line up.
     const band = count === 1 ? .3 + random() * .4 : (index + parity) % 2 ? .62 + random() * .38 : random() * .35;
     const radius = near + (far - near) * band;
-    return { u: hub.x + outward * radius * Math.cos(angle), v: hub.y * k + radius * Math.sin(angle) };
+    const [along, across] = [radius * Math.cos(angle), radius * Math.sin(angle)];
+    return { u: hub.x + du * along + pu * across, v: hub.y * k + dv * along + pv * across };
   });
 
   const clamp = (point: { u: number; v: number }) => {
@@ -67,7 +73,11 @@ export function constellation(seed: string, count: number, hub: Point, side: 'le
       point.v = clear.bottom;
     }
     // Stay on the open side of the hub.
-    if ((point.u - hub.x) * outward < HUB_CLEARANCE * .55) point.u = hub.x + outward * HUB_CLEARANCE * .55;
+    const ahead = (point.u - hub.x) * du + (point.v - hub.y * k) * dv;
+    if (ahead < HUB_CLEARANCE * .55) {
+      point.u += du * (HUB_CLEARANCE * .55 - ahead);
+      point.v += dv * (HUB_CLEARANCE * .55 - ahead);
+    }
   };
 
   // Relax: push apart pairs that are too close, and anything too close to the hub.

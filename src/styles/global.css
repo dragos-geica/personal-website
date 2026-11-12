@@ -691,6 +691,10 @@ astro-island { display: contents; }
 .category[data-active] > :is(.relationship, .graph-edges) { opacity: 0; }
 .category[data-active] .category-node { top: 50%; left: 57.4074%; }
 .graph-primary[data-branch-side="left"] .category[data-active] .category-node { left: 42.5926%; }
+/* Other Interests opens downwards from the top centre (DOWN_HUB in GraphBranch.tsx). */
+@media (min-width: 881px) {
+  .graph-primary[data-branch-side="down"] .category[data-active] .category-node { top: 18.4049%; left: 50%; }
+}
 
 
 @media (max-width: 880px) {
@@ -847,6 +851,8 @@ main[data-graph-pending] .knowledge-graph {
 
 @media (min-width: 881px) {
   .graph-branch[data-side="left"][data-branch-reveal] .branch-node-outline { transform: none; }
+  /* Lines into a downward branch arrive from above. */
+  .graph-branch[data-side="down"][data-branch-reveal] .branch-node-outline { transform: rotate(-90deg); }
 }
 
 @keyframes branch-draw { to { stroke-dashoffset: 0; } }
