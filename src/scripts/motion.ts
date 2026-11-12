@@ -6,7 +6,7 @@ export const durations = {
   sweep: 540,
   /** Hub travel to its branch position; it starts while the ring is still moving. */
   travel: 520,
-  /** A branch line drawing along its length: first Back → hub, then hub → each child. */
+  /** A branch line drawing along its length, from the hub to a child. */
   edge: 380,
   /** A child's outline traces in, then its label pops. */
   outline: 150,
@@ -75,11 +75,11 @@ export function revealStart() {
 }
 
 /**
- * The reveal runs in order: the Back node appears, its line draws into the hub, and
- * only once it arrives do the lines to the children set off, one stagger apart.
+ * The lines to the children set off from the hub once the reveal starts, one stagger apart.
+ * The open hub itself takes the place of a Back button: clicking it closes the branch.
  */
 export function childrenStart() {
-  return revealStart() + durations.outline / 2 + durations.edge;
+  return revealStart();
 }
 
 /** When a child (order 1, 2, …) has fully appeared: its line drawn, outline traced, label in. */

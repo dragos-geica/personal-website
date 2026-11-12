@@ -70,13 +70,13 @@ test('the ring leaves the node gently instead of jumping', () => {
 });
 
 test('opening a category stays within the motion budget', () => {
-  // Worst case: the full sweep, then hub travel and the sequenced reveal of Back and four children.
+  // Worst case: the full sweep, then hub travel and the sequenced reveal of four children.
   const total = durations.sweep + branchRevealDuration(4);
   assert.ok(total <= 2400, `category open takes ${total}ms`);
 });
 
-test('child lines start only once the Back line has reached the hub', () => {
-  assert.equal(childrenStart(), revealStart() + durations.outline / 2 + durations.edge);
+test('child lines set off from the hub as the reveal starts', () => {
+  assert.equal(childrenStart(), revealStart());
   assert.equal(motionProperties()['--motion-children-start'], `${childrenStart()}ms`);
   // Each child's line takes long enough to read as travelling light.
   assert.ok(durations.edge >= 300);

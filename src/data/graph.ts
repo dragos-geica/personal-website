@@ -79,7 +79,9 @@ function hintLines([x, y]: Point, size: number) {
     const to: Point = [from[0] + ux * reach, from[1] + uy * reach / ASPECT];
     const control = [(from[0] + to[0]) / 2 - uy * bow, (from[1] + to[1]) / 2 + ux * bow / ASPECT];
     const round = (point: readonly number[]) => point.map((value) => value.toFixed(1)).join(' ');
-    return { d: `M ${round(from)} Q ${round(control)} ${round(to)}`, from, to };
+    // Rounded so the server and the browser render identical numbers.
+    const fixed = (point: readonly number[]) => point.map((value) => Math.round(value * 10) / 10) as unknown as Point;
+    return { d: `M ${round(from)} Q ${round(control)} ${round(to)}`, from: fixed(from), to: fixed(to) };
   });
 }
 

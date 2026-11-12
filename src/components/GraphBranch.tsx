@@ -28,7 +28,6 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
   const x = isProjects ? PROJECT_HUB_X : originalX < width / 2 ? 460 : 620;
   const y = height / 2;
   const side = originalX < width / 2 ? 'left' : 'right';
-  const backX = x + (side === 'left' ? 225 : -225);
   const branchStart = side === 'left' ? -branchExtension : 0;
   const area = side === 'left'
     ? { left: -branchExtension + edgeMargin, right: x - 200, top: 80, bottom: height - 80 }
@@ -62,7 +61,7 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
         const scaleY = bounds.height / height;
         const hubRadius = hub.offsetWidth / 2;
         const curves = buttons.map((button, index) => {
-          const target = index === 0 ? { cx: backX, cy: y } : children[index - 1];
+          const target = children[index];
           const radius = button.offsetWidth / 2;
           const dx = (target.cx - x) * scaleX;
           const dy = (target.cy - y) * scaleY;
@@ -71,8 +70,6 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
           const start = [x + ux * hubRadius / scaleX, y + uy * hubRadius / scaleY];
           const end = [target.cx - ux * radius / scaleX, target.cy - uy * radius / scaleY];
           const point = ([px, py]: number[]) => `${px.toFixed(1)} ${py.toFixed(1)}`;
-          // The Back line runs from Back into the hub: the reveal starts there.
-          if (index === 0) return `M ${point(end)} L ${point(start)}`;
           // A slight alternating bow keeps the constellation organic rather than spoked.
           const bow = (index % 2 ? 1 : -1) * Math.min(36, length * .07);
           const middle = [(start[0] + end[0]) / 2 - uy * bow / scaleX, (start[1] + end[1]) / 2 + ux * bow / scaleY];
@@ -91,7 +88,6 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
         const rect = button.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2 - bounds.left;
         const top = rect.top - bounds.top;
-        if (index === 0) return `M ${startX} ${top} V ${startY}`;
         if (Math.abs(centerX - startX) < rect.width / 4) return `M ${startX} ${startY} V ${top}`;
         const toward = centerX < startX ? -1 : 1;
         const innerX = centerX - toward * rect.width / 2;
@@ -122,9 +118,6 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
       && (event.target as Element).closest('.branch-children > li:last-child')) onRevealComplete();
   }
 
-  const direction = side === 'left' ? -1 : 1;
-  const hubRadius = node.size * .87 / .78 / 2;
-
   return (
     <li id={`branch-${node.id}`} className="graph-branch" data-side={side}
       data-branch-reveal={revealBranch || undefined} data-hover-locked={hoverLocked || undefined}
@@ -132,8 +125,6 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
       <svg className="branch-edges" ref={desktopEdges} viewBox={`${branchStart} 0 ${width + branchExtension} ${height}`}
         style={{ left: `${branchStart / width * 100}%`, width: `${(width + branchExtension) / width * 100}%` }}
         preserveAspectRatio="none" aria-hidden="true">
-        <path className="branch-edge branch-back-edge" pathLength={1} style={{ '--order': 0 } as CSSProperties}
-          d={`M ${backX + direction * 46} ${y} H ${x - direction * hubRadius}`} />
         {/* Placeholder geometry; the layout effect trims these to the circles before paint. */}
         {children.map(({ label, index, cx, cy }) => (
           <path key={label} className="branch-edge" pathLength={1}
@@ -141,22 +132,11 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
         ))}
       </svg>
       <svg className="branch-mobile-edges" ref={mobileEdges} aria-hidden="true">
-        <path className="branch-edge branch-back-edge" pathLength={1} style={{ '--order': 0 } as CSSProperties} />
         {children.map(({ label, index }) => (
           <path key={label} className="branch-edge" pathLength={1} style={{ '--order': index + 1 } as CSSProperties} />
         ))}
       </svg>
       <ul className="branch-children" role="list" aria-label={`${node.label} items`}>
-        <li className="branch-back" style={{ '--x': `${backX / width * 100}%`, '--y': '50%', '--order': 0 } as CSSProperties}>
-          <NodeOutline />
-          <button type="button" className="node child-node branch-back-node" onClick={onClose}>
-            <span className="branch-label">
-              {side === 'right' && <span aria-hidden="true">← </span>}
-              Back
-              {side === 'left' && <span aria-hidden="true"> →</span>}
-            </span>
-          </button>
-        </li>
         {children.map(({ label, index, cx, cy }) => (
           <li key={label} style={{ '--x': `${cx / width * 100}%`, '--y': `${cy / height * 100}%`,
             '--order': index + 1 } as CSSProperties}>

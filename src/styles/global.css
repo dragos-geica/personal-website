@@ -773,17 +773,6 @@ main[data-graph-pending] .knowledge-graph {
   visibility: hidden;
 }
 
-.branch-back-node {
-  width: clamp(56px, 7cqw, 78px);
-  gap: .2rem;
-  --order: 0;
-}
-
-@media (max-width: 880px) {
-  .branch-back { grid-column: 1 / -1; justify-self: center; }
-  .branch-back-node { width: 60px; min-height: 60px; border-radius: 50%; }
-}
-
 /* The expanding ring sweeps the old graph away; script fades each element as the ring passes. */
 .branch-sweep-overlay, .branch-sweep-clip {
   position: fixed;
@@ -827,20 +816,10 @@ main[data-graph-pending] .knowledge-graph {
 .branch-node-outline, .branch-mobile-edges { display: none; }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* The reveal runs in order: Back appears, its line draws into the hub, and once it
-     arrives each child's line draws outwards (one stagger apart), then that child pops in.
+  /* Each child's line draws outwards from the hub (one stagger apart), then that child pops in.
      A line and its node share --branch-start; the node appears when its line has arrived. */
   .graph-branch[data-branch-reveal] :is(.branch-edge, .branch-children li) {
     --branch-start: calc(var(--motion-children-start) + (var(--order) - 1) * var(--motion-stagger));
-  }
-
-  /* Back's outline and label start the reveal; its line follows as Back appears. */
-  .graph-branch[data-branch-reveal] .branch-children li.branch-back {
-    --branch-start: calc(var(--motion-reveal-start) - var(--motion-edge));
-  }
-
-  .graph-branch[data-branch-reveal] .branch-edge.branch-back-edge {
-    --branch-start: calc(var(--motion-reveal-start) + var(--motion-outline) / 2);
   }
 
   .graph-branch[data-branch-reveal] :is(.branch-edge, .branch-node-outline path) {
@@ -918,14 +897,13 @@ main[data-graph-pending] .knowledge-graph {
     padding: .25rem;
     font-size: .75rem;
   }
-  .graph-branch .branch-back-node { width: 60px; }
-  .graph-branch[data-branch-reveal] .branch-node-outline,
-  .graph-branch[data-branch-reveal] .branch-back .branch-node-outline { transform: rotate(-90deg); }
+  .graph-branch[data-branch-reveal] .branch-node-outline { transform: rotate(-90deg); }
 }
 
 @media (max-width: 880px) {
-  .graph-branch[data-branch-reveal] li:nth-child(4) .branch-node-outline { transform: rotate(180deg); }
-  .graph-branch[data-branch-reveal] li:nth-child(5) .branch-node-outline { transform: none; }
+  /* Each outline starts where its line arrives: the inner side of its column. */
+  .graph-branch[data-branch-reveal] li:nth-child(odd) .branch-node-outline { transform: none; }
+  .graph-branch[data-branch-reveal] li:nth-child(even) .branch-node-outline { transform: rotate(180deg); }
 }
 
 main[data-branch-return] .knowledge-graph { visibility: hidden; animation: none; }
