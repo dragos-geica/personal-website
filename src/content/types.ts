@@ -60,11 +60,21 @@ export interface CvPage {
   sections: readonly { heading: string; entries: readonly CvEntry[] }[];
 }
 
+export interface EasterEgg {
+  /** Shown large, in the same style as your name. */
+  title: string;
+  text: string;
+  /** The line just above the email address. */
+  invite: string;
+  email: string;
+}
+
 export interface SiteContent {
   name: string;
   tagline: string;
   intro: string;
   portrait: ContentImage;
+  easterEgg: EasterEgg;
   pages: { about: ContentPage; research: ContentPage; cv: CvPage };
   categories: Record<CategoryId, ContentCategory>;
 }

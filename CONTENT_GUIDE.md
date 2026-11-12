@@ -17,6 +17,7 @@ You can change it without touching any other code.
 |---|---|
 | Your name, the tagline, the intro sentence | `name`, `tagline`, `intro` at the top |
 | The photo in the centre circle | `portrait` |
+| The message after clicking your photo, and your email | `easterEgg` |
 | About and Research pages | `pages` → `about`, `research` |
 | The CV | `pages` → `cv` → `sections` (see below) |
 | A category's name or the small word on its line | `categories` → `experience`, `projects` or `interests` → `label`, `verb` |

@@ -20,8 +20,16 @@ export const site: SiteContent = {
   tagline: 'My world, connected.',
   intro: 'I study economics, French, and data science at Wesleyan University. This is a map of the research I do, the projects I build, and the things I’m curious about.',
 
-  // The photo in the centre of the graph. Clicking it opens the About page.
+  // The photo in the centre of the graph. Clicking it sets off the easter egg below.
   portrait: { src: '/images/portrait.jpg', alt: 'Portrait of Dragoș Geică' },
+
+  // The message that appears after clicking the portrait (the easter egg).
+  easterEgg: {
+    title: 'That was the easy part.',
+    text: 'Anyone can make a website look smart these days. The one thing you can’t fake is an actual conversation.',
+    invite: 'So let’s have one. Email me:',
+    email: 'dgeica@wesleyan.edu',
+  },
 
   // Simple pages. Each paragraph is its own entry in the list.
   pages: {

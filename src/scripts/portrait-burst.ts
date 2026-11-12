@@ -82,8 +82,10 @@ function vibrate(pattern: number | number[]) {
   }
 }
 
-function geometry(portrait: HTMLElement) {
-  const bounds = portrait.getBoundingClientRect();
+/** `shift` moves the measured portrait vertically, for when it is about to glide back. */
+function geometry(portrait: HTMLElement, shift = 0) {
+  const measured = portrait.getBoundingClientRect();
+  const bounds = new DOMRect(measured.x, measured.y + shift, measured.width, measured.height);
   const x = bounds.left + bounds.width / 2;
   const y = bounds.top + bounds.height / 2;
   const startRadius = bounds.width / 2 / RING_INNER;
@@ -91,6 +93,60 @@ function geometry(portrait: HTMLElement) {
   const timeAt = (distance: number) =>
     RING * burstInverse(Math.min(1, Math.max(0, (distance - startRadius) / (radius - startRadius))));
   return { bounds, x, y, startRadius, radius, timeAt };
+}
+
+/** How far the portrait was lifted to make room for the message, in pixels. */
+let lift = 0;
+const GAP = 28;
+
+/** After the burst: the portrait rises and the message appears beneath it. */
+function showMessage(portrait: HTMLElement) {
+  const message = document.getElementById('portrait-egg');
+  if (!message) return;
+  const email = message.querySelector<HTMLAnchorElement>('.portrait-egg-email');
+  if (email && !email.textContent) {
+    const address = `${email.dataset.user}@${email.dataset.domain}`;
+    email.textContent = address;
+    email.href = `mailto:${address}`;
+    const copy = message.querySelector<HTMLButtonElement>('.portrait-egg-copy');
+    copy?.addEventListener('click', () => {
+      void navigator.clipboard?.writeText(address).then(() => {
+        copy.textContent = 'Copied';
+        setTimeout(() => { copy.textContent = 'Copy'; }, 1600);
+      }, () => {});
+    });
+  }
+  message.hidden = false;
+  // Centre the portrait and the message together on the screen.
+  const bounds = portrait.getBoundingClientRect();
+  const height = message.offsetHeight;
+  const top = Math.max(16, (innerHeight - bounds.height - GAP - height) / 2);
+  lift = top - bounds.top;
+  portrait.style.transition = reducedMotion() ? 'none' : 'translate 760ms cubic-bezier(.45,0,.22,1)';
+  portrait.style.translate = `0 ${lift}px`;
+  message.style.top = `${top + bounds.height + GAP}px`;
+  message.dataset.shown = '';
+  document.documentElement.dataset.portraitEgg = '';
+}
+
+function hideMessage(portrait: HTMLElement | null) {
+  const message = document.getElementById('portrait-egg');
+  if (message) {
+    message.hidden = true;
+    delete message.dataset.shown;
+  }
+  if (portrait) {
+    portrait.style.transition = reducedMotion() ? 'none' : `translate ${RESTORE}ms cubic-bezier(.45,0,.22,1)`;
+    portrait.style.translate = '0 0';
+    const clear = () => {
+      portrait.style.removeProperty('transition');
+      portrait.style.removeProperty('translate');
+    };
+    if (reducedMotion()) clear();
+    else setTimeout(clear, RESTORE + 40);
+  }
+  lift = 0;
+  delete document.documentElement.dataset.portraitEgg;
 }
 
 function ringOverlay(x: number, y: number, radius: number) {
@@ -209,6 +265,7 @@ function burst(portrait: HTMLElement) {
       delete main!.dataset.portraitBurst;
       main!.style.removeProperty('--charge');
       if (running === run) running = null;
+      showMessage(portrait);
     }, reduced ? 300 : RING + 260);
   }
 }
@@ -217,10 +274,13 @@ function restore(portrait: HTMLElement) {
   const main = scene();
   if (!main || running) return;
   const reduced = reducedMotion();
+  const shift = -lift;
+  hideMessage(portrait);
   delete main.dataset.portraitEgg;
   portrait.setAttribute('aria-pressed', 'false');
   if (reduced) return;
-  const { x, y, startRadius, radius } = geometry(portrait);
+  // Measure where the portrait is gliding back to, so the light returns to its home.
+  const { x, y, startRadius, radius } = geometry(portrait, shift);
   // The light pulls back in from the edges; each element returns as it passes.
   const timeAt = (distance: number) =>
     RESTORE * (1 - Math.min(1, Math.max(0, (distance - startRadius) / (radius - startRadius))));
@@ -264,6 +324,8 @@ if (typeof document !== 'undefined') {
     running?.cancel();
     const main = scene();
     if (main) delete main.dataset.portraitEgg;
+    hideMessage(null);
+    document.querySelector<HTMLElement>('.center-node')?.style.removeProperty('translate');
     document.querySelector('.center-node')?.setAttribute('aria-pressed', 'false');
   });
 }

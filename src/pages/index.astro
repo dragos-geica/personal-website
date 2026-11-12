@@ -3,6 +3,10 @@ import KnowledgeGraph from '../components/KnowledgeGraph';
 import SiteLayout from '../layouts/SiteLayout.astro';
 import { site } from '../content/site';
 
+const egg = site.easterEgg;
+// The address is put together in the browser, so simple bots reading the page do not see it.
+const [emailUser, emailDomain] = egg.email.split('@');
+
 const links = [
   { label: site.pages.about.title, href: '/about/' },
   { label: site.categories.projects.label, href: '/projects/' },
@@ -22,6 +26,15 @@ const links = [
       <p class="home-tagline">{site.tagline}</p>
       <p class="home-description">{site.intro}</p>
     </header>
+    <section id="portrait-egg" class="portrait-egg" aria-labelledby="portrait-egg-title" hidden>
+      <h2 id="portrait-egg-title">{egg.title}</h2>
+      <p class="portrait-egg-text">{egg.text}</p>
+      <p class="portrait-egg-invite">{egg.invite}</p>
+      <p class="portrait-egg-contact">
+        <a class="portrait-egg-email" data-user={emailUser} data-domain={emailDomain}></a>
+        <button type="button" class="portrait-egg-copy">Copy</button>
+      </p>
+    </section>
     <div class="graph-stage">
       <KnowledgeGraph client:load transition:persist="knowledge-graph" />
     </div>
