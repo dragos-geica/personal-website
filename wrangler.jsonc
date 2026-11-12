@@ -1,0 +1,7 @@
+// Cloudflare deployment. The site is static: `npm run build` writes plain files to dist/,
+// and `npx wrangler deploy` uploads them as they are. No server code runs on Cloudflare.
+{
+  "name": "personal-website",
+  "compatibility_date": "2026-11-01",
+  "assets": { "directory": "./dist" }
+}
