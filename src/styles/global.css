@@ -964,3 +964,45 @@ button.tag[aria-pressed="true"] { border-color: var(--edge-active); background: 
 .tag-empty { margin-top: 1rem; }
 
 .tag-list li { padding: 0; border: 0; background: none; }
+
+/* The portrait's easter egg (portrait-burst.ts). While it charges, --charge rises from 0 to 1:
+   the page dims, the orbits draw in and the portrait glows. */
+.center-node { cursor: pointer; padding: 0; }
+main[data-portrait-burst] :is(.knowledge-graph, .home-intro) { pointer-events: none; }
+main[data-portrait-burst] .center-node { pointer-events: auto; }
+main[data-portrait-burst] :is(.home-intro, .graph-categories > .category) {
+  opacity: calc(1 - var(--charge, 0) * .5);
+  transition: none;
+}
+main[data-portrait-burst] .orbit {
+  transform: translate(-50%, -50%) rotate(calc(var(--charge, 0) * 70deg)) scale(calc(1 - var(--charge, 0) * .16));
+  border-color: color-mix(in srgb, var(--sweep) calc(var(--charge, 0) * 100%), var(--halo));
+}
+main[data-portrait-burst] .center-node {
+  transition: none;
+  scale: 1;
+  box-shadow:
+    0 0 calc(24px + var(--charge, 0) * 70px) calc(var(--charge, 0) * 18px) color-mix(in srgb, var(--sweep) calc(var(--charge, 0) * 100%), var(--halo)),
+    0 14px 30px var(--halo);
+}
+.portrait-burst-flash {
+  position: fixed;
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side, #fff, color-mix(in srgb, var(--sweep) 70%, #fff) 45%, transparent);
+  pointer-events: none;
+}
+.portrait-burst-overlay { z-index: 7; }
+.portrait-burst-echo { opacity: .5; }
+
+/* After the burst only the portrait is left, breathing softly. */
+main[data-portrait-egg] :is(.home-intro, .graph-categories > .category, .center-orbit > .orbit) {
+  opacity: 0;
+  visibility: hidden;
+  transition: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  main[data-portrait-egg] .center-node { animation: portrait-glow 3.2s ease-in-out infinite; }
+}
+@keyframes portrait-glow {
+  50% { box-shadow: 0 0 64px 8px color-mix(in srgb, var(--sweep) 55%, transparent), 0 14px 30px var(--halo); }
+}

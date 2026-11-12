@@ -6,6 +6,7 @@ import GraphBranch from './GraphBranch';
 import { centerNode, graphCanvas, graphNodes, type GraphNode } from '../data/graph';
 import GraphIcon from './GraphIcon';
 import { site } from '../content/site';
+import { togglePortraitBurst } from '../scripts/portrait-burst';
 import { moveBranchHub, PROJECT_HUB_X, sweepBranch, type BranchSweep } from '../scripts/branch-motion';
 import type { TransitionBeforePreparationEvent } from 'astro:transitions/client';
 
@@ -230,9 +231,12 @@ export default function KnowledgeGraph() {
             <span className="orbit orbit-inner" aria-hidden="true" />
             <span className="orbit orbit-dotted" aria-hidden="true" />
             <span className="orbit orbit-outer" aria-hidden="true" />
-            <a className="node center-node" href="/about/" aria-label={`About ${site.name}`}>
-              <img src={site.portrait.src} alt={site.portrait.alt} width="480" height="480" decoding="async" />
-            </a>
+            {/* An easter egg: the portrait bursts and clears the screen (see portrait-burst.ts). */}
+            <button type="button" className="node center-node" aria-pressed="false"
+              aria-label={`Portrait of ${site.name}. Something happens if you press it.`}
+              onClick={(event) => togglePortraitBurst(event.currentTarget)}>
+              <img src={site.portrait.src} alt="" width="480" height="480" decoding="async" />
+            </button>
           </div>
 
           <ul className="graph-categories" role="list" aria-label="Knowledge categories">
