@@ -3,7 +3,7 @@
 
 export const durations = {
   /** Ring sweep that clears the graph away from the opened category. */
-  sweep: 540,
+  sweep: 700,
   /** Hub travel to its branch position; it starts while the ring is still moving. */
   travel: 520,
   /** A branch line drawing along its length, from the hub to a child. */
