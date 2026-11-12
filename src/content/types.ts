@@ -3,8 +3,8 @@
 export interface ContentImage {
   /** Path under public/, e.g. '/images/airbox.jpg'. */
   src: string;
-  /** A short description of the photo for screen readers. */
-  alt: string;
+  /** A short description of the photo for screen readers. Without one, the item's title is used. */
+  alt?: string;
 }
 
 export interface ContentLink {

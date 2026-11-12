@@ -27,7 +27,7 @@ const { item, category, back } = Astro.props;
       </ul>
     )}
     <p class="detail-summary">{item.summary}</p>
-    {item.image && <img class="project-image detail-image" src={item.image.src} alt={item.image.alt} decoding="async" />}
+    {item.image && <img class="project-image detail-image" src={item.image.src} alt={item.image.alt || `Photo from ${item.title}`} decoding="async" />}
     {!!item.facts?.length && (
       <dl class="project-metrics">
         {item.facts.map(({ label, value }) => <div><dt>{label}</dt><dd>{value}</dd></div>)}
