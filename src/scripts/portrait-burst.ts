@@ -58,6 +58,30 @@ function targets(x: number, y: number) {
   });
 }
 
+/**
+ * A vibration pattern that follows the sound on phones that support it (Android; iPhone
+ * browsers do not allow websites to vibrate). Phones cannot vary strength, so the build-up
+ * is pulses that grow longer with each stutter, and the burst is one long buzz.
+ */
+function vibrationPattern() {
+  const pattern: number[] = [];
+  const slot = 100;
+  for (let time = 0; time < BURST_AT; time += slot) {
+    const on = Math.round(8 + Math.max(...ENVELOPE.slice(time / STEP, (time + slot) / STEP)) * 70);
+    pattern.push(on, slot - on);
+  }
+  pattern.push(380);
+  return pattern;
+}
+
+function vibrate(pattern: number | number[]) {
+  try {
+    navigator.vibrate?.(pattern);
+  } catch {
+    // Some browsers throw instead of ignoring the request.
+  }
+}
+
 function geometry(portrait: HTMLElement) {
   const bounds = portrait.getBoundingClientRect();
   const x = bounds.left + bounds.width / 2;
@@ -109,6 +133,7 @@ function burst(portrait: HTMLElement) {
       animations.forEach((animation) => animation.cancel());
       overlay?.remove();
       resetPortrait();
+      vibrate(0);
       delete main.dataset.portraitBurst;
       main.style.removeProperty('--charge');
       if (running === run) running = null;
@@ -121,6 +146,7 @@ function burst(portrait: HTMLElement) {
   void playSound('burst', { volume: .7, wait: 400 }).then(() => {
     if (cancelled) return;
     const start = performance.now();
+    vibrate(vibrationPattern());
 
     function charge(now: number) {
       const time = now - start;
