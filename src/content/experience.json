@@ -3,7 +3,7 @@
   "verb": "works_in",
   "items": [
     {
-      "title": "Temporary Trade Barriers",
+      "title": "Trade Research",
       "subtitle": "Research assistant to Professor David Kuenzel · Wesleyan Economics and QAC · 2026–present",
       "summary": "I study how U.S. imports change before and after antidumping, countervailing-duty, and safeguard actions. For my summer poster, I linked trade-remedy cases to 35 years of import records and estimated models on 54.6 million observations.",
       "tags": [
@@ -51,7 +51,9 @@
           "label": "Research update on LinkedIn",
           "href": "https://www.linkedin.com/feed/update/urn:li:activity:7502850491702304768/"
         }
-      ]
+      ],
+      "hideFromGraph": false,
+      "draft": false
     },
     {
       "title": "Vocational Education Policy",
@@ -77,7 +79,9 @@
           "title": "The work",
           "text": "Using Excel, I synthesized ten cross-country datasets alongside prior research for a policy brief prepared for Romania’s Ministry of Education."
         }
-      ]
+      ],
+      "hideFromGraph": false,
+      "draft": false
     },
     {
       "title": "Instructional Media Services",
@@ -103,7 +107,9 @@
           "title": "As general manager",
           "text": "I oversee operations, coordinate weekly meetings, and support hiring. I replaced manual spreadsheet tracking with a survey-based audit of classroom technology."
         }
-      ]
+      ],
+      "hideFromGraph": false,
+      "draft": false
     },
     {
       "title": "Undergraduate Consulting",
@@ -129,7 +135,9 @@
           "title": "What we found",
           "text": "We identified four barriers, developed recommendations for career support and engagement, and briefed Career Center leadership."
         }
-      ]
+      ],
+      "hideFromGraph": false,
+      "draft": false
     },
     {
       "title": "International Students",
@@ -159,7 +167,9 @@
           "title": "Beyond the handbook",
           "text": "Our work includes pairing new and current students, recruitment, and working with the Gordon Career Center, including an international alumni career panel on job searches and international career paths in November 2026."
         }
-      ]
+      ],
+      "hideFromGraph": false,
+      "draft": false
     },
     {
       "title": "UNICEF Romania",
@@ -189,7 +199,9 @@
           "label": "Center for Independent Journalism",
           "href": "https://www.cji.ro/"
         }
-      ]
+      ],
+      "hideFromGraph": false,
+      "draft": false
     }
   ]
 }
