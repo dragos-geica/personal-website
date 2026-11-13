@@ -4,19 +4,23 @@
   "items": [
     {
       "title": "Debate",
+      "blurb": "Third place nationally at the Romanian Debate Olympiad.",
       "summary": "I placed third nationally at the Romanian Debate Olympiad in May 2024."
     },
     {
       "title": "Studio Art",
+      "blurb": "Drawing and painting classes in Paris.",
       "summary": "In Paris I took drawing and painting classes at the Académie de la Grande Chaumière, a very different way of learning from economics and data."
     },
     {
       "title": "Alphabet Systems",
+      "blurb": "How writing systems work and how they differ.",
       "summary": "I’m curious about writing systems and linguistics: how alphabets work and how they differ. More here soon.",
       "draft": true
     },
     {
       "title": "Retro Game Emulation",
+      "blurb": "Getting old video games running again.",
       "summary": "I like getting old video games running again through emulation. More here soon.",
       "draft": true
     }

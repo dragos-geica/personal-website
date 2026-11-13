@@ -14,6 +14,8 @@ export interface ContentLink {
 
 export interface ContentItem {
   title: string;
+  /** One short line shown with the title on the home graph. Without one, the summary's first sentence is used. */
+  blurb?: string;
   /** A short line under the heading, e.g. role, place and dates. */
   subtitle?: string;
   summary: string;

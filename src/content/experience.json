@@ -4,6 +4,7 @@
   "items": [
     {
       "title": "Trade Research",
+      "blurb": "How U.S. imports respond to antidumping and safeguard actions.",
       "subtitle": "Research assistant to Professor David Kuenzel · Wesleyan Economics and QAC · 2026–present",
       "summary": "I study how U.S. imports change before and after antidumping, countervailing-duty, and safeguard actions. For my summer poster, I linked trade-remedy cases to 35 years of import records and estimated models on 54.6 million observations.",
       "tags": [
@@ -57,6 +58,7 @@
     },
     {
       "title": "Vocational Education Policy",
+      "blurb": "Comparing vocational education across five EU countries.",
       "subtitle": "Research intern · Romanian Center for European Policies · Fall 2025",
       "summary": "I compared vocational education and professional competency certification across five EU countries, focusing on graduate employability and the move into the labor market.",
       "tags": [
@@ -85,6 +87,7 @@
     },
     {
       "title": "Instructional Media Services",
+      "blurb": "Managing the 30-person team behind Wesleyan’s classroom tech.",
       "subtitle": "Student General Manager · Wesleyan University · 2024–present",
       "summary": "I started as a student technician in 2024, keeping Wesleyan’s classroom technology running, and since September 2025 I’ve managed the team of 30 student employees.",
       "tags": [
@@ -113,6 +116,7 @@
     },
     {
       "title": "Undergraduate Consulting",
+      "blurb": "Helping the career center reach international students.",
       "subtitle": "Consultant, then Manager · Wesleyan Undergraduate Consulting Group · 2025–present",
       "summary": "For a career-center engagement project, our team looked at why international students weren’t making more use of career support, and what could change that.",
       "tags": [
@@ -141,6 +145,7 @@
     },
     {
       "title": "International Students",
+      "blurb": "Co-chairing the board that helps international students settle in.",
       "subtitle": "Co-chair, International Student Advisory Board · Wesleyan · 2024–present",
       "summary": "I co-chair the board that helps international students settle in at Wesleyan, from the handbook they read before arriving to events once they’re here.",
       "tags": [
@@ -173,6 +178,7 @@
     },
     {
       "title": "UNICEF Romania",
+      "blurb": "Three years representing youth on children’s rights.",
       "subtitle": "National Children’s Board · 2021–2024",
       "summary": "For three years I represented youth perspectives on children’s rights as a member of UNICEF Romania’s National Children’s Board.",
       "tags": [

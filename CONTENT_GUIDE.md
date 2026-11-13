@@ -15,7 +15,7 @@ Behind the scenes the content lives in small files in [`src/content/`](src/conte
 | Home page | Your name, the line under it, the introduction, the portrait, and the message after clicking the portrait (with your email) |
 | About page, Research page | The page title, its paragraphs and links |
 | CV | Sections and entries |
-| Experience, Projects, Other Interests | The category's name, and its items (each item is a circle and its own page) |
+| Experience, Projects, Other Interests | The category's name, and its items (each item is a card on the home graph and its own page) |
 
 4. Change what you like and click **Save**. That publishes it: Cloudflare rebuilds the site, and the change is
    live about a minute later.
@@ -24,15 +24,17 @@ Only people with access to the GitHub repository can sign in, which right now is
 
 ## Items
 
-Each item becomes a circle in its category and its own page. Only **Title** and **Summary** are required; leave the
+Each item becomes a card in its category and its own page. Only **Title** and **Summary** are required; leave the
 rest blank if you don't need them. Blank fields are simply not shown.
 
-- **Title:** the circle label and page heading. Keep it short. The page's web address is made from it
+- **Short description:** the one line under the title on the card (about 60 characters). Left blank, the card
+  uses the first sentence of the summary.
+- **Title:** the card's title and page heading. Keep it short. The page's web address is made from it
   ("Neo4j Demo" becomes `/projects/neo4j-demo/`), so renaming an item changes its address.
 - **Tags:** the data, tools and methods behind the item. Every tag used by a project becomes a filter on the
   Projects page. Spell a tool the same way everywhere (`Stata`, not `stata`) so it groups together.
   Tag research work `Research` to list it on the Research page.
-- **Hide from the home graph:** the graph shows up to six circles per category, in the order of the list.
+- **Hide from the home graph:** the graph shows up to six cards per category, in the order of the list.
   Tick this to keep an item off the graph; it still has its page and appears on the Projects page.
 - **Work in progress:** marks the item "in progress" and hides its page from search engines.
 

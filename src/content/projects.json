@@ -4,6 +4,7 @@
   "items": [
     {
       "title": "AirBox Bootcamp",
+      "blurb": "A free STEAM bootcamp where students built air-quality monitors.",
       "subtitle": "Project lead and Projects for Peace grantee · with Alacrity Education · 2026",
       "summary": "I partnered with Alacrity Education to run a free Romanian STEAM bootcamp where students built and deployed air-quality monitors. A $10,000 Projects for Peace grant supported the program, and the students’ readings contributed to a public air-quality dataset.",
       "image": {
@@ -68,6 +69,7 @@
     },
     {
       "title": "Opportunup",
+      "blurb": "A platform for free programs, volunteering and scholarships.",
       "subtitle": "Founder and volunteer coordinator · Romania · 2023–24",
       "summary": "I built a platform that helped young people in Romania discover free programs, civic and volunteer opportunities, and fully funded scholarships.",
       "facts": [
@@ -101,6 +103,7 @@
     },
     {
       "title": "HPC for Stata",
+      "blurb": "Benchmarking large Stata regressions on a computing cluster.",
       "subtitle": "High-performance computing · Wesleyan · Fall 2026",
       "summary": "I benchmarked large Stata PPML regressions on Wesleyan’s computing cluster to see how CPU counts, node allocation, and parallel execution affected runtime, and I updated a faculty guide to running Stata on the cluster.",
       "tags": [
@@ -132,6 +135,7 @@
     },
     {
       "title": "Neo4j Demo",
+      "blurb": "U.S. import data explored as a graph database.",
       "subtitle": "U.S. trade knowledge graph · Fall 2026",
       "summary": "I built an exploratory graph database of U.S. import data, to see what trade looks like when you explore it through relationships rather than tables.",
       "tags": [
@@ -154,6 +158,7 @@
     },
     {
       "title": "Income Volatility & Health",
+      "blurb": "How swings in income relate to self-reported health.",
       "subtitle": "Course research project · QAC 201 · Fall 2025",
       "summary": "Using the U.S. National Financial Well-Being Survey, I explored how income volatility, self-reported health, and living arrangements are related among non-retired respondents.",
       "tags": [
@@ -189,6 +194,7 @@
     },
     {
       "title": "Sephora Reviews",
+      "blurb": "What drives ratings across 5,000+ product reviews.",
       "subtitle": "Data analysis · Wesleyan · Spring 2025",
       "summary": "I analyzed 5,000+ Sephora product reviews to explore how ratings vary with brand, product category, and price.",
       "tags": [

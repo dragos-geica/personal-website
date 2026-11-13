@@ -171,7 +171,7 @@ content:
         label: Small word on its line (e.g. works_in)
         type: string
       - name: items
-        label: Items (the first six appear as circles)
+        label: Items (the first six appear as cards on the home graph)
         type: object
         list:
           collapsible:
@@ -182,6 +182,9 @@ content:
             label: Title (keep it short; renaming changes its web address)
             type: string
             required: true
+          - name: blurb
+            label: Short description on the home graph (one line, about 60 characters)
+            type: string
           - name: subtitle
             label: Line under the heading (role · place · dates)
             type: string
@@ -265,7 +268,7 @@ content:
         label: Small word on its line (e.g. works_in)
         type: string
       - name: items
-        label: Items (the first six appear as circles)
+        label: Items (the first six appear as cards on the home graph)
         type: object
         list:
           collapsible:
@@ -276,6 +279,9 @@ content:
             label: Title (keep it short; renaming changes its web address)
             type: string
             required: true
+          - name: blurb
+            label: Short description on the home graph (one line, about 60 characters)
+            type: string
           - name: subtitle
             label: Line under the heading (role · place · dates)
             type: string
@@ -359,7 +365,7 @@ content:
         label: Small word on its line (e.g. works_in)
         type: string
       - name: items
-        label: Items (the first six appear as circles)
+        label: Items (the first six appear as cards on the home graph)
         type: object
         list:
           collapsible:
@@ -370,6 +376,9 @@ content:
             label: Title (keep it short; renaming changes its web address)
             type: string
             required: true
+          - name: blurb
+            label: Short description on the home graph (one line, about 60 characters)
+            type: string
           - name: subtitle
             label: Line under the heading (role · place · dates)
             type: string

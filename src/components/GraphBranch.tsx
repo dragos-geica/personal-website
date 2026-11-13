@@ -3,16 +3,34 @@ import { branchSide, graphCanvas, type GraphNode } from '../data/graph';
 import { nodeDestination } from '../data/node-destinations';
 import { useEffect, useLayoutEffect, useRef, useState, type AnimationEvent } from 'react';
 import { PROJECT_HUB_X } from '../scripts/branch-motion';
-import NodeOutline from './NodeOutline';
-import { constellation } from '../data/branch-layout';
+import { cardLayout, type BranchSide, type Card, type Point } from '../data/branch-layout';
 
 const { width, height } = graphCanvas;
-// Coordinates are relative to the primary graph, which reserves room on the open side.
-const branchExtension = 300;
-// Node centres stay this far inside the graph so a full circle always fits.
-const edgeMargin = 85;
 /** Where a downward-opening hub sits: top centre (matches its CSS in global.css). */
 export const DOWN_HUB = { x: 540, y: 150 };
+/** How far each card drifts from its place, in pixels, and how long the drift takes to fade in. */
+const DRIFT = 5;
+const DRIFT_FADE_IN = 2400;
+
+type Placed = Card & { index: number };
+
+/** A line from the hub's rim to the card's near side, arriving straight on (in pixels). */
+function edgePath(hub: Point & { r: number }, card: Placed, side: BranchSide) {
+  const point = (x: number, y: number) => `${x.toFixed(1)} ${y.toFixed(1)}`;
+  const down = side === 'down';
+  const end = down ? { x: card.x, y: card.y - card.height / 2 }
+    : { x: card.x + (card.x < hub.x ? card.width / 2 : -card.width / 2), y: card.y };
+  const dx = end.x - hub.x;
+  const dy = end.y - hub.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const start = { x: hub.x + dx / length * hub.r, y: hub.y + dy / length * hub.r };
+  const [sx, sy] = [end.x - start.x, end.y - start.y];
+  // Leave the hub along the line's main direction and bend into the card's side.
+  const [a, b] = down
+    ? [{ x: start.x, y: start.y + sy * .5 }, { x: end.x, y: end.y - sy * .5 }]
+    : [{ x: start.x + sx * .1, y: start.y + sy * .75 }, { x: end.x - sx * .5, y: end.y }];
+  return `M ${point(start.x, start.y)} C ${point(a.x, a.y)} ${point(b.x, b.y)} ${point(end.x, end.y)}`;
+}
 
 export default function GraphBranch({ node, onClose, revealBranch, onRevealComplete }: {
   node: GraphNode;
@@ -29,68 +47,78 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
   // The hub's place while open; it must match the open hub's CSS position.
   const [x, y] = side === 'down' ? [DOWN_HUB.x, DOWN_HUB.y]
     : [node.id === 'projects' ? PROJECT_HUB_X : side === 'left' ? 460 : 620, height / 2];
-  // Sideways branches borrow room beyond the graph's edge; a downward one stays inside it.
-  const extension = side === 'down' ? 0 : branchExtension;
-  const branchStart = side === 'left' ? -extension : 0;
-  const area = side === 'left'
-    ? { left: -extension + edgeMargin, right: x - 200, top: 80, bottom: height - 80 }
-    : side === 'right'
-      ? { left: x + 200, right: width + extension - edgeMargin, top: 80, bottom: height - 80 }
-      : { left: edgeMargin + 40, right: width - edgeMargin - 40, top: y + 160, bottom: height - 70 };
-  const children = constellation(node.id, node.children.length, { x, y }, side, area)
-    .map(({ x: cx, y: cy }, index) => ({ label: node.children[index], index, cx, cy }));
+  const children = node.children.map((label, index) => ({ label, blurb: node.blurbs[index], index }));
 
   useLayoutEffect(() => {
     const hub = document.getElementById(`category-${node.id}`);
-    const branch = mobileEdges.current?.closest('.graph-branch');
+    const branch = mobileEdges.current?.closest<HTMLElement>('.graph-branch');
     const category = hub?.parentElement;
     const desktop = desktopEdges.current;
     const mobile = mobileEdges.current;
     if (!hub || !branch || !category || !desktop || !mobile) return;
+    const items = [...branch.querySelectorAll<HTMLElement>('.branch-children > li')];
+    const still = matchMedia('(prefers-reduced-motion: reduce)');
+    let frame = 0;
+    let placed: Placed[] = [];
+    let hubPoint = { x: 0, y: 0, r: 0 };
+    const opened = performance.now();
 
-    function positionEdges() {
+    function updatePaths(svg: SVGSVGElement, curves: string[]) {
+      svg.querySelectorAll('path').forEach((path, index) => {
+        if (curves[index] && path.getAttribute('d') !== curves[index]) path.setAttribute('d', curves[index]);
+      });
+    }
+
+    // Each card wanders a few pixels on its own slow loop; its line follows it.
+    function drift(now: number) {
+      const strength = Math.min(1, (now - opened) / DRIFT_FADE_IN) * DRIFT;
+      const moved = placed.map((card) => {
+        const phase = card.index * 1.7;
+        const dx = Math.sin(now / (5200 + card.index * 610) + phase) * strength;
+        const dy = Math.cos(now / (6100 + card.index * 470) + phase * 1.3) * strength * .8;
+        items[card.index].style.translate = `${dx.toFixed(2)}px ${dy.toFixed(2)}px`;
+        return { ...card, x: card.x + dx, y: card.y + dy };
+      });
+      updatePaths(desktop!, moved.map((card) => edgePath(hubPoint, card, side)));
+      frame = requestAnimationFrame(drift);
+    }
+
+    function position() {
       if (!hub || !branch || !category || !desktop || !mobile) return;
+      cancelAnimationFrame(frame);
       const bounds = branch.getBoundingClientRect();
       if (!bounds.width) return;
-      const buttons = [...branch.querySelectorAll<HTMLElement>('.child-node')];
-      function updatePaths(svg: SVGSVGElement, curves: string[]) {
-        svg.querySelectorAll('path').forEach((path, index) => {
-          if (path.getAttribute('d') !== curves[index]) path.setAttribute('d', curves[index]);
-        });
-      }
       if (getComputedStyle(desktop).display !== 'none') {
-        // Canvas units are not square on screen, so aim and trim each edge in pixels.
         // Positions come from the layout, not from measuring the hub, which may be
-        // mid-travel when this runs.
-        const scaleX = bounds.width / width;
-        const scaleY = bounds.height / height;
-        const hubRadius = hub.offsetWidth / 2;
-        const curves = buttons.map((button, index) => {
-          const target = children[index];
-          const radius = button.offsetWidth / 2;
-          const dx = (target.cx - x) * scaleX;
-          const dy = (target.cy - y) * scaleY;
-          const length = Math.hypot(dx, dy) || 1;
-          const [ux, uy] = [dx / length, dy / length];
-          const start = [x + ux * hubRadius / scaleX, y + uy * hubRadius / scaleY];
-          const end = [target.cx - ux * radius / scaleX, target.cy - uy * radius / scaleY];
-          const point = ([px, py]: number[]) => `${px.toFixed(1)} ${py.toFixed(1)}`;
-          // A slight alternating bow keeps the constellation organic rather than spoked.
-          const bow = (index % 2 ? 1 : -1) * Math.min(36, length * .07);
-          const middle = [(start[0] + end[0]) / 2 - uy * bow / scaleX, (start[1] + end[1]) / 2 + ux * bow / scaleY];
-          return `M ${point(start)} Q ${point(middle)} ${point(end)}`;
-        });
-        updatePaths(desktop, curves);
+        // mid-travel when this runs. Cards may use the whole width of the window.
+        hubPoint = { x: x / width * bounds.width, y: y / height * bounds.height, r: hub.offsetWidth / 2 };
+        const size = {
+          width: Math.max(...items.map((item) => item.offsetWidth)),
+          height: Math.max(...items.map((item) => item.offsetHeight)),
+        };
+        const viewport = document.documentElement.clientWidth;
+        const area = { left: 24 - bounds.left, right: viewport - 24 - bounds.left, top: 0, bottom: bounds.height };
+        placed = cardLayout(node.id, items.length, hubPoint, side, area, size).map((card, index) => ({
+          ...card, index, width: items[index].offsetWidth, height: items[index].offsetHeight,
+        }));
+        placed.forEach((card) => Object.assign(items[card.index].style, { left: `${card.x}px`, top: `${card.y}px` }));
+        updatePaths(desktop, placed.map((card) => edgePath(hubPoint, card, side)));
+        if (!still.matches) frame = requestAnimationFrame(drift);
         return;
       }
+      items.forEach((item) => {
+        item.style.removeProperty('left');
+        item.style.removeProperty('top');
+        item.style.removeProperty('translate');
+      });
 
       // A spine runs straight down from the hub through the gap between the two
       // columns; each child branches off it with a short bend into its inner side.
       const source = category.getBoundingClientRect();
       const startX = source.left + source.width / 2 - bounds.left;
       const startY = source.top + hub.offsetHeight / 2 - bounds.top;
-      const curves = buttons.map((button, index) => {
-        const rect = button.getBoundingClientRect();
+      const curves = items.map((item) => {
+        const rect = item.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2 - bounds.left;
         const top = rect.top - bounds.top;
         if (Math.abs(centerX - startX) < rect.width / 4) return `M ${startX} ${startY} V ${top}`;
@@ -103,11 +131,18 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
       updatePaths(mobile, curves);
     }
 
-    positionEdges();
-    const observer = new ResizeObserver(positionEdges);
+    position();
+    const observer = new ResizeObserver(position);
     observer.observe(branch);
     observer.observe(hub);
-    return () => observer.disconnect();
+    addEventListener('resize', position);
+    still.addEventListener('change', position);
+    return () => {
+      observer.disconnect();
+      removeEventListener('resize', position);
+      still.removeEventListener('change', position);
+      cancelAnimationFrame(frame);
+    };
   }, [node.id]);
 
   useEffect(() => {
@@ -127,13 +162,10 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
     <li id={`branch-${node.id}`} className="graph-branch" data-side={side}
       data-branch-reveal={revealBranch || undefined} data-hover-locked={hoverLocked || undefined}
       onAnimationEnd={onRevealEvent}>
-      <svg className="branch-edges" ref={desktopEdges} viewBox={`${branchStart} 0 ${width + extension} ${height}`}
-        style={{ left: `${branchStart / width * 100}%`, width: `${(width + extension) / width * 100}%` }}
-        preserveAspectRatio="none" aria-hidden="true">
-        {/* Placeholder geometry; the layout effect trims these to the circles before paint. */}
-        {children.map(({ label, index, cx, cy }) => (
-          <path key={label} className="branch-edge" pathLength={1}
-            style={{ '--order': index + 1 } as CSSProperties} d={`M ${x} ${y} L ${cx} ${cy}`} />
+      <svg className="branch-edges" ref={desktopEdges} aria-hidden="true">
+        {/* The layout effect draws these, from the hub to each card, before paint. */}
+        {children.map(({ label, index }) => (
+          <path key={label} className="branch-edge" pathLength={1} style={{ '--order': index + 1 } as CSSProperties} />
         ))}
       </svg>
       <svg className="branch-mobile-edges" ref={mobileEdges} aria-hidden="true">
@@ -142,12 +174,14 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
         ))}
       </svg>
       <ul className="branch-children" role="list" aria-label={`${node.label} items`}>
-        {children.map(({ label, index, cx, cy }) => (
-          <li key={label} style={{ '--x': `${cx / width * 100}%`, '--y': `${cy / height * 100}%`,
-            '--order': index + 1 } as CSSProperties}>
-            <NodeOutline />
+        {children.map(({ label, blurb, index }) => (
+          <li key={label} style={{ '--order': index + 1 } as CSSProperties}>
+            <svg className="branch-node-outline" aria-hidden="true">
+              <rect x=".75" y=".75" rx="13" pathLength={1} />
+            </svg>
             <a className="node child-node" data-morph-node={nodeDestination(node.id, label)} href={nodeDestination(node.id, label)}>
               <span className="branch-label">{label}</span>
+              {blurb && <span className="branch-blurb">{blurb}</span>}
             </a>
           </li>
         ))}

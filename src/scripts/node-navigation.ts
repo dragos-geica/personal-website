@@ -29,6 +29,8 @@ interface Pose {
   textWrap: string;
   color: string;
   strokeOpacity: number;
+  /** Outline shape: 2 is a circle; higher values square it off towards a rounded rectangle (a card). */
+  squareness: number;
 }
 
 interface Morph {
@@ -86,11 +88,13 @@ function getPose(element: HTMLElement, surface: Surface): Pose {
     textWrap: styles.textWrap,
     color: styles.color,
     strokeOpacity: 1,
+    squareness: element.matches('.child-node') ? 9 : 2,
   };
 }
 
 function styleLabel(label: HTMLSpanElement, pose: Pose, element: HTMLElement) {
-  label.textContent = element.textContent?.trim() ?? '';
+  // Only the title travels; a card's short description stays behind.
+  label.textContent = (element.querySelector('.branch-label') ?? element).textContent?.trim() ?? '';
   Object.assign(label.style, {
     width: `${pose.labelWidth}px`, fontSize: `${pose.fontSize}px`, fontFamily: pose.fontFamily,
     fontWeight: pose.fontWeight, lineHeight: pose.lineHeight, letterSpacing: pose.letterSpacing,
@@ -104,14 +108,17 @@ function draw(shot: Morph, from: Pose, to: Pose, progress: number, flatten: numb
   const y = lerp(from.y, to.y, progress);
   const width = lerp(from.w, to.w, progress);
   const height = lerp(from.h, to.h, progress);
-  // Open the circle from the top and flatten the remaining arc from left to right.
+  // Open the outline from the top and flatten the remaining arc from left to right. A card's
+  // outline is a superellipse, which reads as a rounded rectangle.
   const sweep = lerp(Math.PI * 2, Math.PI, flatten);
+  const power = 2 / lerp(from.squareness, to.squareness, progress);
+  const shape = (value: number) => Math.sign(value) * Math.abs(value) ** power;
   let path = '';
-  for (let index = 0; index <= 32; index++) {
-    const t = index / 32;
+  for (let index = 0; index <= 64; index++) {
+    const t = index / 64;
     const angle = Math.PI / 2 + sweep * (.5 - t);
-    const px = x + lerp(Math.cos(angle) / 2, t - .5, flatten) * width;
-    const py = y + Math.sin(angle) * height / 2 * (1 - flatten);
+    const px = x + lerp(shape(Math.cos(angle)) / 2, t - .5, flatten) * width;
+    const py = y + shape(Math.sin(angle)) * height / 2 * (1 - flatten);
     path += `${index ? 'L' : 'M'}${px.toFixed(2)} ${py.toFixed(2)} `;
   }
   outline.setAttribute('d', path);

@@ -172,6 +172,9 @@ astro-island { display: contents; }
 }
 
 .knowledge-graph:focus-visible { outline-offset: 0; }
+/* An open branch's cards may use the whole window; GraphBranch keeps them inside it. */
+.knowledge-graph:has(.graph-branch) { overflow: visible; }
+body:has(.graph-branch) { overflow-x: clip; }
 
 .graph-stage { display: grid; justify-items: center; width: 100%; min-width: 0; }
 
@@ -421,26 +424,40 @@ astro-island { display: contents; }
 .branch-children li {
   position: absolute;
   z-index: 2;
-  left: var(--x);
-  top: var(--y);
+  left: 0;
+  top: 0;
   transform: translate(-50%, -50%);
 }
 
+/* An item card: its title and one short line. GraphBranch places it and keeps it drifting. */
 .child-node {
-  width: clamp(84px, 10.3cqw, 116px);
-  aspect-ratio: 1;
-  padding: .25rem;
+  width: clamp(196px, 15.5vw, 244px);
+  gap: .3rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: .75rem .9rem .8rem;
   border: 1px solid var(--border);
+  border-radius: 14px;
   background: linear-gradient(155deg, var(--node), var(--node-shade));
   box-shadow: 0 7px 17px var(--shadow);
-  font-size: clamp(.64rem, 1.31cqw, .9rem);
-  font-weight: 590;
-  line-height: 1.18;
-  text-wrap: balance;
+  text-align: left;
   overflow-wrap: normal;
   hyphens: manual;
   cursor: pointer;
   pointer-events: auto;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+.branch-label {
+  font-size: clamp(.86rem, 1.05vw, .98rem);
+  font-weight: 620;
+  line-height: 1.2;
+}
+.branch-blurb {
+  color: var(--muted);
+  font-size: clamp(.74rem, .85vw, .82rem);
+  font-weight: 420;
+  line-height: 1.38;
+  text-wrap: pretty;
 }
 
 .graph-branch:not([data-hover-locked]) .child-node:hover,
@@ -449,6 +466,8 @@ astro-island { display: contents; }
   background: var(--accent);
   color: var(--accent-ink);
 }
+.graph-branch:not([data-hover-locked]) .child-node:hover .branch-blurb,
+.child-node:focus-visible .branch-blurb { color: inherit; opacity: .85; }
 
 .section-page {
   width: min(86%, 48rem);
@@ -526,11 +545,12 @@ astro-island { display: contents; }
 
   .child-node {
     width: 100%;
-    min-height: 3rem;
-    aspect-ratio: auto;
-    border-radius: .55rem;
-    font-size: .81rem;
+    height: 100%;
+    padding: .6rem .7rem .65rem;
+    border-radius: .7rem;
   }
+  .branch-label { font-size: .82rem; }
+  .branch-blurb { font-size: .72rem; }
 
   .graph-categories, .relationship, .center-orbit {
     position: relative;
@@ -808,7 +828,7 @@ main[data-graph-pending] .knowledge-graph {
     --branch-start: calc(var(--motion-children-start) + (var(--order) - 1) * var(--motion-stagger));
   }
 
-  .graph-branch[data-branch-reveal] :is(.branch-edge, .branch-node-outline path) {
+  .graph-branch[data-branch-reveal] :is(.branch-edge, .branch-node-outline rect) {
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
   }
@@ -817,7 +837,7 @@ main[data-graph-pending] .knowledge-graph {
     animation: branch-draw var(--motion-edge) var(--ease-move) var(--branch-start) both;
   }
 
-  .graph-branch[data-branch-reveal] .branch-node-outline path {
+  .graph-branch[data-branch-reveal] .branch-node-outline rect {
     animation: branch-draw var(--motion-outline) ease-out calc(var(--branch-start) + var(--motion-edge)) both;
   }
 
@@ -828,17 +848,19 @@ main[data-graph-pending] .knowledge-graph {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    transform: rotate(180deg);
+    overflow: visible;
   }
 
-  .graph-branch[data-branch-reveal] .branch-node-outline path {
+  .graph-branch[data-branch-reveal] .branch-node-outline rect {
+    width: calc(100% - 1.5px);
+    height: calc(100% - 1.5px);
     fill: none;
     stroke: var(--border);
     stroke-width: 1.5;
   }
 
   /* A node is visible and clickable from the moment its label starts to pop. */
-  .graph-branch[data-branch-reveal] :is(.child-node, .branch-label) {
+  .graph-branch[data-branch-reveal] :is(.child-node, .branch-label, .branch-blurb) {
     animation-duration: var(--motion-label);
     animation-delay: calc(var(--branch-start) + var(--motion-edge) + var(--motion-outline) * .5);
     animation-fill-mode: both;
@@ -847,16 +869,13 @@ main[data-graph-pending] .knowledge-graph {
 
   .graph-branch[data-branch-reveal] .child-node { animation-name: branch-node-ready; animation-timing-function: linear; }
   .graph-branch[data-branch-reveal] .branch-label { animation-name: branch-label-in; }
-}
-
-@media (min-width: 881px) {
-  .graph-branch[data-side="left"][data-branch-reveal] .branch-node-outline { transform: none; }
-  /* Lines into a downward branch arrive from above. */
-  .graph-branch[data-side="down"][data-branch-reveal] .branch-node-outline { transform: rotate(-90deg); }
+  /* Its own name, so only the title's animation marks the end of the reveal. */
+  .graph-branch[data-branch-reveal] .branch-blurb { animation-name: branch-blurb-in; }
 }
 
 @keyframes branch-draw { to { stroke-dashoffset: 0; } }
 @keyframes branch-node-ready { from { visibility: hidden; } 1%, 100% { visibility: visible; } }
+@keyframes branch-blurb-in { from { opacity: 0; } }
 @keyframes branch-label-in {
   from { opacity: 0; scale: .86; }
   70% { opacity: 1; scale: 1.04; }
@@ -876,22 +895,7 @@ main[data-graph-pending] .knowledge-graph {
     pointer-events: none;
   }
 
-  .graph-branch .branch-children li { position: relative; inset: auto; justify-self: center; }
-  .graph-branch .child-node {
-    width: clamp(86px, 25vw, 106px);
-    min-height: 0;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    padding: .25rem;
-    font-size: .75rem;
-  }
-  .graph-branch[data-branch-reveal] .branch-node-outline { transform: rotate(-90deg); }
-}
-
-@media (max-width: 880px) {
-  /* Each outline starts where its line arrives: the inner side of its column. */
-  .graph-branch[data-branch-reveal] li:nth-child(odd) .branch-node-outline { transform: none; }
-  .graph-branch[data-branch-reveal] li:nth-child(even) .branch-node-outline { transform: rotate(180deg); }
+  .graph-branch .branch-children li { position: relative; inset: auto; }
 }
 
 main[data-branch-return] .knowledge-graph { visibility: hidden; animation: none; }

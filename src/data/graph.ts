@@ -15,8 +15,10 @@ export interface GraphNode {
   size: number;
   pill: Point;
   curve: string;
-  /** Item titles shown as circles when the category opens. */
+  /** Item titles shown as cards when the category opens. */
   children: readonly string[];
+  /** One short line per child, shown under its title on the card. */
+  blurbs: readonly string[];
   /** Faint lines that leave the node and fade out, hinting that it opens onto more. */
   hints: readonly { d: string; from: Point; to: Point }[];
 }
@@ -39,7 +41,7 @@ const HINTS = [
 
 /** Canvas units are wider than they are tall on screen; see branch-layout.ts. */
 const ASPECT = 1.35;
-/** Most circles shown when a category opens; the rest stay on the category's page. */
+/** Most cards shown when a category opens; the rest stay on the category's page. */
 export const MAX_GRAPH_ITEMS = 6;
 
 // A gently bowed line from the category's rim to the portrait's outer orbit,
@@ -86,12 +88,20 @@ function hintLines([x, y]: Point, size: number) {
   });
 }
 
+/** A card's fallback description: the summary's first sentence, cut at a word if it runs long. */
+export function firstSentence(text: string, limit = 90) {
+  const sentence = text.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? text;
+  if (sentence.length <= limit) return sentence;
+  return `${sentence.slice(0, limit).replace(/\s+\S*$/, '')}…`;
+}
+
 export const graphNodes: readonly GraphNode[] = layout.map(({ id, position, size, bow }) => {
   const content = site.categories[id];
   const children = content.items.filter(({ hideFromGraph }) => !hideFromGraph).slice(0, MAX_GRAPH_ITEMS);
   return {
     id, position, size, ...connect(position, size, bow), hints: hintLines(position, size),
     label: content.label, verb: content.verb, children: children.map(({ title }) => title),
+    blurbs: children.map(({ blurb, summary }) => blurb ?? firstSentence(summary)),
   };
 });
 

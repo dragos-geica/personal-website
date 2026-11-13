@@ -1,29 +1,18 @@
-// Places an open category's children like a small constellation around its hub:
-// scattered in angle and distance, the same every time for a given category,
-// and never closer to each other than a minimum spacing.
+// Places an open category's cards around its hub, in screen pixels. Most cards go on the open
+// side in a loose zigzag; with three or more, one or two sit behind the hub when there is room.
+// A small seeded jitter keeps it organic, and the same category always gets the same layout.
 
 export interface Point { x: number; y: number }
+export interface Box { left: number; right: number; top: number; bottom: number }
+export interface Card { x: number; y: number; width: number; height: number }
 
-export interface ConstellationArea {
-  /** Allowed rectangle for node centres, in canvas units. */
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
-  /** An optional rectangle to keep node centres out of. */
-  keepClear?: { left: number; right: number; top: number; bottom: number };
-}
+/** Which way an open category's cards spread from its hub. */
+export type BranchSide = 'left' | 'right' | 'down';
 
-/**
- * Canvas units are not square on screen: the graph is wider in units than in pixels.
- * One vertical unit is roughly this many horizontal units, so distances are measured
- * in horizontal units after scaling y by it.
- */
-export const CANVAS_ASPECT = 1.35;
-/** Minimum centre-to-centre distance between children, in horizontal canvas units. */
-export const CHILD_SPACING = 235;
-/** Minimum distance between a child's centre and the hub's centre. */
-export const HUB_CLEARANCE = 290;
+/** Space between the hub's rim and the nearest card edge, in pixels. */
+export const HUB_GAP = 64;
+/** Smallest gap between two cards, in pixels. */
+export const CARD_GAP = 18;
 
 function seeded(text: string) {
   let state = 2166136261;
@@ -36,81 +25,71 @@ function seeded(text: string) {
   };
 }
 
-/** Which way an open category's children spread from its hub. */
-export type BranchSide = 'left' | 'right' | 'down';
+const clamp = (value: number, low: number, high: number) => Math.min(high, Math.max(low, value));
 
-export function constellation(seed: string, count: number, hub: Point, side: BranchSide, area: ConstellationArea): Point[] {
+/** Evenly spread `count` centres between `from` and `to` (a single one sits at `middle`). */
+function spread(count: number, from: number, to: number, middle: number) {
+  if (count === 1) return [clamp(middle, from, to)];
+  return Array.from({ length: count }, (_, index) => from + (to - from) * index / (count - 1));
+}
+
+/**
+ * Card centres for `count` cards of `size` around a hub (centre and radius, in pixels), kept
+ * inside `area`. `side` is the direction the branch opens in.
+ */
+export function cardLayout(seed: string, count: number, hub: Point & { r: number }, side: BranchSide,
+  area: Box, size: { width: number; height: number }): Card[] {
   const random = seeded(seed);
-  // The direction children spread in, and the one they fan out along.
-  const [du, dv] = side === 'left' ? [-1, 0] : side === 'right' ? [1, 0] : [0, 1];
-  const [pu, pv] = side === 'down' ? [1, 0] : [0, 1];
-  const k = CANVAS_ASPECT;
-  // Work in a square space: u is horizontal units, v is vertical units scaled by k.
-  const bounds = { left: area.left, right: area.right, top: area.top * k, bottom: area.bottom * k };
-  const clear = area.keepClear && {
-    left: area.keepClear.left, right: area.keepClear.right, top: area.keepClear.top * k, bottom: area.keepClear.bottom * k,
-  };
-  const reach = side === 'down' ? area.bottom * k - hub.y * k : Math.max(area.right - hub.x, hub.x - area.left);
-  const near = HUB_CLEARANCE + 30;
-  const far = Math.max(near + 60, Math.min(reach - 40, near + 330));
-  const spread = Math.min(1.2, .4 + count * .2);
-  const slot = (2 * spread) / Math.max(1, count);
-
-  const parity = random() < .5 ? 0 : 1;
-  const points = Array.from({ length: count }, (_, index) => {
-    const angle = (count === 1 ? 0 : -spread + slot * (index + .5)) + (random() - .5) * slot * .55;
-    // Alternate inner and outer orbits, each with its own wobble, so no two line up.
-    const band = count === 1 ? .3 + random() * .4 : (index + parity) % 2 ? .62 + random() * .38 : random() * .35;
-    const radius = near + (far - near) * band;
-    const [along, across] = [radius * Math.cos(angle), radius * Math.sin(angle)];
-    return { u: hub.x + du * along + pu * across, v: hub.y * k + dv * along + pv * across };
+  const jitter = (amount: number) => (random() * 2 - 1) * amount;
+  const { width: w, height: h } = size;
+  const card = (x: number, y: number): Card => ({
+    x: Math.round(clamp(x, area.left + w / 2, area.right - w / 2)),
+    y: Math.round(clamp(y, area.top + h / 2, area.bottom - h / 2)),
+    width: w, height: h,
   });
 
-  const clamp = (point: { u: number; v: number }) => {
-    point.u = Math.min(bounds.right, Math.max(bounds.left, point.u));
-    point.v = Math.min(bounds.bottom, Math.max(bounds.top, point.v));
-    if (clear && point.u > clear.left && point.u < clear.right && point.v > clear.top && point.v < clear.bottom) {
-      point.v = clear.bottom;
-    }
-    // Stay on the open side of the hub.
-    const ahead = (point.u - hub.x) * du + (point.v - hub.y * k) * dv;
-    if (ahead < HUB_CLEARANCE * .55) {
-      point.u += du * (HUB_CLEARANCE * .55 - ahead);
-      point.v += dv * (HUB_CLEARANCE * .55 - ahead);
-    }
-  };
-
-  // Relax: push apart pairs that are too close, and anything too close to the hub.
-  const hubV = hub.y * k;
-  for (let step = 0; step < 200; step++) {
-    let moved = false;
-    for (let a = 0; a < count; a++) {
-      for (let b = a + 1; b < count; b++) {
-        const p = points[a];
-        const q = points[b];
-        let du = q.u - p.u;
-        let dv = q.v - p.v;
-        let distance = Math.hypot(du, dv);
-        if (distance >= CHILD_SPACING) continue;
-        if (distance < 1e-6) { du = 0; dv = 1; distance = 1; }
-        const push = (CHILD_SPACING - distance) / 2 + .5;
-        p.u -= du / distance * push; p.v -= dv / distance * push;
-        q.u += du / distance * push; q.v += dv / distance * push;
-        moved = true;
-      }
-    }
-    for (const point of points) {
-      const du = point.u - hub.x;
-      const dv = point.v - hubV;
-      const distance = Math.hypot(du, dv) || 1;
-      if (distance < HUB_CLEARANCE) {
-        point.u = hub.x + du / distance * HUB_CLEARANCE;
-        point.v = hubV + dv / distance * HUB_CLEARANCE;
-        moved = true;
-      }
-      clamp(point);
-    }
-    if (!moved) break;
+  if (side === 'down') {
+    // One row under the hub when the cards fit side by side, every other card dropped a little.
+    // Further rows sit in the gaps of the row above, so their lines pass between its cards.
+    const room = area.right - area.left - w;
+    const columns = Math.max(1, Math.min(count, Math.floor(room / (w + CARD_GAP * 2)) + 1));
+    const rows = Math.ceil(count / columns);
+    const top = hub.y + hub.r + HUB_GAP + h / 2;
+    const bottom = area.bottom - h / 2;
+    const step = columns > 1 ? Math.min(room / (columns - 1), w + 110) : 0;
+    const rowStep = rows > 1 ? Math.max(h + CARD_GAP, (bottom - top) / rows) : 0;
+    const drop = Math.min(h * .6, Math.max(0, (rows > 1 ? rowStep - h - CARD_GAP : bottom - top) * .8));
+    return Array.from({ length: count }, (_, index) => {
+      const row = Math.floor(index / columns);
+      const column = index % columns;
+      const inRow = Math.min(columns, count - row * columns);
+      const offset = row % 2 && inRow === columns ? step / 2 : 0;
+      // Centre the row under the hub, shifted sideways if that would run off the window.
+      const span = (inRow - 1) * step + offset;
+      const middle = clamp(hub.x, area.left + w / 2 + span / 2, area.right - w / 2 - span / 2);
+      const x = middle - span / 2 + column * step + offset;
+      return card(x + jitter(14), top + row * rowStep + (column % 2) * drop + jitter(8));
+    });
   }
-  return points.map(({ u, v }) => ({ x: Math.round(u), y: Math.round(v / k) }));
+
+  const dir = side === 'right' ? 1 : -1;
+  const near = hub.r + HUB_GAP + w / 2;
+  const behindRoom = dir > 0 ? hub.x - area.left : area.right - hub.x;
+  const back = count >= 3 && behindRoom >= near + w / 2 ? Math.floor(count / 3) : 0;
+  const front = count - back;
+  const top = area.top + h / 2;
+  const bottom = area.bottom - h / 2;
+
+  // Zigzag: alternate cards step further out, so neighbours never line up.
+  const step = Math.min(w * .55 + 30, Math.max(0, (dir > 0 ? area.right - hub.x : hub.x - area.left) - near - w / 2));
+  const outer = random() < .5 ? 0 : 1;
+  const frontYs = spread(front, top, bottom, hub.y - h * .8);
+  const cards = frontYs.map((y, index) =>
+    card(hub.x + dir * (near + ((index + outer) % 2) * step + jitter(12)), y + jitter(10)));
+
+  // Behind the hub: one card just above its level, or two either side of it.
+  const gap = h / 2 + Math.max(CARD_GAP, hub.r * .45);
+  const backYs = back === 1 ? [hub.y - h * .7] : [hub.y - gap, hub.y + gap];
+  backYs.slice(0, back).forEach((y) => cards.push(card(hub.x - dir * (near + jitter(10)), y + jitter(8))));
+  return cards;
 }
