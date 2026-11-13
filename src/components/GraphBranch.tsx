@@ -112,21 +112,21 @@ export default function GraphBranch({ node, onClose, revealBranch, onRevealCompl
         item.style.removeProperty('translate');
       });
 
-      // A spine runs straight down from the hub through the gap between the two
-      // columns; each child branches off it with a short bend into its inner side.
+      // Phones list the cards one under another. The line drops from the hub, turns into
+      // the gutter left of the cards, runs down it and bends into each card's left side.
       const source = category.getBoundingClientRect();
       const startX = source.left + source.width / 2 - bounds.left;
       const startY = source.top + hub.offsetHeight / 2 - bounds.top;
+      const first = items[0]?.getBoundingClientRect();
+      const cardLeft = (first?.left ?? 0) - bounds.left;
+      const gutter = cardLeft - 9;
+      const turnY = (first?.top ?? 0) - bounds.top - 14;
+      const r = 8;
       const curves = items.map((item) => {
         const rect = item.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2 - bounds.left;
-        const top = rect.top - bounds.top;
-        if (Math.abs(centerX - startX) < rect.width / 4) return `M ${startX} ${startY} V ${top}`;
-        const toward = centerX < startX ? -1 : 1;
-        const innerX = centerX - toward * rect.width / 2;
-        const centerY = top + rect.height / 2;
-        const bend = Math.max(0, Math.min(12, Math.abs(innerX - startX) / 2));
-        return `M ${startX} ${startY} V ${centerY - bend} Q ${startX} ${centerY} ${startX + toward * bend} ${centerY} H ${innerX}`;
+        const centerY = rect.top - bounds.top + rect.height / 2;
+        return `M ${startX} ${startY} V ${turnY - r} Q ${startX} ${turnY} ${startX - r} ${turnY} H ${gutter + r} `
+          + `Q ${gutter} ${turnY} ${gutter} ${turnY + r} V ${centerY - r} Q ${gutter} ${centerY} ${gutter + r} ${centerY} H ${cardLeft}`;
       });
       updatePaths(mobile, curves);
     }
