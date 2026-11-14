@@ -23,6 +23,17 @@
       "blurb": "Getting old video games running again.",
       "summary": "I like getting old video games running again through emulation. More here soon.",
       "draft": true
+    },
+    {
+      "title": "Europe Travel Map",
+      "blurb": "A map of the European countries I have visited.",
+      "summary": "A map of the European countries I have visited, with photos from each. Choose a highlighted country to see them.",
+      "links": [
+        {
+          "label": "Open the travel map",
+          "href": "/travel/"
+        }
+      ]
     }
   ]
 }

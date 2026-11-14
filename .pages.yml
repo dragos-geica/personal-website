@@ -448,3 +448,56 @@ content:
           - name: draft
             label: Work in progress (hidden from search engines)
             type: boolean
+  - name: travel
+    label: Europe travel map
+    type: file
+    path: src/content/travel.json
+    format: json
+    fields:
+      - name: title
+        label: Page title
+        type: string
+        required: true
+      - name: intro
+        label: Introduction
+        type: text
+      - name: countries
+        label: Countries (add photos under the country you want; countries without photos show "photos coming soon")
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{name}"
+          addable: false
+          deletable: false
+        fields:
+          - name: name
+            label: Country (do not change)
+            type: string
+          - name: code
+            label: Map code (do not change)
+            type: string
+          - name: place
+            label: Place to mention, e.g. Budapest (optional)
+            type: string
+          - name: folder
+            label: Photo folder (for reference)
+            type: string
+          - name: photos
+            label: Photos
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{caption}"
+            fields:
+              - name: src
+                label: Photo
+                type: image
+                required: true
+              - name: alt
+                label: Photo description (read aloud to blind visitors, optional)
+                type: string
+              - name: caption
+                label: Caption (optional)
+                type: string

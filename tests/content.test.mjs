@@ -64,3 +64,11 @@ test('items stay on the graph unless hidden', () => {
   const hidden = site.categories.projects.items.filter(({ hideFromGraph }) => hideFromGraph).map(({ title }) => title);
   assert.deepEqual(hidden, ['Global Economic Indicators', 'Data Visualizations', 'EcoCrafting']);
 });
+
+test('every travel photo exists, and each country has a photo folder', async () => {
+  const { default: travel } = await import('../src/content/travel.json', { with: { type: 'json' } });
+  for (const { name, folder, photos = [] } of travel.countries) {
+    assert.ok(existsSync(publicFile(folder)), `${name}: create public${folder}`);
+    for (const { src } of photos) assert.ok(existsSync(publicFile(src)), `${name}: ${src} is missing from public/`);
+  }
+});

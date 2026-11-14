@@ -1,0 +1,82 @@
+---
+// Europe travel map. Countries and photos come from src/content/travel.json (edit it at /admin).
+import SiteLayout from '../layouts/SiteLayout.astro';
+import travel from '../content/travel.json';
+import { site } from '../content/site';
+import { tidy } from '../content/site';
+
+const data = tidy(travel);
+---
+<SiteLayout title={`${data.title} — ${site.name}`} description={data.intro}>
+  <main id="main-content" class="section-page travel-page mx-auto" tabindex="-1">
+    <p class="section-eyebrow">{site.name}</p>
+    <h1>{data.title}</h1>
+    {data.intro && <p>{data.intro}</p>}
+
+    <div class="travel-map" id="travel-map" aria-label="Map of Europe with visited countries highlighted">
+      <p class="travel-map-fallback">The map needs JavaScript. Pick a country from the list below instead.</p>
+    </div>
+
+    <ul class="travel-chips" aria-label="Countries I have visited">
+      {data.countries.map(({ name, code }) => (
+        <li><button type="button" class="tag" data-code={code} aria-pressed="false">{name}</button></li>
+      ))}
+    </ul>
+
+    <section class="travel-panel" id="travel-panel" aria-live="polite">
+      <p class="travel-hint">Choose a highlighted country to see photos from there.</p>
+    </section>
+
+    <a class="back-link" href="/">← Back to the knowledge graph</a>
+  </main>
+
+  <dialog id="travel-lightbox" class="travel-lightbox" aria-label="Photo viewer">
+    <figure>
+      <img alt="" />
+      <figcaption></figcaption>
+    </figure>
+    <button type="button" class="tag lb-close" aria-label="Close photo">Close</button>
+    <button type="button" class="tag lb-prev" aria-label="Previous photo">←</button>
+    <button type="button" class="tag lb-next" aria-label="Next photo">→</button>
+  </dialog>
+
+  <script type="application/json" id="travel-data" set:html={JSON.stringify(data.countries)} />
+</SiteLayout>
+
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js" integrity="sha384-su5kReKyYlIFrI62mbQRKXHzFobMa7BHp1cK6julLPbnYcCW9NIZKJiTODjLPeDh" crossorigin="anonymous"></script>
+<script is:inline src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" crossorigin="anonymous"></script>
+
+<script>
+  import { initTravelMap } from '../scripts/travel-map';
+  document.addEventListener('astro:page-load', () => initTravelMap());
+</script>
+
+<style is:global>
+  .travel-page { max-width: 62rem; }
+  .travel-map { margin: 1.4rem 0 .8rem; border: 1px solid var(--border); border-radius: 14px; background: var(--node-shade); overflow: hidden; }
+  .travel-map svg { display: block; width: 100%; height: auto; }
+  .travel-map-fallback { padding: 1rem; }
+  .travel-map .land { fill: var(--node); stroke: var(--border); stroke-width: .6; }
+  .travel-map .visited { fill: var(--accent); stroke: var(--edge-active); stroke-width: 1; cursor: pointer; transition: fill .15s; }
+  .travel-map .visited:hover, .travel-map .visited:focus-visible { fill: color-mix(in srgb, var(--edge-active) 55%, var(--accent)); }
+  .travel-map .visited.selected { fill: var(--edge-active); }
+  .travel-map .visited:focus { outline: none; }
+  .travel-map .visited:focus-visible { stroke: var(--focus); stroke-width: 2.5; }
+  .travel-chips { display: flex; flex-wrap: wrap; gap: .45rem; list-style: none; padding: 0; margin: 0 0 1.2rem; }
+  .travel-chips .tag[aria-pressed="true"] { background: var(--edge-active); color: var(--paper); }
+  .travel-panel h2 { margin-top: .4rem; }
+  .travel-soon { padding: 1.2rem; border: 1px dashed var(--border); border-radius: 12px; }
+  .travel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .7rem; list-style: none; padding: 0; margin: .8rem 0 0; }
+  .travel-grid button { display: block; width: 100%; padding: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--node); cursor: pointer; }
+  .travel-grid img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .travel-grid button:focus-visible, .lb-close:focus-visible, .lb-prev:focus-visible, .lb-next:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .travel-lightbox { border: 0; padding: 0; background: transparent; max-width: 100vw; max-height: 100vh; width: 100vw; height: 100dvh; color: #fff; }
+  .travel-lightbox::backdrop { background: #000d; }
+  .travel-lightbox figure { margin: 0; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem; padding: 3.5rem 1rem 1rem; }
+  .travel-lightbox img { max-width: 100%; max-height: calc(100dvh - 8rem); object-fit: contain; }
+  .travel-lightbox figcaption { color: #e6e9ee; text-align: center; min-height: 1.4em; }
+  .lb-close, .lb-prev, .lb-next { position: fixed; background: var(--node); color: var(--ink); }
+  .lb-close { top: .8rem; right: .8rem; }
+  .lb-prev, .lb-next { top: 50%; transform: translateY(-50%); }
+  .lb-prev { left: .6rem; } .lb-next { right: .6rem; }
+</style>
