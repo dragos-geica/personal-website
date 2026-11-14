@@ -1,0 +1,97 @@
+{
+  "title": "Places I've been in Europe",
+  "intro": "Countries I have visited, from short trips to the backpacking trip last summer. Choose a highlighted country to see photos from there.",
+  "countries": [
+    {
+      "name": "United Kingdom",
+      "code": "826",
+      "place": "",
+      "folder": "/images/travel/united-kingdom/",
+      "photos": []
+    },
+    {
+      "name": "France",
+      "code": "250",
+      "place": "",
+      "folder": "/images/travel/france/",
+      "photos": []
+    },
+    {
+      "name": "Germany",
+      "code": "276",
+      "place": "",
+      "folder": "/images/travel/germany/",
+      "photos": []
+    },
+    {
+      "name": "Italy",
+      "code": "380",
+      "place": "",
+      "folder": "/images/travel/italy/",
+      "photos": []
+    },
+    {
+      "name": "Switzerland",
+      "code": "756",
+      "place": "",
+      "folder": "/images/travel/switzerland/",
+      "photos": []
+    },
+    {
+      "name": "Czech Republic",
+      "code": "203",
+      "place": "",
+      "folder": "/images/travel/czech-republic/",
+      "photos": []
+    },
+    {
+      "name": "Serbia",
+      "code": "688",
+      "place": "",
+      "folder": "/images/travel/serbia/",
+      "photos": []
+    },
+    {
+      "name": "Montenegro",
+      "code": "499",
+      "place": "",
+      "folder": "/images/travel/montenegro/",
+      "photos": []
+    },
+    {
+      "name": "Croatia",
+      "code": "191",
+      "place": "",
+      "folder": "/images/travel/croatia/",
+      "photos": []
+    },
+    {
+      "name": "Bosnia and Herzegovina",
+      "code": "070",
+      "place": "",
+      "folder": "/images/travel/bosnia-and-herzegovina/",
+      "photos": []
+    },
+    {
+      "name": "Moldova",
+      "code": "498",
+      "place": "",
+      "folder": "/images/travel/moldova/",
+      "photos": []
+    },
+    {
+      "name": "Hungary",
+      "code": "348",
+      "place": "Budapest",
+      "folder": "/images/travel/hungary/",
+      "photos": []
+    },
+    {
+      "name": "Netherlands",
+      "code": "528",
+      "place": "",
+      "folder": "/images/travel/netherlands/",
+      "photos": []
+    }
+  ]
+}
