@@ -13,8 +13,21 @@ const links = [
   { label: site.pages.research.title, href: '/research/' },
   { label: site.pages.cv.title, href: '/cv/' },
 ];
+const plainName = site.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const description = `${plainName} (${site.name}): ${site.intro}`;
+// Helps search engines connect the site to the person, including the spelling without accents.
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  ...(plainName !== site.name && { alternateName: plainName }),
+  url: Astro.site?.href,
+  description: site.intro,
+  alumniOf: 'Wesleyan University',
+};
 ---
-<SiteLayout title={`${site.name} — ${site.tagline}`}>
+<SiteLayout title={`${site.name} — ${site.tagline}`} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify(person)} slot="head" />
   <main id="main-content" class="home-scene" tabindex="-1" aria-labelledby="home-title">
     <header class="home-intro">
       <h1 id="home-title">
